@@ -36,91 +36,144 @@
 
       @media (min-width: 768px) {
         .bd-placeholder-img-lg {
-          font-size: 3.5rem;
+          font-size: 3.5.rem;
         }
       }
+
     </style>
+
     <!-- Custom styles for this template -->
+
     <link href="form-validation.css" rel="stylesheet">
   </head>
   <body class="bg-light">
     <div class="container">
-  <div class="py-5 text-center">
-    <img class="d-block mx-auto mb-4" src="/docs/4.5/assets/brand/bootstrap-solid.svg" alt="" width="72" height="72">
-    <h1><b> Welcome John,</b></h1>
-  </div>
+        <div class="py-5 text-center">
+            <img class="d-block mx-auto mb-4" src="/docs/4.5/assets/brand/bootstrap-solid.svg" alt="" width="72" height="72">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <a href="url">
+                        <button class="btn btn-primary btn-lg btn-block" class="form-control" type="submit" data-inline="true">Reports</button>
+                    </a>
+                </div>
 
-  <div class="row">
-    <div class="col-md-4 order-md-2 mb-4">
-      <h4 class="d-flex justify-content-between align-items-center mb-3">
-    </div>
+                <div class="col-md-4 mb-3">
+                    <a href="url">
+                        <button class="btn btn-primary btn-lg btn-block" class="form-control" type="submit" data-inline="true">Print History</button>
+                    </a>
+                </div>
 
-    <div class="col-md-12 order-md-1">
-        <a href="customer-new-job.html">
-          <button class="btn btn-primary btn-lg btn-block" type="submit">Create New Print Job</button>
-        </a>
-        <hr class="mb-12">
-
-        <h2>Print Job Status</h2>
+                <div class="col-md-4 mb-3">
+                    <a href="url">
+                        <button class="btn btn-primary btn-lg btn-block" class="form-control" type="submit" data-inline="true">Manage Printers</button>
+                    </a>
+                </div>
+        
+            <div class="container">
+          <div class="py-5 text-left">
+            <h2>Not Priced</h2>
+            <div class="py-3"></div>
       <div class="table-responsive">
         <table class="table table-striped table-md">
           <thead>
             <tr>
-              <th>Date</th>
+              <th>Username</th>
               <th>Name</th>
-              <th>Status</th>
+              <th>Date</th>
             </tr>
           </thead>
           <tbody>
             <tr>
+              <td>john</td>
+              <td>Velociraptor</td>
               <td>May 7</td>
-                <td>Velociraptor</td>
-              <td>Pending Quote</td>
             </tr>
             <tr>
-              <td>May 5</td>
-              <td>Bones</td>
-              <td>Pending Quote</td>
+              <td>hmccue</td>
+              <td>Trex Skeleton</td>
+              <td>May 8</td>
             </tr>
+          </tbody>
+        </table>
+
+            <h2>Pending Payment</h2>
+            <div class="py-3"></div>
+      <div class="table-responsive">
+        <table class="table table-striped table-md">
+          <tbody>
             <tr>
-              <td>May 4</td>
-              <td>Cookie Cutter</td>
-              <td>Pending Payment</td>
-            </tr>
-            <tr>
-              <td>April 30</td>
-              <td>Sandwich Cutter</td>
-              <td>Pending Payment</td>
-            </tr>
-            <tr>
-              <td>April 27</td>
-              <td>Sheep Skull</td>
-              <td>Queued to Print</td>
-            </tr>
-            <tr>
-              <td>April 24</td>
-              <td>Ostrich Egg</td>
-              <td>Ready for Pickup</td>
-            </tr>
-            <tr>
-              <td>April 20</td>
+              <td>rymccue</td>
               <td>Screw</td>
-              <td>Ready for Pickup</td>
+              <td>May 4</td>
             </tr>
             <tr>
-              <td>April 19</td>
+              <td>rymccue</td>
+              <td>Sandwich Cutter</td>
+              <td>May 4</td>
+            </tr>
+            <tr>
+              <td>emmccue</td>
+              <td>Sandwich Cutter</td>
+              <td>May 5</td>
+            </tr>
+            <tr>
+              <td>hmccue</td>
+              <td>Apple</td>
+              <td>May 6</td>
+            </tr>
+          </tbody>
+        </table>
+
+            <h2>Ready to Print</h2>
+            <div class="py-3"></div>
+      <div class="table-responsive">
+        <table class="table table-striped table-md">
+          <tbody>
+            <tr>
+              <td>emmccue</td>
+              <td>Sheep Skull</td>
+              <td>May 3</td>
+            </tr>
+          </tbody>
+        </table>
+
+            <h2>Printing</h2>
+            <div class="py-3"></div>
+      <div class="table-responsive">
+        <table class="table table-striped table-md">
+          <tbody>
+            <tr>
+              <td>jmccue</td>
+              <td>Ostrich Egg</td>
+              <td>May 2</td>
+            </tr>
+            <tr>
+              <td>mattmccue</td>
+              <td>Screw</td>
+              <td>May 2</td>
+            </tr>
+          </tbody>
+        </table>
+
+            <h2>Complete</h2>
+            <div class="py-3"></div>
+      <div class="table-responsive">
+        <table class="table table-striped table-md">
+         <tbody>        
+            <tr>
+              <td>geraldf</td>
               <td>Screwdriver</td>
-              <td>Order Fulfilled</td>
+              <td>April 29</td>
             </tr>
             <tr>
-              <td>April 17</td>
+              <td>bobgeo</td>
               <td>Plant Fossil</td>
-              <td>Order Fulfilled</td>
+              <td>April 27</td>
             </tr>
             <tr>
-              <td>April 2</td>
+              <td>candiceaw</td>
               <td>Bagel</td>
-              <td>Order Fulfilled</td>
+              <td>April 24</td>
             </tr>
           </tbody>
         </table>
