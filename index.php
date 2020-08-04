@@ -1,4 +1,23 @@
 <?php
+require ('db.php');
+$stm = $conn->query("SELECT VERSION()");
+$version = $stm->fetch();
+#echo $version;
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  $stmt = $conn->prepare("INSERT INTO table (netlink_id, job_name, model_name, infill, scale, layer_height, supports, copies, material_type, comments, status) VALUES (:netlink_id, :job_name, :model_name, :infill, :scale, :layer_height, :supports, :copies, :material_type, :comments, :status)");
+  $stmt->bindParam(':netlink_id', "rmccue");
+  $stmt->bindParam(':job_name', $_POST["job_name"]);
+  $stmt->bindParam(':model_name', "test.stl");
+  $stmt->bindParam(':infill', intval($_POST["infill"]), PDO::PARAM_INT);
+  $stmt->bindParam(':scale', intval($_POST["scale"]), PDO::PARAM_INT);
+  $stmt->bindParam(':layer_height', $_POST["layer_height"], PDO::PARAM_STR);
+  $stmt->bindParam(':supports', intval($_POST["supports"]), PDO::PARAM_INT);
+  $stmt->bindParam(':copies', intval($_POST["copies"]), PDO::PARAM_INT);
+  $stmt->bindParam(':material_type', $_POST["material_type"]);
+  $stmt->bindParam(':comments', $_POST["comments"]);
+  $stmt->bindParam(':status', "not_priced");
+  $stmt->execute();
+}
 ?>
 
 
@@ -49,6 +68,7 @@
   </head>
   <body class="bg-light">
     <div class="container">
+        <form method="POST">
   <div class="py-5 text-center">
     <img class="d-block mx-auto mb-4" src="/docs/4.5/assets/brand/bootstrap-solid.svg" alt="" width="72" height="72">
     <h1>New Print Job</h1>
@@ -56,10 +76,9 @@
 
     <div class="col-md-12 order-md-1">
         <h3 class="mb-3">Print Job Name</h3>
-        <form class="needs-validation" novalidate>
           <div class="row">
             <div class="col-md-12 mb-3">
-              <input type="text" class="form-control" id="printJobName" placeholder="" value="" required>
+              <input type="text" class="form-control" name="job_name" id="printJobName" placeholder="" value="" required>
               <div class="invalid-feedback">
                 Valid print job name is required.
               </div>
@@ -70,22 +89,19 @@
 
     <h3 class="mb-3">Upload 3D Model</h3>
     <small class="text-muted">(Max 200MB)</small>
-    <form action="/action_page.php">
         <input type="file" id="myFile" name="filename">
-      </form>
       <br>
       <hr class="mb-6">
 
 
     <div class="col-md-12 order-md-1">
       <h3 class="mb-3">Specifications</h3>
-      <form class="needs-validation" novalidate>
         <div class="row">
             <div class="col-md-3 mb-3">
                 <label for="username">Infill</label>
                 <div class="input-group">
                   <div class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="100" aria-label="100" aria-describedby="basic-addon2">
+                    <input type="text" class="form-control" name="infill" placeholder="100" aria-label="100" aria-describedby="basic-addon2">
                     <div class="input-group-append">
                     <span class="input-group-text" id="basic-addon2">%</span>
                     </div>
@@ -99,7 +115,7 @@
                 <label for="username">Scale</label>
                 <div class="input-group">
                 <div class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="100" aria-label="100" aria-describedby="basic-addon2">
+                    <input type="text" class="form-control" name="scale" placeholder="100" aria-label="100" aria-describedby="basic-addon2">
                     <div class="input-group-append">
                         <span class="input-group-text" id="basic-addon2">%</span>
                     </div>
@@ -114,7 +130,7 @@
         <div class="row">
           <div class="col-md-3 mb-3">
             <label for="layer-height">Layer Height</label>
-            <select class="custom-select d-block w-100" id="layer-height" required>
+            <select class="custom-select d-block w-100" name="layer_height" id="layer-height" required>
               <option value="">0.2</option>
               <option>0.1</option>
               <option>0.15</option>
@@ -127,7 +143,7 @@
           </div>
           <div class="col-md-3 mb-3">
             <label for="supports">Supports</label>
-            <select class="custom-select d-block w-100" id="supports" required>
+            <select class="custom-select d-block w-100" name="supports" id="supports" required>
               <option value="">Yes</option>
               <option>No</option>
             </select>
@@ -141,7 +157,7 @@
         <hr class="mb-4">
           <div class="col-md-3 mb-3">
             <label for="supports">Copies</label>
-            <select class="custom-select d-block w-100" id="supports" required>
+            <select class="custom-select d-block w-100" name="copies" id="supports" required>
               <option value="">1</option>
               <option>2</option>
               <option>3</option>
@@ -163,19 +179,19 @@
         <h3 class="mb-2">Material Type</h3>
         <div class="d-block my-3">
           <div class="custom-control custom-radio">
-            <input id="pla" name="materialType" type="radio" class="custom-control-input" checked required>
+            <input id="pla" name="material_type" type="radio" class="custom-control-input" checked required>
             <label class="custom-control-label" for="pla">PLA</label>
           </div>
           <div class="custom-control custom-radio">
-            <input id="pla-pva" name="materialType" type="radio" class="custom-control-input" required>
+            <input id="pla-pva" name="material_type" type="radio" class="custom-control-input" required>
             <label class="custom-control-label" for="pla-pva">PLA + PVA</label>
           </div>
           <div class="custom-control custom-radio">
-            <input id="tpu95" name="materialType" type="radio" class="custom-control-input" required>
+            <input id="tpu95" name="material_type" type="radio" class="custom-control-input" required>
             <label class="custom-control-label" for="tpu95">TPU95</label>
           </div>
           <div class="custom-control custom-radio">
-            <input id="other" name="materialType" type="radio" class="custom-control-input" required>
+            <input id="other" name="material_type" type="radio" class="custom-control-input" required>
             <label class="custom-control-label" for="other">Other</label>
             <small class="text-muted"> - Elaborate in Additional Comments section</small>
           </div>
@@ -184,7 +200,7 @@
         <hr class="mb-4">
         <h3 class="mb-2">Additional Comments</h3>
             <div class="input-group">
-                <textarea class="form-control" aria-label="additional-comments"></textarea>
+                <textarea class="form-control" name="comments" aria-label="additional-comments"></textarea>
             </div>
             <div class="invalid-feedback">
             Please enter additional comments.
@@ -194,11 +210,11 @@
         <hr class="mb-4">
         <center>
             <a href="customer-dashboard.html">
-                <button type="button" class="btn btn-primary btn-lg" type="submit">Submit Print Job</button>
+                <button class="btn btn-primary btn-lg" type="submit">Submit Print Job</button>
             </a>
         </center>
-      </form>
     </div>
+    </form>
   </div>
 
   <p></p>
