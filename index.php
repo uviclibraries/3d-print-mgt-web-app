@@ -1,13 +1,18 @@
 <?php
 require ('db.php');
 $stm = $conn->query("SELECT VERSION()");
-$version = $stm->fetch();
+#$version = $stm->fetch();
 #echo $version;
+
+$netlink_id = "rmccue"; # Temporary 4 testing. Netlink ID will eventually be passed from login form. 
+$model_name = "test.stl"; # Temporary 4 testing...
+$status = "not_priced";
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $stmt = $conn->prepare("INSERT INTO table (netlink_id, job_name, model_name, infill, scale, layer_height, supports, copies, material_type, comments, status) VALUES (:netlink_id, :job_name, :model_name, :infill, :scale, :layer_height, :supports, :copies, :material_type, :comments, :status)");
-  $stmt->bindParam(':netlink_id', "rmccue");
+  $stmt->bindParam(':netlink_id', $netlink_id);
   $stmt->bindParam(':job_name', $_POST["job_name"]);
-  $stmt->bindParam(':model_name', "test.stl");
+  $stmt->bindParam(':model_name', $model_name);
   $stmt->bindParam(':infill', intval($_POST["infill"]), PDO::PARAM_INT);
   $stmt->bindParam(':scale', intval($_POST["scale"]), PDO::PARAM_INT);
   $stmt->bindParam(':layer_height', $_POST["layer_height"], PDO::PARAM_STR);
@@ -15,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $stmt->bindParam(':copies', intval($_POST["copies"]), PDO::PARAM_INT);
   $stmt->bindParam(':material_type', $_POST["material_type"]);
   $stmt->bindParam(':comments', $_POST["comments"]);
-  $stmt->bindParam(':status', "not_priced");
+  $stmt->bindParam(':status', $status);
   $stmt->execute();
 }
 ?>
