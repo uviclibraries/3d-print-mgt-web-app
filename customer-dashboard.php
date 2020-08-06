@@ -1,3 +1,8 @@
+<?php
+require ('db.php');
+$stm = $conn->query("SELECT id, job_name, status, submission_date FROM print_job");
+$data = $stm->fetchAll();
+?>
 <!doctype html>
 <html lang="en">
   <head>
@@ -72,56 +77,17 @@
             </tr>
           </thead>
           <tbody>
+            <?php
+            foreach($data as $row){
+            ?>
             <tr>
-              <td>May 7</td>
-                <td><a href="customer-job-information.html">Velociraptor</a></td>
-              <td>Pending Quote</td>
+              <td><?php echo $row["submission_date"]; ?></td>
+                <td><a href="customer-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+              <td><?php echo $row["status"]; ?></td>
             </tr>
-            <tr>
-              <td>May 5</td>
-              <td>Bones</td>
-              <td>Pending Quote</td>
-            </tr>
-            <tr>
-              <td>May 4</td>
-              <td>Cookie Cutter</td>
-              <td>Pending Payment</td>
-            </tr>
-            <tr>
-              <td>April 30</td>
-              <td>Sandwich Cutter</td>
-              <td>Pending Payment</td>
-            </tr>
-            <tr>
-              <td>April 27</td>
-              <td>Sheep Skull</td>
-              <td>Queued to Print</td>
-            </tr>
-            <tr>
-              <td>April 24</td>
-              <td>Ostrich Egg</td>
-              <td>Ready for Pickup</td>
-            </tr>
-            <tr>
-              <td>April 20</td>
-              <td>Screw</td>
-              <td>Ready for Pickup</td>
-            </tr>
-            <tr>
-              <td>April 19</td>
-              <td>Screwdriver</td>
-              <td>Order Fulfilled</td>
-            </tr>
-            <tr>
-              <td>April 17</td>
-              <td>Plant Fossil</td>
-              <td>Order Fulfilled</td>
-            </tr>
-            <tr>
-              <td>April 2</td>
-              <td>Bagel</td>
-              <td>Order Fulfilled</td>
-            </tr>
+            <?php
+            }
+            ?>
           </tbody>
         </table>
       </div>
