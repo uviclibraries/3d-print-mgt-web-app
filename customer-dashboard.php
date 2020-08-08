@@ -61,7 +61,7 @@ $data = $stm->fetchAll();
     </div>
 
     <div class="col-md-12 order-md-1">
-        <a href="customer-new-job.html">
+        <a href="customer-new-job.php">
           <button class="btn btn-primary btn-lg btn-block" type="submit">Create New Print Job</button>
         </a>
         <hr class="mb-12">
