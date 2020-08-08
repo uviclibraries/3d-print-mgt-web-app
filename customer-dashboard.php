@@ -1,6 +1,6 @@
 <?php
 require ('db.php');
-$stm = $conn->query("SELECT id, job_name, status, submission_date FROM print_job");
+$stm = $conn->query("SELECT id, job_name, status, submission_date FROM print_job ORDER BY id DESC");
 $data = $stm->fetchAll();
 ?>
 <!doctype html>

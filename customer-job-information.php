@@ -1,3 +1,10 @@
+<?php
+require ('db.php');
+$stm = $conn->prepare("SELECT * FROM print_job WHERE id=?");
+$stm->execute([$_GET["job_id"]]);
+$job=$stm->fetch();
+?>
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -55,7 +62,7 @@
         <form class="needs-validation" novalidate>
           <div class="row">
             <div class="col-md-12 mb-3">
-              <input type="text" class="form-control" id="printJobName" placeholder="Velociraptor" value="" required readonly>
+              <input type="text" class="form-control" id="printJobName" placeholder="Velociraptor" value="<?php echo $job["job_name"]; ?>" required readonly>
               <div class="invalid-feedback">
                 Valid print job name is required.
               </div>
@@ -79,7 +86,7 @@
                 <label for="username">Infill</label>
                 <div class="input-group">
                   <div class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="100" aria-label="100" aria-describedby="basic-addon2" readonly>
+                    <input type="text" class="form-control" placeholder="100" value="<?php echo $job["infill"]; ?>" aria-label="100" aria-describedby="basic-addon2" readonly>
                     <div class="input-group-append">
                     <span class="input-group-text" id="basic-addon2">%</span>
                     </div>
@@ -93,7 +100,7 @@
                 <label for="username">Scale</label>
                 <div class="input-group">
                 <div class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="100" aria-label="100" aria-describedby="basic-addon2" readonly>
+                    <input type="text" class="form-control" placeholder="100" value="<?php echo $job["scale"]; ?>" aria-label="100" aria-describedby="basic-addon2" readonly>
                     <div class="input-group-append">
                         <span class="input-group-text" id="basic-addon2">%</span>
                     </div>
@@ -106,65 +113,44 @@
         </div>
 
         <div class="row">
-          <div class="col-md-3 mb-3">
-            <label for="layer-height">Layer Height</label>
-            <select class="custom-select d-block w-100" id="layer-height" disabled>
-              <option value="">0.2</option>
-              <option>0.1</option>
-              <option>0.15</option>
-              <option>0.3</option>
-              <option>0.6</option>
-            </select>
-          </div>
-          <div class="col-md-3 mb-3">
-            <label for="supports">Supports</label>
-            <select class="custom-select d-block w-100" id="supports" disabled>
-              <option value="">Yes</option>
-              <option>No</option>
-            </select>
-          </div>
+
+        <div class="col-md-3 mb-3">
+                <label for="username">Layer Height</label>
+                <div class="input-group">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="100" value="<?php echo $job["layer_height"]; ?>" aria-label="100" aria-describedby="basic-addon2" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 mb-3">
+                <label for="username">Supports</label>
+                <div class="input-group">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="100" value="<?php if ($job["supports"]==1) {echo "Yes";} else {echo "No";} ?>" aria-label="100" aria-describedby="basic-addon2" readonly>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div>
-        <hr class="mb-4">
-          <div class="col-md-3 mb-3">
-            <label for="supports">Copies</label>
-            <select class="custom-select d-block w-100" id="supports" disabled>
-              <option value="">1</option>
-              <option>2</option>
-              <option>3</option>
-              <option>4</option>
-              <option>5</option>
-              <option>6</option>
-              <option>7</option>
-              <option>8</option>
-              <option>9</option>
-              <option>10</option>
-            </select>
-          </div>
-        </div>
+        <div class="col-md-3 mb-3">
+                <label for="username">Copies</label>
+                <div class="input-group">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="100" value="<?php echo $job["copies"]; ?>" aria-label="100" aria-describedby="basic-addon2" readonly>
+                    </div>
+                </div>
+            </div>
 
-        <hr class="mb-4">
-        <h5 class="mb-2">Material Type</h5>
-        <div class="d-block my-3">
-          <div class="custom-control custom-radio">
-            <input id="pla" name="materialType" type="radio" class="custom-control-input" checked required disabled>
-            <label class="custom-control-label" for="pla">PLA</label>
-          </div>
-          <div class="custom-control custom-radio">
-            <input id="pla-pva" name="materialType" type="radio" class="custom-control-input" required disabled>
-            <label class="custom-control-label" for="pla-pva">PLA + PVA</label>
-          </div>
-          <div class="custom-control custom-radio">
-            <input id="tpu95" name="materialType" type="radio" class="custom-control-input" required disabled>
-            <label class="custom-control-label" for="tpu95">TPU95</label>
-          </div>
-          <div class="custom-control custom-radio">
-            <input id="other" name="materialType" type="radio" class="custom-control-input" required disabled>
-            <label class="custom-control-label" for="other">Other</label>
-            <small class="text-muted"> - Elaborate in Additional Comments section</small>
-          </div>
-        </div>
+            <hr class="mb-4">
+            <div class="col-md-3 mb-3">
+                <label for="username">Material Type</label>
+                <div class="input-group">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="100" value="<?php echo $job["material_type"]; ?>" aria-label="100" aria-describedby="basic-addon2" readonly>
+                    </div>
+                </div>
+            </div>
 
         <hr class="mb-4">
         <h5 class="mb-2">Additional Comments</h5>
@@ -178,7 +164,7 @@
         
         <hr class="mb-4">
         <center>
-            <a href="customer-dashboard.html">
+            <a href="customer-dashboard.php">
                 <button type="button" class="btn btn-primary btn-lg" type="submit">Back to Dashboard</button>
             </a>
         </center>

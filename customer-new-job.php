@@ -151,8 +151,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <div class="col-md-3 mb-3">
             <label for="supports">Supports</label>
             <select class="custom-select d-block w-100" name="supports" id="supports" required>
-              <option>Yes</option>
-              <option>No</option>
+              <option value="1">Yes</option>
+              <option value="0">No</option>
             </select>
             <div class="invalid-feedback">
               Please provide a valid response.
@@ -186,19 +186,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h3 class="mb-2">Material Type</h3>
         <div class="d-block my-3">
           <div class="custom-control custom-radio">
-            <input id="pla" name="material_type" type="radio" class="custom-control-input" checked required>
+            <input id="pla" name="material_type" value="PLA" type="radio" class="custom-control-input" checked required>
             <label class="custom-control-label" for="pla">PLA</label>
           </div>
           <div class="custom-control custom-radio">
-            <input id="pla-pva" name="material_type" type="radio" class="custom-control-input" required>
+            <input id="pla-pva" name="material_type" value="PLA + PVA" type="radio" class="custom-control-input" required>
             <label class="custom-control-label" for="pla-pva">PLA + PVA</label>
           </div>
           <div class="custom-control custom-radio">
-            <input id="tpu95" name="material_type" type="radio" class="custom-control-input" required>
+            <input id="tpu95" name="material_type" value="TPU95" type="radio" class="custom-control-input" required>
             <label class="custom-control-label" for="tpu95">TPU95</label>
           </div>
           <div class="custom-control custom-radio">
-            <input id="other" name="material_type" type="radio" class="custom-control-input" required>
+            <input id="other" name="material_type" value="Other" type="radio" class="custom-control-input" required>
             <label class="custom-control-label" for="other">Other</label>
             <small class="text-muted"> - Elaborate in Additional Comments section</small>
           </div>

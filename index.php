@@ -91,7 +91,7 @@ body {
   <img class="mb-4" src="/docs/4.5/assets/brand/bootstrap-solid.svg" alt="" width="72" height="72">
   <h1 class="h3 mb-3 font-weight-normal">DSC 3D Print sign in</h1>
 
-  <a class="btn btn-primary btn-lg btn-block" href="customer-dashboard.html" role="button">Sign In</a>
+  <a class="btn btn-primary btn-lg btn-block" href="customer-dashboard.php" role="button">Sign In</a>
 
   <p class="mt-5 mb-3 text-muted">&copy; 2020</p>
 </form>
