@@ -108,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <label for="username">Infill</label>
                 <div class="input-group">
                   <div class="input-group mb-3">
-                    <input type="number" max="100" min="0" class="form-control" name="infill" value="100" aria-label="100" aria-describedby="basic-addon2">
+                    <input type="number" max="100" min="0" class="form-control" name="infill" value="10" aria-label="100" aria-describedby="basic-addon2">
                     <div class="input-group-append">
                     <span class="input-group-text" id="basic-addon2">%</span>
                     </div>
