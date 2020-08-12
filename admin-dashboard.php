@@ -1,3 +1,30 @@
+<?php
+require ('db.php');
+$stm = $conn->query("SELECT id, job_name, netlink_id, status, submission_date, priced_date, pending_pmt_date, ready_to_prnt_date, printing_date, complete_date FROM print_job ORDER BY id DESC");
+$jobs = $stm->fetchAll();
+#
+$not_priced = [];
+$pending_payment = [];
+$ready_to_print = [];
+$printing = [];
+$complete = [];
+
+foreach ($jobs as $job) {
+  if ($job["status"] == "not_priced"){
+    $not_priced[] = $job;
+  } else if ($job["status"] == "pending_payment"){
+    $pending_payment[] = $job;
+  } else if ($job["status"] == "ready_to_print"){
+    $ready_to_print[] = $job;
+  } else if ($job["status"] == "printing"){
+    $printing[] = $job;
+  } else if ($job["status"] == "complete"){
+    $complete[] = $job;
+  }
+  # code...
+}
+?>
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -83,16 +110,17 @@
             </tr>
           </thead>
           <tbody>
+          <?php
+            foreach($not_priced as $row){
+            ?>
             <tr>
-              <td>john</td>
-              <td><a href="admin-job-specification.html">Velociraptor</a></td>
-              <td>May 7</td>
+              <td><?php echo $row["netlink_id"]; ?></td>
+                <td><a href="admin-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+              <td><?php echo $row["submission_date"]; ?></td>
             </tr>
-            <tr>
-              <td>hmccue</td>
-              <td>Trex Skeleton</td>
-              <td>May 8</td>
-            </tr>
+            <?php
+            }
+            ?>
           </tbody>
         </table>
 
@@ -101,26 +129,18 @@
       <div class="table-responsive">
         <table class="table table-striped table-md">
           <tbody>
+
+          <?php
+            foreach($pending_payment as $row){
+            ?>
             <tr>
-              <td>rymccue</td>
-              <td>Screw</td>
-              <td>May 4</td>
+              <td><?php echo $row["netlink_id"]; ?></td>
+                <td><a href="admin-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+              <td><?php echo $row["priced_date"]; ?></td>
             </tr>
-            <tr>
-              <td>rymccue</td>
-              <td>Sandwich Cutter</td>
-              <td>May 4</td>
-            </tr>
-            <tr>
-              <td>emmccue</td>
-              <td>Sandwich Cutter</td>
-              <td>May 5</td>
-            </tr>
-            <tr>
-              <td>hmccue</td>
-              <td>Apple</td>
-              <td>May 6</td>
-            </tr>
+            <?php
+            }
+            ?>
           </tbody>
         </table>
 
@@ -129,11 +149,17 @@
       <div class="table-responsive">
         <table class="table table-striped table-md">
           <tbody>
+          <?php
+            foreach($ready_to_print as $row){
+            ?>
             <tr>
-              <td>emmccue</td>
-              <td>Sheep Skull</td>
-              <td>May 3</td>
+              <td><?php echo $row["netlink_id"]; ?></td>
+                <td><a href="admin-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+              <td><?php echo $row["ready_to_prnt_date"]; ?></td>
             </tr>
+            <?php
+            }
+            ?>
           </tbody>
         </table>
 
@@ -142,16 +168,17 @@
       <div class="table-responsive">
         <table class="table table-striped table-md">
           <tbody>
+          <?php
+            foreach($printing as $row){
+            ?>
             <tr>
-              <td>jmccue</td>
-              <td>Ostrich Egg</td>
-              <td>May 2</td>
+              <td><?php echo $row["netlink_id"]; ?></td>
+                <td><a href="admin-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+              <td><?php echo $row["printing_date"]; ?></td>
             </tr>
-            <tr>
-              <td>mattmccue</td>
-              <td>Screw</td>
-              <td>May 2</td>
-            </tr>
+            <?php
+            }
+            ?>
           </tbody>
         </table>
 
@@ -159,22 +186,18 @@
             <div class="py-3"></div>
       <div class="table-responsive">
         <table class="table table-striped table-md">
-         <tbody>        
+         <tbody>
+          <?php
+            foreach($complete as $row){
+            ?>
             <tr>
-              <td>geraldf</td>
-              <td>Screwdriver</td>
-              <td>April 29</td>
+              <td><?php echo $row["netlink_id"]; ?></td>
+                <td><a href="admin-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+              <td><?php echo $row["complete_date"]; ?></td>
             </tr>
-            <tr>
-              <td>bobgeo</td>
-              <td>Plant Fossil</td>
-              <td>April 27</td>
-            </tr>
-            <tr>
-              <td>candiceaw</td>
-              <td>Bagel</td>
-              <td>April 24</td>
-            </tr>
+            <?php
+            }        
+            ?>
           </tbody>
         </table>
       </div>
