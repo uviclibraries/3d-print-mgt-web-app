@@ -1,3 +1,28 @@
+<?php
+require ('db.php');
+$stm = $conn->prepare("SELECT * FROM print_job WHERE id=?");
+$stm->execute([$_GET["job_id"]]);
+$job=$stm->fetch();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  $stmt = $conn->prepare("UPDATE print_job SET price = :price, infill = :infill, scale = :scale, layer_height = :layer_height, supports = :supports, copies = :copies, material_type = :material_type, staff_notes = :staff_notes WHERE id = :job_id;
+  ");
+  $stmt->bindParam(':job_id', $_POST["job_id"]);
+  $stmt->bindParam(':price', intval($_POST["price"]), PDO::PARAM_INT);
+  $stmt->bindParam(':infill', intval($_POST["infill"]), PDO::PARAM_INT);
+  $stmt->bindParam(':scale', intval($_POST["scale"]), PDO::PARAM_INT);
+  $stmt->bindParam(':layer_height', $_POST["layer_height"], PDO::PARAM_STR);
+  $stmt->bindParam(':supports', intval($_POST["supports"]), PDO::PARAM_INT);
+  $stmt->bindParam(':copies', intval($_POST["copies"]), PDO::PARAM_INT);
+  $stmt->bindParam(':material_type', $_POST["material_type"]);
+  $stmt->bindParam(':staff_notes', $_POST["staff_notes"]);
+  $stmt->bindParam(':status', $status);
+  $stmt->execute();
+
+  header("location: customer-dashboard.php");
+}
+?>
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -47,7 +72,7 @@
     <div class="container">
   <div class="py-5 text-center">
     <img class="d-block mx-auto mb-4" src="/docs/4.5/assets/brand/bootstrap-solid.svg" alt="" width="72" height="72">
-    <h1>Velociraptor</h1>
+    <h1><?php echo $job["job_name"]; ?></h1>
     </div>
     
     <div class="col-md-12 order-md-1">
@@ -56,11 +81,11 @@
           <div class="row">
             <div class="col-md-3 mb-3">
                 <select class="custom-select d-block w-100" id="layer-height">
-                  <option value="">Not Priced</option>
-                  <option>Pending Payment</option>
-                  <option>Ready to Print</option>
-                  <option>Printing</option>
-                  <option>Complete</option>
+                  <option <?php if ($job["status"]== "not_priced"){echo "selected";} ?>>Not Priced</option>
+                  <option <?php if ($job["status"]== "pending_payment"){echo "selected";} ?>>Pending Payment</option>
+                  <option <?php if ($job["status"]== "ready_to_print"){echo "selected";} ?>>Ready to Print</option>
+                  <option <?php if ($job["status"]== "printing"){echo "selected";} ?>>Printing</option>
+                  <option <?php if ($job["status"]== "complete"){echo "selected";} ?>>Complete</option>
                 </select>
               </div>
               </div>
@@ -73,7 +98,7 @@
                   <div class="col-md-3 mb-3">
                       <div class="input-group">
                         <div class="input-group">
-                          <input type="text" class="form-control" placeholder="May 7">
+                          <input type="text" class="form-control" value="<?php echo $job["submission_date"]; ?>" readonly>
                           </div>
                       </div>
                       <div class="invalid-feedback" style="width: 100%;">
@@ -92,7 +117,7 @@
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text">$</span>
-                          <input type="text" class="form-control" placeholder="">
+                          <input type="text" class="form-control" value="<?php echo $job["price"]; ?>">
                           </div>
                       </div>
                       <div class="invalid-feedback" style="width: 100%;">
@@ -129,7 +154,7 @@
                 <label for="username">Infill</label>
                 <div class="input-group">
                   <div class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="100" aria-label="100" aria-describedby="basic-addon2">
+                    <input type="text" class="form-control" value="<?php echo $job["infill"]; ?>" placeholder="100" aria-label="100" aria-describedby="basic-addon2">
                     <div class="input-group-append">
                     <span class="input-group-text" id="basic-addon2">%</span>
                     </div>
@@ -143,7 +168,7 @@
                 <label for="username">Scale</label>
                 <div class="input-group">
                 <div class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="100" aria-label="100" aria-describedby="basic-addon2">
+                    <input type="text" class="form-control" value="<?php echo $job["scale"]; ?>" placeholder="100" aria-label="100" aria-describedby="basic-addon2">
                     <div class="input-group-append">
                         <span class="input-group-text" id="basic-addon2">%</span>
                     </div>
@@ -159,18 +184,18 @@
           <div class="col-md-3 mb-3">
             <label for="layer-height">Layer Height</label>
             <select class="custom-select d-block w-100" id="layer-height">
-              <option value="">0.2</option>
-              <option>0.1</option>
-              <option>0.15</option>
-              <option>0.3</option>
-              <option>0.6</option>
+              <option <?php if ($job["layer_height"]== 0.2){echo "selected";} ?>>0.2</option>
+              <option <?php if ($job["layer_height"]== 0.1){echo "selected";} ?>>0.1</option>
+              <option <?php if ($job["layer_height"]== 0.15){echo "selected";} ?>>0.15</option>
+              <option <?php if ($job["layer_height"]== 0.3){echo "selected";} ?>>0.3</option>
+              <option <?php if ($job["layer_height"]== 0.6){echo "selected";} ?>>0.6</option>
             </select>
           </div>
           <div class="col-md-3 mb-3">
             <label for="supports">Supports</label>
             <select class="custom-select d-block w-100" id="supports">
-              <option value="">Yes</option>
-              <option>No</option>
+              <option <?php if ($job["supports"]== 1){echo "selected";} ?>>Yes</option>
+              <option <?php if ($job["supports"]== 0){echo "selected";} ?>>No</option>
             </select>
           </div>
         </div>
@@ -178,18 +203,18 @@
         <div>
         <hr class="mb-4">
           <div class="col-md-3 mb-3">
-            <label for="supports">Copies</label>
+            <label for="copies">Copies</label>
             <select class="custom-select d-block w-100" id="supports">
-              <option value="">1</option>
-              <option>2</option>
-              <option>3</option>
-              <option>4</option>
-              <option>5</option>
-              <option>6</option>
-              <option>7</option>
-              <option>8</option>
-              <option>9</option>
-              <option>10</option>
+              <option <?php if ($job["copies"]== 1){echo "selected";} ?>>1</option>
+              <option <?php if ($job["copies"]== 2){echo "selected";} ?>>2</option>
+              <option <?php if ($job["copies"]== 3){echo "selected";} ?>>3</option>
+              <option <?php if ($job["copies"]== 4){echo "selected";} ?>>4</option>
+              <option <?php if ($job["copies"]== 5){echo "selected";} ?>>5</option>
+              <option <?php if ($job["copies"]== 6){echo "selected";} ?>>6</option>
+              <option <?php if ($job["copies"]== 7){echo "selected";} ?>>7</option>
+              <option <?php if ($job["copies"]== 8){echo "selected";} ?>>8</option>
+              <option <?php if ($job["copies"]== 9){echo "selected";} ?>>9</option>
+              <option <?php if ($job["copies"]== 10){echo "selected";} ?>>10</option>
             </select>
           </div>
         </div>
@@ -198,19 +223,19 @@
         <h5 class="mb-2">Material Type</h5>
         <div class="d-block my-3">
           <div class="custom-control custom-radio">
-            <input id="pla" name="materialType" type="radio" class="custom-control-input" checked required>
+            <input id="pla" name="materialType" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "PLA"){echo "checked";} ?>>
             <label class="custom-control-label" for="pla">PLA</label>
           </div>
           <div class="custom-control custom-radio">
-            <input id="pla-pva" name="materialType" type="radio" class="custom-control-input" required>
+            <input id="pla-pva" name="materialType" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "PLA + PVA"){echo "checked";} ?>>
             <label class="custom-control-label" for="pla-pva">PLA + PVA</label>
           </div>
           <div class="custom-control custom-radio">
-            <input id="tpu95" name="materialType" type="radio" class="custom-control-input" required>
+            <input id="tpu95" name="materialType" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "TPU95"){echo "checked";} ?>>
             <label class="custom-control-label" for="tpu95">TPU95</label>
           </div>
           <div class="custom-control custom-radio">
-            <input id="other" name="materialType" type="radio" class="custom-control-input" required>
+            <input id="other" name="materialType" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "Other"){echo "checked";} ?>>
             <label class="custom-control-label" for="other">Other</label>
             <small class="text-muted"> - Elaborate in Additional Comments section</small>
           </div>
@@ -219,13 +244,13 @@
         <hr class="mb-4">
         <h5 class="mb-2">Additional Comments</h5>
             <div class="input-group">
-                <textarea class="form-control" aria-label="additional-comments" readonly></textarea>
+                <textarea class="form-control" aria-label="additional-comments" readonly><?php echo $job["comments"]; ?></textarea>
             </div>
 
         <hr class="mb-4">
         <h5 class="mb-2">Staff Notes</h5>
             <div class="input-group">
-                <textarea class="form-control" aria-label="additional-comments"></textarea>
+                <textarea class="form-control" aria-label="additional-comments"><?php echo $job["staff_notes"]; ?></textarea>
             </div>
             <div class="invalid-feedback">
             Please enter additional comments.
