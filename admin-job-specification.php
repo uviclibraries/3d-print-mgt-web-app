@@ -4,10 +4,11 @@ $stm = $conn->prepare("SELECT * FROM print_job WHERE id=?");
 $stm->execute([$_GET["job_id"]]);
 $job=$stm->fetch();
 
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  $stmt = $conn->prepare("UPDATE print_job SET price = :price, infill = :infill, scale = :scale, layer_height = :layer_height, supports = :supports, copies = :copies, material_type = :material_type, staff_notes = :staff_notes, status = :status WHERE id = 10;
+  $stmt = $conn->prepare("UPDATE print_job SET price = :price, infill = :infill, scale = :scale, layer_height = :layer_height, supports = :supports, copies = :copies, material_type = :material_type, staff_notes = :staff_notes, status = :status WHERE id = :job_id;
   ");
-  #$stmt->bindParam(':job_id', $_POST["job_id"]);
+  $stmt->bindParam(':job_id', intval($_GET["job_id"]), PDO::PARAM_INT);
   $stmt->bindParam(':price', intval($_POST["price"]), PDO::PARAM_INT);
   $stmt->bindParam(':infill', intval($_POST["infill"]), PDO::PARAM_INT);
   $stmt->bindParam(':scale', intval($_POST["scale"]), PDO::PARAM_INT);
@@ -216,19 +217,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h5 class="mb-2">Material Type</h5>
         <div class="d-block my-3">
           <div class="custom-control custom-radio">
-            <input id="pla" name="material_type" value="pla" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "PLA"){echo "checked";} ?>>
+            <input id="pla" name="material_type" value="PLA" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "PLA"){echo "checked";} ?>>
             <label class="custom-control-label" for="pla">PLA</label>
           </div>
           <div class="custom-control custom-radio">
-            <input id="pla-pva" name="material_type" value="pla-pva" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "PLA + PVA"){echo "checked";} ?>>
+            <input id="pla-pva" name="material_type" value="PLA + PVA" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "PLA + PVA"){echo "checked";} ?>>
             <label class="custom-control-label" for="pla-pva">PLA + PVA</label>
           </div>
           <div class="custom-control custom-radio">
-            <input id="tpu95" name="material_type" value="tpu95" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "TPU95"){echo "checked";} ?>>
+            <input id="tpu95" name="material_type" value="TPU95" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "TPU95"){echo "checked";} ?>>
             <label class="custom-control-label" for="tpu95">TPU95</label>
           </div>
           <div class="custom-control custom-radio">
-            <input id="other" name="material_type" value="other" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "Other"){echo "checked";} ?>>
+            <input id="other" name="material_type" value="Other" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "Other"){echo "checked";} ?>>
             <label class="custom-control-label" for="other">Other</label>
             <small class="text-muted"> - Elaborate in Additional Comments section</small>
           </div>
