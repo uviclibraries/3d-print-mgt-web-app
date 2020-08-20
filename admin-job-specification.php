@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $stmt->bindParam(':status', $status);
   $stmt->execute();
 
-  header("location: customer-dashboard.php");
+  header("location: admin-dashboard.php");
 }
 ?>
 
