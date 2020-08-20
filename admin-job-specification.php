@@ -5,9 +5,9 @@ $stm->execute([$_GET["job_id"]]);
 $job=$stm->fetch();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  $stmt = $conn->prepare("UPDATE print_job SET price = :price, infill = :infill, scale = :scale, layer_height = :layer_height, supports = :supports, copies = :copies, material_type = :material_type, staff_notes = :staff_notes WHERE id = :job_id;
+  $stmt = $conn->prepare("UPDATE print_job SET price = :price, infill = :infill, scale = :scale, layer_height = :layer_height, supports = :supports, copies = :copies, material_type = :material_type, staff_notes = :staff_notes, status = :status WHERE id = 10;
   ");
-  $stmt->bindParam(':job_id', $_POST["job_id"]);
+  #$stmt->bindParam(':job_id', $_POST["job_id"]);
   $stmt->bindParam(':price', intval($_POST["price"]), PDO::PARAM_INT);
   $stmt->bindParam(':infill', intval($_POST["infill"]), PDO::PARAM_INT);
   $stmt->bindParam(':scale', intval($_POST["scale"]), PDO::PARAM_INT);
@@ -16,10 +16,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $stmt->bindParam(':copies', intval($_POST["copies"]), PDO::PARAM_INT);
   $stmt->bindParam(':material_type', $_POST["material_type"]);
   $stmt->bindParam(':staff_notes', $_POST["staff_notes"]);
-  $stmt->bindParam(':status', $status);
+  $stmt->bindParam(':status', $_POST["status"]);
   $stmt->execute();
 
-  header("location: customer-dashboard.php");
+  header("location: admin-dashboard.php");
 }
 ?>
 
@@ -70,6 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </head>
   <body class="bg-light">
     <div class="container">
+    <form method="POST">
   <div class="py-5 text-center">
     <img class="d-block mx-auto mb-4" src="/docs/4.5/assets/brand/bootstrap-solid.svg" alt="" width="72" height="72">
     <h1><?php echo $job["job_name"]; ?></h1>
@@ -77,15 +78,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     <div class="col-md-12 order-md-1">
         <h4 class="mb-3">Status</h4>
-        <form class="needs-validation" novalidate>
           <div class="row">
             <div class="col-md-3 mb-3">
-                <select class="custom-select d-block w-100" id="layer-height">
-                  <option <?php if ($job["status"]== "not_priced"){echo "selected";} ?>>Not Priced</option>
-                  <option <?php if ($job["status"]== "pending_payment"){echo "selected";} ?>>Pending Payment</option>
-                  <option <?php if ($job["status"]== "ready_to_print"){echo "selected";} ?>>Ready to Print</option>
-                  <option <?php if ($job["status"]== "printing"){echo "selected";} ?>>Printing</option>
-                  <option <?php if ($job["status"]== "complete"){echo "selected";} ?>>Complete</option>
+                <select class="custom-select d-block w-100" name="status" id="layer-height">
+                  <option value="not_priced" <?php if ($job["status"]== "not_priced"){echo "selected";} ?>>Not Priced</option>
+                  <option value="pending_payment" <?php if ($job["status"]== "pending_payment"){echo "selected";} ?>>Pending Payment</option>
+                  <option value="ready_to_print" <?php if ($job["status"]== "ready_to_print"){echo "selected";} ?>>Ready to Print</option>
+                  <option value="printing" <?php if ($job["status"]== "printing"){echo "selected";} ?>>Printing</option>
+                  <option vlaue="complete" <?php if ($job["status"]== "complete"){echo "selected";} ?>>Complete</option>
                 </select>
               </div>
               </div>
@@ -93,7 +93,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
           <div class="col-md-12 order-md-1">
             <h4 class="mb-3">Submission Date</h4>
-            <form class="needs-validation" novalidate>
               <div class="row">
                   <div class="col-md-3 mb-3">
                       <div class="input-group">
@@ -110,14 +109,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
           <div class="col-md-12 order-md-1">
             <h4 class="mb-3">Price</h4>
-            <form class="needs-validation" novalidate>
               <div class="row">
                   <div class="col-md-3 mb-3">
                       <div class="input-group">
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text">$</span>
-                          <input type="text" class="form-control" value="<?php echo $job["price"]; ?>">
+                          <input type="text" name="price" class="form-control" value="<?php echo $job["price"]; ?>">
                           </div>
                       </div>
                       <div class="invalid-feedback" style="width: 100%;">
@@ -130,9 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <hr class="mb-6">
 
     <h3 class="mb-3">3D Model</h3>
-    <form action="/action_page.php">
         <input type="file" id="myFile" name="filename" disabled>
-      </form>
       <br>
       <hr class="mb-6">
 
@@ -140,21 +136,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <small class="text-muted">Only if needed</small>
     <br />
     <small class="text-muted">(Max 200MB)</small>
-    <form action="/action_page.php">
         <input type="file" id="myFile" name="filename">
-      </form>
       <br>
       <hr class="mb-6">
 
     <div class="col-md-12 order-md-1">
       <h4 class="mb-3">Specifications</h4>
-      <form class="needs-validation" novalidate>
         <div class="row">
             <div class="col-md-3 mb-3">
                 <label for="username">Infill</label>
                 <div class="input-group">
                   <div class="input-group mb-3">
-                    <input type="text" class="form-control" value="<?php echo $job["infill"]; ?>" placeholder="100" aria-label="100" aria-describedby="basic-addon2">
+                    <input type="text" name="infill" class="form-control" value="<?php echo $job["infill"]; ?>" placeholder="100" aria-label="100" aria-describedby="basic-addon2">
                     <div class="input-group-append">
                     <span class="input-group-text" id="basic-addon2">%</span>
                     </div>
@@ -168,7 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <label for="username">Scale</label>
                 <div class="input-group">
                 <div class="input-group mb-3">
-                    <input type="text" class="form-control" value="<?php echo $job["scale"]; ?>" placeholder="100" aria-label="100" aria-describedby="basic-addon2">
+                    <input type="text" class="form-control" name="scale" value="<?php echo $job["scale"]; ?>" placeholder="100" aria-label="100" aria-describedby="basic-addon2">
                     <div class="input-group-append">
                         <span class="input-group-text" id="basic-addon2">%</span>
                     </div>
@@ -183,7 +176,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="row">
           <div class="col-md-3 mb-3">
             <label for="layer-height">Layer Height</label>
-            <select class="custom-select d-block w-100" id="layer-height">
+            <select class="custom-select d-block w-100" name="layer_height" id="layer-height">
               <option <?php if ($job["layer_height"]== 0.2){echo "selected";} ?>>0.2</option>
               <option <?php if ($job["layer_height"]== 0.1){echo "selected";} ?>>0.1</option>
               <option <?php if ($job["layer_height"]== 0.15){echo "selected";} ?>>0.15</option>
@@ -193,7 +186,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           </div>
           <div class="col-md-3 mb-3">
             <label for="supports">Supports</label>
-            <select class="custom-select d-block w-100" id="supports">
+            <select class="custom-select d-block w-100" name="supports" id="supports">
               <option <?php if ($job["supports"]== 1){echo "selected";} ?>>Yes</option>
               <option <?php if ($job["supports"]== 0){echo "selected";} ?>>No</option>
             </select>
@@ -204,7 +197,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <hr class="mb-4">
           <div class="col-md-3 mb-3">
             <label for="copies">Copies</label>
-            <select class="custom-select d-block w-100" id="supports">
+            <select class="custom-select d-block w-100" name="copies" id="copies">
               <option <?php if ($job["copies"]== 1){echo "selected";} ?>>1</option>
               <option <?php if ($job["copies"]== 2){echo "selected";} ?>>2</option>
               <option <?php if ($job["copies"]== 3){echo "selected";} ?>>3</option>
@@ -223,19 +216,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h5 class="mb-2">Material Type</h5>
         <div class="d-block my-3">
           <div class="custom-control custom-radio">
-            <input id="pla" name="materialType" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "PLA"){echo "checked";} ?>>
+            <input id="pla" name="material_type" value="pla" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "PLA"){echo "checked";} ?>>
             <label class="custom-control-label" for="pla">PLA</label>
           </div>
           <div class="custom-control custom-radio">
-            <input id="pla-pva" name="materialType" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "PLA + PVA"){echo "checked";} ?>>
+            <input id="pla-pva" name="material_type" value="pla-pva" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "PLA + PVA"){echo "checked";} ?>>
             <label class="custom-control-label" for="pla-pva">PLA + PVA</label>
           </div>
           <div class="custom-control custom-radio">
-            <input id="tpu95" name="materialType" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "TPU95"){echo "checked";} ?>>
+            <input id="tpu95" name="material_type" value="tpu95" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "TPU95"){echo "checked";} ?>>
             <label class="custom-control-label" for="tpu95">TPU95</label>
           </div>
           <div class="custom-control custom-radio">
-            <input id="other" name="materialType" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "Other"){echo "checked";} ?>>
+            <input id="other" name="material_type" value="other" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "Other"){echo "checked";} ?>>
             <label class="custom-control-label" for="other">Other</label>
             <small class="text-muted"> - Elaborate in Additional Comments section</small>
           </div>
@@ -250,7 +243,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <hr class="mb-4">
         <h5 class="mb-2">Staff Notes</h5>
             <div class="input-group">
-                <textarea class="form-control" aria-label="additional-comments"><?php echo $job["staff_notes"]; ?></textarea>
+                <textarea class="form-control" name="staff_notes" aria-label="additional-comments"><?php echo $job["staff_notes"]; ?></textarea>
             </div>
             <div class="invalid-feedback">
             Please enter additional comments.
@@ -267,8 +260,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="col-md-6 mb-3">
                 <a class="btn btn-primary btn-lg btn-block" href="admin-dashboard.html" role="button">Back to Dashboard</a>
         </div>
-      </form>
     </div>
+    </form>
   </div>
 
   <p></p>
@@ -277,5 +270,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
       <script>window.jQuery || document.write('<script src="/docs/4.5/assets/js/vendor/jquery.slim.min.js"><\/script>')</script><script src="/docs/4.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-1CmrxMRARb6aLqgBO7yyAxTOQE2AKb9GfXnEo760AUcUmFx3ibVJJAzGytlQcNXd" crossorigin="anonymous"></script>
-        <script src="form-validation.js"></script></body>
+        <script src="form-validation.js"></script>
+        </body>
 </html>
