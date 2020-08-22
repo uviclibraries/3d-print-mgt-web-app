@@ -9,6 +9,65 @@ $model_name = "test.stl"; # Temporary 4 testing...
 $status = "not_priced";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+  try {
+    
+      // Undefined | Multiple Files | $_FILES Corruption Attack
+      // If this request falls under any of them, treat it invalid.
+      if (
+          !isset($_FILES["3d_model"]['error']) ||
+          is_array($_FILES["3d_model"]['error'])
+      ) {
+ #         throw new RuntimeException('Invalid parameters.');
+      }
+
+      // Check $_FILES["3d_model"]['error'] value.
+      switch ($_FILES["3d_model"]['error']) {
+          case UPLOAD_ERR_OK:
+              break;
+          case UPLOAD_ERR_NO_FILE:
+              throw new RuntimeException('No file sent.');
+          case UPLOAD_ERR_INI_SIZE:
+          case UPLOAD_ERR_FORM_SIZE:
+              throw new RuntimeException('Exceeded filesize limit.');
+          default:
+              throw new RuntimeException('Unknown errors.');
+      }
+
+      // You should also check filesize here.
+      if ($_FILES["3d_model"]['size'] > 200000000) {
+          throw new RuntimeException('Exceeded filesize limit.');
+      }
+
+      // DO NOT TRUST $_FILES["3d_model"]['mime'] VALUE !!
+      // Check MIME Type by yourself.
+      $file_name = $_FILES["3d_model"]['name'];
+      $file_array = explode(".",$file_name);
+      $ext = end($file_array);
+      if (!in_array($ext, ["stl", "obj", "3mf", "gcode"])) {
+          throw new RuntimeException('Invalid file format.');
+      }
+
+      // You should name it uniquely.
+      // DO NOT USE $_FILES["3d_model"]['name'] WITHOUT ANY VALIDATION !!
+      // On this example, obtain safe unique name from its binary data.
+      if (!move_uploaded_file(
+          $_FILES["3d_model"]['tmp_name'],
+          sprintf('./uploads/%s.%s',
+              sha1_file($_FILES["3d_model"]['tmp_name']),
+              $ext
+          )
+      )) {
+          throw new RuntimeException('Failed to move uploaded file.');
+      }
+
+      echo 'File is uploaded successfully.';
+
+  } catch (RuntimeException $e) {
+
+      echo $e->getMessage();
+
+  }
   $stmt = $conn->prepare("INSERT INTO print_job (netlink_id, job_name, model_name, infill, scale, layer_height, supports, copies, material_type, comments, status) VALUES (:netlink_id, :job_name, :model_name, :infill, :scale, :layer_height, :supports, :copies, :material_type, :comments, :status)");
   $stmt->bindParam(':netlink_id', $netlink_id);
   $stmt->bindParam(':job_name', $_POST["job_name"]);
@@ -23,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $stmt->bindParam(':status', $status);
   $stmt->execute();
 
-  header("location: customer-dashboard.php");
+#  header("location: customer-dashboard.php");
 }
 ?>
 
@@ -75,7 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </head>
   <body class="bg-light">
     <div class="container">
-        <form method="POST">
+        <form method="POST" enctype="multipart/form-data">
   <div class="py-5 text-center">
     <img class="d-block mx-auto mb-4" src="/docs/4.5/assets/brand/bootstrap-solid.svg" alt="" width="72" height="72">
     <h1>New Print Job</h1>
@@ -96,7 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <h3 class="mb-3">Upload 3D Model</h3>
     <small class="text-muted">(Max 200MB)</small>
-        <input type="file" id="myFile" name="filename">
+        <input type="file" id="myFile" name="3d_model">
       <br>
       <hr class="mb-6">
 
