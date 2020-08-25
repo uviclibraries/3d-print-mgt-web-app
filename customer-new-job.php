@@ -51,12 +51,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       // You should name it uniquely.
       // DO NOT USE $_FILES["3d_model"]['name'] WITHOUT ANY VALIDATION !!
       // On this example, obtain safe unique name from its binary data.
+      $date = new DateTime();
+      $hash_name = sprintf("%s-%s.%s", sha1_file($_FILES["3d_model"]['tmp_name']),
+      $date->getTimestamp(),
+      $ext);
+      $savefilename = sprintf('./uploads/%s',
+        $hash_name,
+      );
       if (!move_uploaded_file(
           $_FILES["3d_model"]['tmp_name'],
-          sprintf('./uploads/%s.%s',
-              sha1_file($_FILES["3d_model"]['tmp_name']),
-              $ext
-          )
+          $savefilename
       )) {
           throw new RuntimeException('Failed to move uploaded file.');
       }
@@ -71,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $stmt = $conn->prepare("INSERT INTO print_job (netlink_id, job_name, model_name, infill, scale, layer_height, supports, copies, material_type, comments, status) VALUES (:netlink_id, :job_name, :model_name, :infill, :scale, :layer_height, :supports, :copies, :material_type, :comments, :status)");
   $stmt->bindParam(':netlink_id', $netlink_id);
   $stmt->bindParam(':job_name', $_POST["job_name"]);
-  $stmt->bindParam(':model_name', $model_name);
+  $stmt->bindParam(':model_name', $hash_name);
   $stmt->bindParam(':infill', intval($_POST["infill"]), PDO::PARAM_INT);
   $stmt->bindParam(':scale', intval($_POST["scale"]), PDO::PARAM_INT);
   $stmt->bindParam(':layer_height', $_POST["layer_height"], PDO::PARAM_STR);
