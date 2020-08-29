@@ -20,6 +20,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $stmt->bindParam(':status', $_POST["status"]);
   $stmt->execute();
 
+  if ($_POST['status'] == "pending_payment") {
+    $msg = "
+    <html>
+    <head>
+    <title>HTML email</title>
+    </head>
+    <body>
+    <p>Make " . $_POST['price'] . " payment for " . $job['job_name'] . " using this link
+    <a href='#'>link</a></p>
+    </body>
+    </html>";
+    $headers = "MIME-Version: 1.0" . "\r\n";
+    $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+    mail("emily@msys.ca","3D Print - Make Payment",$msg,$headers); # *** change email to users  ***
+  } elseif ($_POST['status'] == "complete") {
+    $msg = "
+    <html>
+    <head>
+    <title>HTML email</title>
+    </head>
+    <body>
+    <p>Your " . $job['job_name'] . " is complete. You can pick it up at...</p>
+    </body>
+    </html>";
+    $headers = "MIME-Version: 1.0" . "\r\n";
+    $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+    mail("emily@msys.ca","3D Print - Make Payment",$msg,$headers); # *** change email to users  ***
+  }
+  
+
+
   header("location: admin-dashboard.php");
 }
 ?>
@@ -86,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                   <option value="pending_payment" <?php if ($job["status"]== "pending_payment"){echo "selected";} ?>>Pending Payment</option>
                   <option value="ready_to_print" <?php if ($job["status"]== "ready_to_print"){echo "selected";} ?>>Ready to Print</option>
                   <option value="printing" <?php if ($job["status"]== "printing"){echo "selected";} ?>>Printing</option>
-                  <option vlaue="complete" <?php if ($job["status"]== "complete"){echo "selected";} ?>>Complete</option>
+                  <option value="complete" <?php if ($job["status"]== "complete"){echo "selected";} ?>>Complete</option>
                 </select>
               </div>
               </div>

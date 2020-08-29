@@ -1,108 +1,34 @@
 <?php
 require ('db.php');
-$stm = $conn->query("SELECT VERSION()");
-#$version = $stm->fetch();
-#echo $version;
 
-$netlink_id = "rmccue"; # Temporary 4 testing. Netlink ID will eventually be passed from login form. 
-$model_name = "test.stl"; # Temporary 4 testing...
-$status = "not_priced";
+$job_id = $_GET['job_id'];
+$status = "ready_to_print";
+$stmt = $conn->prepare("UPDATE print_job SET status = :status WHERE id = :job_id;
+");
+$stmt->bindParam(':job_id', intval($_GET["job_id"]), PDO::PARAM_INT);
+$stmt->bindParam(':status', $status);
+$stmt->execute();
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+$stm = $conn->prepare("SELECT * FROM print_job WHERE id=?");
+$stm->execute([$_GET["job_id"]]);
+$job=$stm->fetch();
 
-  try {
-    
-      // Undefined | Multiple Files | $_FILES Corruption Attack
-      // If this request falls under any of them, treat it invalid.
-      if (
-          !isset($_FILES["3d_model"]['error']) ||
-          is_array($_FILES["3d_model"]['error'])
-      ) {
- #         throw new RuntimeException('Invalid parameters.');
-      }
-
-      // Check $_FILES["3d_model"]['error'] value.
-      switch ($_FILES["3d_model"]['error']) {
-          case UPLOAD_ERR_OK:
-              break;
-          case UPLOAD_ERR_NO_FILE:
-              throw new RuntimeException('No file sent.');
-          case UPLOAD_ERR_INI_SIZE:
-          case UPLOAD_ERR_FORM_SIZE:
-              throw new RuntimeException('Exceeded filesize limit.');
-          default:
-              throw new RuntimeException('Unknown errors.');
-      }
-
-      // You should also check filesize here.
-      if ($_FILES["3d_model"]['size'] > 200000000) {
-          throw new RuntimeException('Exceeded filesize limit.');
-      }
-
-      // DO NOT TRUST $_FILES["3d_model"]['mime'] VALUE !!
-      // Check MIME Type by yourself.
-      $file_name = $_FILES["3d_model"]['name'];
-      $file_array = explode(".",$file_name);
-      $ext = end($file_array);
-      if (!in_array($ext, ["stl", "obj", "3mf", "gcode"])) {
-          throw new RuntimeException('Invalid file format.');
-      }
-
-      // You should name it uniquely.
-      // DO NOT USE $_FILES["3d_model"]['name'] WITHOUT ANY VALIDATION !!
-      // On this example, obtain safe unique name from its binary data.
-      $date = new DateTime();
-      $hash_name = sprintf("%s-%s.%s", sha1_file($_FILES["3d_model"]['tmp_name']),
-      $date->getTimestamp(),
-      $ext);
-      $savefilename = sprintf('./uploads/%s',
-        $hash_name,
-      );
-      if (!move_uploaded_file(
-          $_FILES["3d_model"]['tmp_name'],
-          $savefilename
-      )) {
-          throw new RuntimeException('Failed to move uploaded file.');
-      }
-
-      echo 'File is uploaded successfully.';
-
-  } catch (RuntimeException $e) {
-
-      echo $e->getMessage();
-
-  }
-  $stmt = $conn->prepare("INSERT INTO print_job (netlink_id, job_name, model_name, infill, scale, layer_height, supports, copies, material_type, comments, status) VALUES (:netlink_id, :job_name, :model_name, :infill, :scale, :layer_height, :supports, :copies, :material_type, :comments, :status)");
-  $stmt->bindParam(':netlink_id', $netlink_id);
-  $stmt->bindParam(':job_name', $_POST["job_name"]);
-  $stmt->bindParam(':model_name', $hash_name);
-  $stmt->bindParam(':infill', intval($_POST["infill"]), PDO::PARAM_INT);
-  $stmt->bindParam(':scale', intval($_POST["scale"]), PDO::PARAM_INT);
-  $stmt->bindParam(':layer_height', $_POST["layer_height"], PDO::PARAM_STR);
-  $stmt->bindParam(':supports', intval($_POST["supports"]), PDO::PARAM_INT);
-  $stmt->bindParam(':copies', intval($_POST["copies"]), PDO::PARAM_INT);
-  $stmt->bindParam(':material_type', $_POST["material_type"]);
-  $stmt->bindParam(':comments', $_POST["comments"]);
-  $stmt->bindParam(':status', $status);
-  $stmt->execute();
-
-  $msg = "
-  <html>
-  <head>
-  <title>HTML email</title>
-  </head>
-  <body>
-  <p>New print job submitted.</p>
-  </body>
-  </html>";
-  $headers = "MIME-Version: 1.0" . "\r\n";
-  $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-  mail("emily@msys.ca","3D Print - New Job",$msg,$headers); # *** change email to users  ***
+$msg = "
+<html>
+<head>
+<title>HTML email</title>
+</head>
+<body>
+<p>Payment is successful for print job " . $job['job_name'] . " for $" . $job['price'] . "</p>
+</body>
+</html>";
+$headers = "MIME-Version: 1.0" . "\r\n";
+$headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+mail("emily@msys.ca","3D Print - New Job",$msg,$headers); # *** change email to users  ***
 
 #  header("location: customer-dashboard.php");
-}
-?>
 
+?>
 
 <!doctype html>
 <html lang="en">
