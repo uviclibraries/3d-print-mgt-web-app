@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </html>";
   $headers = "MIME-Version: 1.0" . "\r\n";
   $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-  mail("emily@msys.ca","3D Print - New Job",$msg,$headers); # *** change email to users  ***
+  mail("kenziewong@gmail.com","3D Print - New Job",$msg,$headers); # *** change email to users  ***
 
 #  header("location: customer-dashboard.php");
 }
