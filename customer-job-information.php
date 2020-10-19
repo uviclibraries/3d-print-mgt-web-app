@@ -68,14 +68,67 @@ $job=$stm->fetch();
               </div>
             </div>
           </div>
+          <!------------------->
+          <div class="row">
+            <div class="col-md-3 mb-3">
+                <label for="username">Status</label>
+                <div class="input-group">
+                  <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="100" value="<?php echo $job["status"]; ?>" aria-label="100" aria-describedby="basic-addon2" readonly>
+                </div>
+                <div class="invalid-feedback" style="width: 100%;">
+                Status is required.
+                </div>
+            </div>
+            </div>
+            </div>
+            <!------------------->
+
+
           <hr class="mb-6">
 
     <h3 class="mb-3">Upload 3D Model</h3>
     <small class="text-muted">(Max 200MB)</small>
     <form action="/action_page.php">
-        <input type="file" id="myFile" name="filename" disabled>
+        <input type="file" id="myFile" name="filename" disabled> <!-- display 3d file -->
       </form>
       <br>
+        
+      <!-- if its priced/payed-->
+      <?php if($job["status"] != "not_priced"){?>
+       
+
+        <div class="col-md-3 mb-3">
+                <label for="username">Price</label>
+                
+                
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">$</span>
+                          <input type="text" name="price" class="form-control" value="<?php echo $job["price"]; ?>" readonly>
+                    </div>
+                
+                
+            </div>
+        <!-- if its priced and not payed-->                    
+        <?php if ($job["status"] == "pending_payment") { ?>
+            
+                <!-- start button location --> 
+                
+                    <a href="customer-payment.php">
+                        <button type="button" class="btn btn-primary btn-lg" type="submit">Payment</button>
+                    </a>
+                
+                <!-- end button location --> 
+            
+        <?php } ?>
+        
+        <?php }  ?>
+            
+        
+           <!-- end if(if) else --> 
+           
+        </div>
+
       <hr class="mb-6">
 
     <div class="col-md-12 order-md-1">
@@ -155,7 +208,8 @@ $job=$stm->fetch();
         <hr class="mb-4">
         <h5 class="mb-2">Additional Comments</h5>
             <div class="input-group">
-                <textarea class="form-control" aria-label="additional-comments" readonly></textarea>
+                <textarea class="form-control" aria-label="additional-comments"readonly ><?php echo $job["comments"]; ?>      
+                </textarea>
             </div>
             <div class="invalid-feedback">
             Please enter additional comments.

@@ -91,7 +91,7 @@ body {
   <img class="mb-4" src="/docs/4.5/assets/brand/bootstrap-solid.svg" alt="" width="72" height="72">
   <h1 class="h3 mb-3 font-weight-normal">Manage Printers</h1>
 
-  <a class="btn btn-primary btn-lg btn-block" href="admin-dashboard.html" role="button">Back to Dashboard</a>
+  <a class="btn btn-primary btn-lg btn-block" href="admin-dashboard.php" role="button">Back to Dashboard</a>
 
 </form>
 </body>

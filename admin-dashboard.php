@@ -79,19 +79,19 @@ foreach ($jobs as $job) {
             <img class="d-block mx-auto mb-4" src="/docs/4.5/assets/brand/bootstrap-solid.svg" alt="" width="72" height="72">
             <div class="row">
                 <div class="col-md-4 mb-3">
-                    <a href="admin-reports.html">
+                    <a href="admin-reports.php">
                         <button class="btn btn-primary btn-lg btn-block" class="form-control" type="submit" data-inline="true">Reports</button>
                     </a>
                 </div>
 
                 <div class="col-md-4 mb-3">
-                    <a href="admin-print-history.html">
+                    <a href="admin-print-history.php">
                         <button class="btn btn-primary btn-lg btn-block" class="form-control" type="submit" data-inline="true">Print History</button>
                     </a>
                 </div>
 
                 <div class="col-md-4 mb-3">
-                    <a href="admin-manage-printers.html">
+                    <a href="admin-manage-printers.php">
                         <button class="btn btn-primary btn-lg btn-block" class="form-control" type="submit" data-inline="true">Manage Printers</button>
                     </a>
                 </div>
@@ -203,7 +203,7 @@ foreach ($jobs as $job) {
       </div>
 
         <hr class="mb-12">
-        <a class="btn btn-md btn-block" href="login.html" role="button">Log Out</a>
+        <a class="btn btn-md btn-block" href="login.php" role="button">Log Out</a>
     </div>
   </div>
 </div>

@@ -218,7 +218,7 @@ mail("emily@msys.ca","3D Print - New Job",$msg,$headers); # *** change email to 
         
         <hr class="mb-4">
         <center>
-            <a href="customer-dashboard.html">
+            <a href="customer-dashboard.php">
                 <button class="btn btn-primary btn-lg" type="submit">Submit Print Job</button>
             </a>
         </center>
