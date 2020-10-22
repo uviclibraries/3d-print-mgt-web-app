@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </html>";
     $headers = "MIME-Version: 1.0" . "\r\n";
     $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-    mail("emily@msys.ca","3D Print - Make Payment",$msg,$headers); # *** change email to users  ***
+    mail("kenziewong@gmail.com","3D Print - Make Payment",$msg,$headers); # *** change email to users  ***
   } elseif ($_POST['status'] == "complete") {
     $msg = "
     <html>
@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </html>";
     $headers = "MIME-Version: 1.0" . "\r\n";
     $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-    mail("emily@msys.ca","3D Print - Make Payment",$msg,$headers); # *** change email to users  ***
+    mail("kenziewong@gmail.com","3D Print - Make Payment",$msg,$headers); # *** change email to users  ***
   }
   
 
@@ -147,7 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text">$</span>
-                          <input type="text" name="price" class="form-control" value="<?php echo $job["price"]; ?>">
+                          <input type="text" name="price" autocomplete="off" class="form-control" value="<?php echo $job["price"]; ?>">
                           </div>
                       </div>
                       <div class="invalid-feedback" style="width: 100%;">
