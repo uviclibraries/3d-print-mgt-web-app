@@ -14,6 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
       // Undefined | Multiple Files | $_FILES Corruption Attack
       // If this request falls under any of them, treat it invalid.
+    //what? kw
       if (
           !isset($_FILES["3d_model"]['error']) ||
           is_array($_FILES["3d_model"]['error'])
@@ -36,6 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       // You should also check filesize here.
       if ($_FILES["3d_model"]['size'] > 200000000) {
+
           throw new RuntimeException('Exceeded filesize limit.');
       }
 
@@ -44,7 +46,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $file_name = $_FILES["3d_model"]['name'];
       $file_array = explode(".",$file_name);
       $ext = end($file_array);
-      if (!in_array($ext, ["stl", "obj", "3mf", "gcode"])) {
+      $explode_len = count($file_array);
+      if (!in_array($ext, ["stl", "obj", "3mf", "gcode"])|| $explode_len > 2) {
           throw new RuntimeException('Invalid file format.');
       }
 
@@ -161,7 +164,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h3 class="mb-3">Print Job Name</h3>
           <div class="row">
             <div class="col-md-12 mb-3">
-              <input type="text" class="form-control" name="job_name" id="printJobName" placeholder="" value="" required>
+              <input type="text" class="form-control" name="job_name" id="printJobName" placeholder="" autocomplete="off" value="" required>
               <div class="invalid-feedback">
                 Valid print job name is required.
               </div>
@@ -184,7 +187,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <label for="username">Infill</label>
                 <div class="input-group">
                   <div class="input-group mb-3">
-                    <input type="number" max="100" min="0" class="form-control" name="infill" value="10" aria-label="100" aria-describedby="basic-addon2">
+                    <input type="number" max="100" min="0" class="form-control" name="infill" value="10" aria-label="100" aria-describedby="basic-addon2" required>
                     <div class="input-group-append">
                     <span class="input-group-text" id="basic-addon2">%</span>
                     </div>
@@ -198,7 +201,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <label for="username">Scale</label>
                 <div class="input-group">
                 <div class="input-group mb-3">
-                    <input type="number" min="1" class="form-control" name="scale" value="100" aria-label="100" aria-describedby="basic-addon2">
+                    <input type="number" min="1" class="form-control" name="scale" value="100" aria-label="100" aria-describedby="basic-addon2" required>
                     <div class="input-group-append">
                         <span class="input-group-text" id="basic-addon2">%</span>
                     </div>
