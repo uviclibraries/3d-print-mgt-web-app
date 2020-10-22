@@ -98,7 +98,7 @@ foreach ($jobs as $job) {
 
             <div class="container">
           <div class="py-5 text-left">
-            <h2>Not Priced</h2>
+            <h3>Not Priced</h3>
             <div class="py-3"></div>
       <div class="table-responsive">
         <table class="table table-striped table-md">
@@ -106,7 +106,7 @@ foreach ($jobs as $job) {
             <tr>
               <th>Username</th>
               <th>Name</th>
-              <th>Date</th>
+              <th>Submission Date</th>
             </tr>
           </thead>
           <tbody>
@@ -124,10 +124,11 @@ foreach ($jobs as $job) {
           </tbody>
         </table>
 
-            <h2>Pending Payment</h2>
+            <h3>Pending Payment</h3>
             <div class="py-3"></div>
       <div class="table-responsive">
         <table class="table table-striped table-md">
+          
           <tbody>
 
           <?php
@@ -144,7 +145,7 @@ foreach ($jobs as $job) {
           </tbody>
         </table>
 
-            <h2>Ready to Print</h2>
+            <h3>Ready to Print</h3>
             <div class="py-3"></div>
       <div class="table-responsive">
         <table class="table table-striped table-md">
@@ -163,7 +164,7 @@ foreach ($jobs as $job) {
           </tbody>
         </table>
 
-            <h2>Printing</h2>
+            <h3>Printing</h3>
             <div class="py-3"></div>
       <div class="table-responsive">
         <table class="table table-striped table-md">
@@ -182,7 +183,7 @@ foreach ($jobs as $job) {
           </tbody>
         </table>
 
-            <h2>Complete</h2>
+            <h3>Complete</h3>
             <div class="py-3"></div>
       <div class="table-responsive">
         <table class="table table-striped table-md">

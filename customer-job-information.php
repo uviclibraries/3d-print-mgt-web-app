@@ -90,12 +90,12 @@ $job=$stm->fetch();
     <h3 class="mb-3">Upload 3D Model</h3>
     <small class="text-muted">(Max 200MB)</small>
     <form action="/action_page.php">
-        <input type="file" id="myFile" name="filename" disabled> <!-- display 3d file -->
+        <input type="file" id="myFile" name="filename" disabled> <!-- *need*display 3d file -->
       </form>
       <br>
         
-      <!-- if its priced/payed-->
-      <?php if($job["status"] != "not_priced"){?>
+    <!-- if its priced/payed-->
+    <?php if($job["status"] != "not_priced"){?>
        
 
         <div class="col-md-3 mb-3">
@@ -110,19 +110,14 @@ $job=$stm->fetch();
                 
             </div>
         <!-- if its priced and not payed-->                    
-        <?php if ($job["status"] == "pending_payment") { ?>
-            
-                <!-- start button location --> 
+        <?php if ($job["status"] == "pending_payment") { ?> 
                 
                     <a href="customer-payment.php">
                         <button type="button" class="btn btn-primary btn-lg" type="submit">Payment</button>
                     </a>
-                
-                <!-- end button location --> 
             
-        <?php } ?>
-        
-        <?php }  ?>
+        <?php } ?>       
+    <?php }  ?>
             
         
            <!-- end if(if) else --> 
