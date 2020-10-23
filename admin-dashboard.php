@@ -2,7 +2,7 @@
 require ('db.php');
 $stm = $conn->query("SELECT id, job_name, netlink_id, status, submission_date, priced_date, pending_pmt_date, ready_to_prnt_date, printing_date, complete_date FROM print_job ORDER BY id DESC");
 $jobs = $stm->fetchAll();
-#
+# need to change so I grab by dates within sections. thinking multiple quiries.
 $not_priced = [];
 $pending_payment = [];
 $ready_to_print = [];
@@ -76,7 +76,7 @@ foreach ($jobs as $job) {
   <body class="bg-light">
     <div class="container">
         <div class="py-5 text-center">
-            <img class="d-block mx-auto mb-4" src="/docs/4.5/assets/brand/bootstrap-solid.svg" alt="" width="72" height="72">
+            
             <div class="row">
                 <div class="col-md-4 mb-3">
                     <a href="admin-reports.php">
@@ -128,7 +128,13 @@ foreach ($jobs as $job) {
             <div class="py-3"></div>
       <div class="table-responsive">
         <table class="table table-striped table-md">
-          
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Name</th>
+              <th>Priced Date</th>
+            </tr>
+          </thead>
           <tbody>
 
           <?php
@@ -149,6 +155,13 @@ foreach ($jobs as $job) {
             <div class="py-3"></div>
       <div class="table-responsive">
         <table class="table table-striped table-md">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Name</th>
+              <th>Payment Date</th>
+            </tr>
+          </thead>
           <tbody>
           <?php
             foreach($ready_to_print as $row){
@@ -168,6 +181,13 @@ foreach ($jobs as $job) {
             <div class="py-3"></div>
       <div class="table-responsive">
         <table class="table table-striped table-md">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Name</th>
+              <th>Print Start Date</th>
+            </tr>
+          </thead>
           <tbody>
           <?php
             foreach($printing as $row){
@@ -187,6 +207,13 @@ foreach ($jobs as $job) {
             <div class="py-3"></div>
       <div class="table-responsive">
         <table class="table table-striped table-md">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Name</th>
+              <th>Completed Date</th>
+            </tr>
+          </thead>
          <tbody>
           <?php
             foreach($complete as $row){
