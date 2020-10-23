@@ -51,7 +51,7 @@ $data = $stm->fetchAll();
   <body class="bg-light">
     <div class="container">
   <div class="py-5 text-center">
-    <img class="d-block mx-auto mb-4" src="/docs/4.5/assets/brand/bootstrap-solid.svg" alt="" width="72" height="72">
+    
     <h1><b> Welcome John,</b></h1>
   </div>
 
