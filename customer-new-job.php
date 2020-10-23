@@ -75,6 +75,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       echo $e->getMessage();
 
   }
+/*  Check inputs here */
+
   $stmt = $conn->prepare("INSERT INTO print_job (netlink_id, job_name, model_name, infill, scale, layer_height, supports, copies, material_type, comments, status) VALUES (:netlink_id, :job_name, :model_name, :infill, :scale, :layer_height, :supports, :copies, :material_type, :comments, :status)");
   $stmt->bindParam(':netlink_id', $netlink_id);
   $stmt->bindParam(':job_name', $_POST["job_name"]);
@@ -175,7 +177,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <h3 class="mb-3">Upload 3D Model</h3>
     <small class="text-muted">(Max 200MB)</small>
-        <input type="file" id="myFile" name="3d_model">
+        <input type="file" id="myFile" name="3d_model" required>
       <br>
       <hr class="mb-6">
 
