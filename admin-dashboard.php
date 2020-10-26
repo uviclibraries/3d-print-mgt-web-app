@@ -130,7 +130,8 @@ foreach ($jobs as $job) {
 
             <div class="container">
           <div class="py-5 text-left">
-            <h3>Not Priced</h3>
+
+            <h3>Active Jobs</h3>
             <div class="py-3"></div>
       <div class="table-responsive">
         <table class="table table-striped table-md">
@@ -139,9 +140,11 @@ foreach ($jobs as $job) {
               <th>Username</th>
               <th>Name</th>
               <th>Submission Date</th>
+              <th>Status</th>
             </tr>
           </thead>
           <tbody>
+
           <?php
             foreach($not_priced as $row){
             ?>
@@ -149,115 +152,114 @@ foreach ($jobs as $job) {
               <td><?php echo $row["netlink_id"]; ?></td>
                 <td><a href="admin-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
               <td><?php echo $row["submission_date"]; ?></td>
+              <td><?php echo $row["status"]; ?></td>
             </tr>
             <?php
-            }
-            ?>
-          </tbody>
-        </table>
-
-            <h3>Pending Payment</h3>
-            <div class="py-3"></div>
-      <div class="table-responsive">
-        <table class="table table-striped table-md">
-          <thead>
+            } ?> 
             <tr>
-              <th>Username</th>
-              <th>Name</th>
-              <th>Priced Date</th>
+              <td> </td>
+              <td> </td>
+              <td> </td>
+              <td> </td>
             </tr>
-          </thead>
-          <tbody>
-
-          <?php
-            foreach($pending_payment as $row){
+            <tr>
+              <thread>
+                <th>Username</th>
+                <th>Name</th>
+                <th>Priced Date</th>
+                <th>Status</th>
+              </thread>
+            </tr>
+            <?php foreach ($pending_payment as $row) {
             ?>
             <tr>
               <td><?php echo $row["netlink_id"]; ?></td>
                 <td><a href="admin-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
               <td><?php echo $row["priced_date"]; ?></td>
+              <td><?php echo $row["status"]; ?></td>
             </tr>
             <?php
             }
             ?>
-          </tbody>
-        </table>
-
-            <h3>Ready to Print</h3>
-            <div class="py-3"></div>
-      <div class="table-responsive">
-        <table class="table table-striped table-md">
-          <thead>
             <tr>
-              <th>Username</th>
-              <th>Name</th>
-              <th>Payment Date</th>
+              <td> </td>
+              <td> </td>
+              <td> </td>
+              <td> </td>
             </tr>
-          </thead>
-          <tbody>
-          <?php
-            foreach($ready_to_print as $row){
+            <tr>
+            <tr>
+              <thread>
+                <th>Username</th>
+                <th>Name</th>
+                <th>Payment Date</th>
+                <th>Status</th>
+              </thread>
+            </tr>
+            <?php foreach ($ready_to_print as $row) {
             ?>
             <tr>
               <td><?php echo $row["netlink_id"]; ?></td>
                 <td><a href="admin-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
               <td><?php echo $row["ready_to_prnt_date"]; ?></td>
+              <td><?php echo $row["status"]; ?></td>
             </tr>
             <?php
             }
             ?>
-          </tbody>
-        </table>
-
-            <h3>Printing</h3>
-            <div class="py-3"></div>
-      <div class="table-responsive">
-        <table class="table table-striped table-md">
-          <thead>
             <tr>
-              <th>Username</th>
-              <th>Name</th>
-              <th>Print Start Date</th>
+              <td> </td>
+              <td> </td>
+              <td> </td>
+              <td> </td>
             </tr>
-          </thead>
-          <tbody>
-          <?php
-            foreach($printing as $row){
+            <tr>
+            <tr>
+              <thread>
+                <th>Username</th>
+                <th>Name</th>
+                <th>Print Start Date</th>
+                <th>Status</th>
+              </thread>
+            </tr>
+            <?php foreach ($printing as $row) {
             ?>
             <tr>
               <td><?php echo $row["netlink_id"]; ?></td>
                 <td><a href="admin-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
               <td><?php echo $row["printing_date"]; ?></td>
+              <td><?php echo $row["status"]; ?></td>
             </tr>
             <?php
             }
             ?>
-          </tbody>
-        </table>
-
-            <h3>Complete</h3>
-            <div class="py-3"></div>
-      <div class="table-responsive">
-        <table class="table table-striped table-md">
-          <thead>
             <tr>
-              <th>Username</th>
-              <th>Name</th>
-              <th>Completed Date</th>
+              <td> </td>
+              <td> </td>
+              <td> </td>
+              <td> </td>
             </tr>
-          </thead>
-         <tbody>
-          <?php
-            foreach($complete as $row){
+            <tr>
+            <tr>
+              <thread>
+                <th>Username</th>
+                <th>Name</th>
+                <th>Completion Date</th>
+                <th>Status</th>
+              </thread>
+            </tr>
+            <?php foreach ($complete as $row) {
             ?>
             <tr>
               <td><?php echo $row["netlink_id"]; ?></td>
                 <td><a href="admin-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
               <td><?php echo $row["complete_date"]; ?></td>
+              <td><?php echo $row["status"]; ?></td>
             </tr>
             <?php
-            }        
+            }
             ?>
+
           </tbody>
         </table>
       </div>
