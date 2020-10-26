@@ -1,14 +1,45 @@
 <?php
 require ('db.php');
+/*
 $stm = $conn->query("SELECT id, job_name, netlink_id, status, submission_date, priced_date, pending_pmt_date, ready_to_prnt_date, printing_date, complete_date FROM print_job ORDER BY id DESC");
 $jobs = $stm->fetchAll();
+*/
+$stm = $conn->query("SELECT id, job_name, netlink_id, status, submission_date FROM print_job WHERE status = 'not_priced' ORDER BY submission_date ASC");
+$job1 = $stm->fetchAll();
+
+$stm = $conn->query("SELECT id, job_name, netlink_id, status, priced_date FROM print_job WHERE status = 'pending_payment' ORDER BY priced_date ASC");
+$job2 = $stm->fetchAll();
+
+$stm = $conn->query("SELECT id, job_name, netlink_id, status, ready_to_prnt_date FROM print_job WHERE status = 'ready_to_print' ORDER BY ready_to_prnt_date ASC");
+$job3 = $stm->fetchAll();
+
+$stm = $conn->query("SELECT id, job_name, netlink_id, status, printing_date FROM print_job WHERE status = 'printing' ORDER BY printing_date ASC");
+$job4 = $stm->fetchAll();
+
+$stm = $conn->query("SELECT id, job_name, netlink_id, status, complete_date FROM print_job WHERE status = 'complete' ORDER BY complete_date ASC");
+$job5 = $stm->fetchAll();
 # need to change so I grab by dates within sections. thinking multiple quiries.
 $not_priced = [];
 $pending_payment = [];
 $ready_to_print = [];
 $printing = [];
 $complete = [];
-
+foreach ($job1 as $job) {
+  $not_priced[] = $job;
+}
+foreach ($job2 as $job) {
+  $pending_payment[] = $job;
+}
+foreach ($job3 as $job) {
+  $ready_to_print[] = $job;
+}
+foreach ($job4 as $job) {
+  $printing[] = $job;
+}
+foreach ($job5 as $job) {
+  $complete[] = $job;
+}
+/*
 foreach ($jobs as $job) {
   if ($job["status"] == "not_priced"){
     $not_priced[] = $job;
@@ -23,6 +54,7 @@ foreach ($jobs as $job) {
   }
   # code...
 }
+*/
 ?>
 
 <!doctype html>

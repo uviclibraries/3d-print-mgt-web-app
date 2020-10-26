@@ -9,6 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $stmt = $conn->prepare("UPDATE print_job SET price = :price, infill = :infill, scale = :scale, layer_height = :layer_height, supports = :supports, copies = :copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date, ready_to_prnt_date = :ready_to_prnt_date, printing_date = :printing_date, complete_date = :complete_date WHERE id = :job_id;
   ");
   $current_date = date("Y-m-d");
+  $prev_status = $job["status"];
   $stmt->bindParam(':job_id', intval($_GET["job_id"]), PDO::PARAM_INT);
   $stmt->bindParam(':price', floatval($_POST["price"]));
   $stmt->bindParam(':infill', intval($_POST["infill"]), PDO::PARAM_INT);
@@ -160,7 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                       <div class="input-group">
                         <div class="input-group">
                             <div class="input-group-prepend">
-                              <!-- catch non floatable input??-->
+                              <!-- ** catch non floatable input-->
                                 <span class="input-group-text">$</span>
                           <input type="text" name="price" autocomplete="off" class="form-control" value="<?php echo $job["price"]; ?>">
                           </div>
@@ -175,7 +176,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <hr class="mb-6">
 
     <h3 class="mb-3">3D Model</h3>
-        <input type="file" id="myFile" name="filename" disabled>
+        
+        <a href="<?php echo "/uploads/" . $job['model_name']; ?>" > Download 3D file </a>
       <br>
       <hr class="mb-6">
 
@@ -234,8 +236,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <div class="col-md-3 mb-3">
             <label for="supports">Supports</label>
             <select class="custom-select d-block w-100" name="supports" id="supports">
-              <option <?php if ($job["supports"]== 1){echo "selected";} ?>>Yes</option>
-              <option <?php if ($job["supports"]== 0){echo "selected";} ?>>No</option>
+              <option value = 1  <?php if ($job["supports"]== 1){echo "selected";} ?>>Yes</option>
+              <option value = 0 <?php if ($job["supports"]== 0){echo "selected";} ?>>No</option>
             </select>
           </div>
         </div>
