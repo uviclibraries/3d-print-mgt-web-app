@@ -119,7 +119,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="container">
     <form method="POST">
   <div class="py-5 text-center">
-    <img class="d-block mx-auto mb-4" src="/docs/4.5/assets/brand/bootstrap-solid.svg" alt="" width="72" height="72">
     <h1><?php echo $job["job_name"]; ?></h1>
     </div>
     
