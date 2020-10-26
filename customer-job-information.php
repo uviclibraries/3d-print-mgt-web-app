@@ -53,7 +53,7 @@ $job=$stm->fetch();
   <body class="bg-light">
     <div class="container">
   <div class="py-5 text-center">
-    
+
     <h1>Submitted Print Job</h1>
     </div>
 
@@ -93,35 +93,35 @@ $job=$stm->fetch();
         <input type="file" id="myFile" name="filename" disabled> <!-- *need*display 3d file -->
       </form>
       <br>
-        
+
     <!-- if its priced/payed-->
     <?php if($job["status"] != "not_priced"){?>
-       
+
 
         <div class="col-md-3 mb-3">
                 <label for="username">Price</label>
-                
-                
+
+
                     <div class="input-group-prepend">
                         <span class="input-group-text">$</span>
                           <input type="text" name="price" class="form-control" value="<?php echo $job["price"]; ?>" readonly>
                     </div>
-                
-                
+
+
             </div>
-        <!-- if its priced and not payed-->                    
-        <?php if ($job["status"] == "pending_payment") { ?> 
-                
+        <!-- if its priced and not payed-->
+        <?php if ($job["status"] == "pending_payment") { ?>
+
                     <a href="customer-payment.php">
                         <button type="button" class="btn btn-primary btn-lg" type="submit">Payment</button>
                     </a>
-            
-        <?php } ?>       
+
+        <?php } ?>
     <?php }  ?>
-            
-        
-           <!-- end if(if) else --> 
-           
+
+
+           <!-- end if(if) else -->
+
         </div>
 
       <hr class="mb-6">
@@ -203,14 +203,14 @@ $job=$stm->fetch();
         <hr class="mb-4">
         <h5 class="mb-2">Additional Comments</h5>
             <div class="input-group">
-                <textarea class="form-control" aria-label="additional-comments"readonly ><?php echo $job["comments"]; ?>      
+                <textarea class="form-control" aria-label="additional-comments"readonly ><?php echo $job["comments"]; ?>
                 </textarea>
             </div>
             <div class="invalid-feedback">
             Please enter additional comments.
             </div>
         </div>
-        
+
         <hr class="mb-4">
         <center>
             <a href="customer-dashboard.php">
