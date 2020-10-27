@@ -1,9 +1,5 @@
 <?php
 require ('db.php');
-/*
-$stm = $conn->query("SELECT id, job_name, netlink_id, status, submission_date, priced_date, pending_pmt_date, ready_to_prnt_date, printing_date, complete_date FROM print_job ORDER BY id DESC");
-$jobs = $stm->fetchAll();
-*/
 $stm = $conn->query("SELECT id, job_name, netlink_id, status, submission_date FROM print_job WHERE status = 'not_priced' ORDER BY submission_date ASC");
 $job1 = $stm->fetchAll();
 
@@ -18,12 +14,13 @@ $job4 = $stm->fetchAll();
 
 $stm = $conn->query("SELECT id, job_name, netlink_id, status, complete_date FROM print_job WHERE status = 'complete' ORDER BY complete_date ASC");
 $job5 = $stm->fetchAll();
-# need to change so I grab by dates within sections. thinking multiple quiries.
+
 $not_priced = [];
 $pending_payment = [];
 $ready_to_print = [];
 $printing = [];
 $complete = [];
+
 foreach ($job1 as $job) {
   $not_priced[] = $job;
 }
@@ -39,22 +36,6 @@ foreach ($job4 as $job) {
 foreach ($job5 as $job) {
   $complete[] = $job;
 }
-/*
-foreach ($jobs as $job) {
-  if ($job["status"] == "not_priced"){
-    $not_priced[] = $job;
-  } else if ($job["status"] == "pending_payment"){
-    $pending_payment[] = $job;
-  } else if ($job["status"] == "ready_to_print"){
-    $ready_to_print[] = $job;
-  } else if ($job["status"] == "printing"){
-    $printing[] = $job;
-  } else if ($job["status"] == "complete"){
-    $complete[] = $job;
-  }
-  # code...
-}
-*/
 ?>
 
 <!doctype html>
@@ -137,6 +118,7 @@ foreach ($jobs as $job) {
         <table class="table table-striped table-md">
           <thead>
             <tr>
+              <!-- table header-->
               <th>Username</th>
               <th>Name</th>
               <th>Submission Date</th>
@@ -146,6 +128,7 @@ foreach ($jobs as $job) {
           <tbody>
 
           <?php
+            //Grab each item from each array
             foreach($not_priced as $row){
             ?>
             <tr>
@@ -157,6 +140,7 @@ foreach ($jobs as $job) {
             <?php
             } ?> 
             <tr>
+              <!-- empty row-->
               <td> </td>
               <td> </td>
               <td> </td>
