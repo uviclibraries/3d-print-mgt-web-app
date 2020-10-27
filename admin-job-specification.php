@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $current_date = date("Y-m-d");
   $prev_status = $job["status"];
   $stmt->bindParam(':job_id', intval($_GET["job_id"]), PDO::PARAM_INT);
-  $stmt->bindParam(':price', floatval($_POST["price"]));
+  $stmt->bindParam(':price', floatval(number_format((float)$_POST["price"], 2, '.','')));
   $stmt->bindParam(':infill', intval($_POST["infill"]), PDO::PARAM_INT);
   $stmt->bindParam(':scale', intval($_POST["scale"]), PDO::PARAM_INT);
   $stmt->bindParam(':layer_height', $_POST["layer_height"], PDO::PARAM_STR);
@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>HTML email</title>
     </head>
     <body>
-    <p>Make " . $_POST['price'] . " payment for " . $job['job_name'] . " using this link
+    <p>Make " . (number_format((float)$_POST["price"], 2, '.','')) . " payment for " . $job['job_name'] . " using this link
     <a href='#'>link</a></p>
     </body>
     </html>";
@@ -119,7 +119,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="container">
     <form method="POST">
   <div class="py-5 text-center">
-    <img class="d-block mx-auto mb-4" src="/docs/4.5/assets/brand/bootstrap-solid.svg" alt="" width="72" height="72">
     <h1><?php echo $job["job_name"]; ?></h1>
     </div>
     
@@ -163,7 +162,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <div class="input-group-prepend">
                               <!-- ** catch non floatable input-->
                                 <span class="input-group-text">$</span>
-                          <input type="text" name="price" autocomplete="off" class="form-control" value="<?php echo $job["price"]; ?>">
+                          <input type="text" name="price" autocomplete="off" class="form-control" value="<?php echo number_format((float)$job["price"], 2, '.',''); ?>">
                           </div>
                       </div>
                       <div class="invalid-feedback" style="width: 100%;">

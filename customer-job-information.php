@@ -114,6 +114,21 @@ $job=$stm->fetch();
 
                     <a href="customer-payment.php">
                         <button type="button" class="btn btn-primary btn-lg" type="submit">Payment</button>
+                        <!--
+                        <FORM METHOD="POST" ACTION= https://esqa.moneris.com/HPPDP/index.php >
+
+                            <INPUT TYPE="HIDDEN" NAME="netlink_id" VALUE="AF4Fs1024">
+
+                            <INPUT TYPE="HIDDEN" NAME="job_id" VALUE="Hsjh4GSr4g">
+
+                            <INPUT TYPE="HIDDEN" NAME="price" VALUE="1.00">
+
+                            ** MORE OPTIONAL VARIABLES CAN BE DEFINED HERE 
+
+                            <INPUT TYPE="SUBMIT" NAME="SUBMIT" VALUE="Click to proceed to Secure Page">
+
+                        </FORM>    
+                     -->
                     </a>
 
         <?php } ?>

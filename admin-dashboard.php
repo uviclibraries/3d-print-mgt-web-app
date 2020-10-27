@@ -1,9 +1,5 @@
 <?php
 require ('db.php');
-/*
-$stm = $conn->query("SELECT id, job_name, netlink_id, status, submission_date, priced_date, pending_pmt_date, ready_to_prnt_date, printing_date, complete_date FROM print_job ORDER BY id DESC");
-$jobs = $stm->fetchAll();
-*/
 $stm = $conn->query("SELECT id, job_name, netlink_id, status, submission_date FROM print_job WHERE status = 'not_priced' ORDER BY submission_date ASC");
 $job1 = $stm->fetchAll();
 
@@ -18,12 +14,13 @@ $job4 = $stm->fetchAll();
 
 $stm = $conn->query("SELECT id, job_name, netlink_id, status, complete_date FROM print_job WHERE status = 'complete' ORDER BY complete_date ASC");
 $job5 = $stm->fetchAll();
-# need to change so I grab by dates within sections. thinking multiple quiries.
+
 $not_priced = [];
 $pending_payment = [];
 $ready_to_print = [];
 $printing = [];
 $complete = [];
+
 foreach ($job1 as $job) {
   $not_priced[] = $job;
 }
@@ -39,22 +36,6 @@ foreach ($job4 as $job) {
 foreach ($job5 as $job) {
   $complete[] = $job;
 }
-/*
-foreach ($jobs as $job) {
-  if ($job["status"] == "not_priced"){
-    $not_priced[] = $job;
-  } else if ($job["status"] == "pending_payment"){
-    $pending_payment[] = $job;
-  } else if ($job["status"] == "ready_to_print"){
-    $ready_to_print[] = $job;
-  } else if ($job["status"] == "printing"){
-    $printing[] = $job;
-  } else if ($job["status"] == "complete"){
-    $complete[] = $job;
-  }
-  # code...
-}
-*/
 ?>
 
 <!doctype html>
@@ -130,134 +111,139 @@ foreach ($jobs as $job) {
 
             <div class="container">
           <div class="py-5 text-left">
-            <h3>Not Priced</h3>
+
+            <h3>Active Jobs</h3>
             <div class="py-3"></div>
       <div class="table-responsive">
         <table class="table table-striped table-md">
           <thead>
             <tr>
+              <!-- table header-->
               <th>Username</th>
               <th>Name</th>
               <th>Submission Date</th>
+              <th>Status</th>
             </tr>
           </thead>
           <tbody>
+
           <?php
+            //Grab each item from each array
             foreach($not_priced as $row){
             ?>
             <tr>
               <td><?php echo $row["netlink_id"]; ?></td>
                 <td><a href="admin-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
               <td><?php echo $row["submission_date"]; ?></td>
+              <td><?php echo $row["status"]; ?></td>
             </tr>
             <?php
-            }
-            ?>
-          </tbody>
-        </table>
-
-            <h3>Pending Payment</h3>
-            <div class="py-3"></div>
-      <div class="table-responsive">
-        <table class="table table-striped table-md">
-          <thead>
+            } ?> 
             <tr>
-              <th>Username</th>
-              <th>Name</th>
-              <th>Priced Date</th>
+              <!-- empty row-->
+              <td> </td>
+              <td> </td>
+              <td> </td>
+              <td> </td>
             </tr>
-          </thead>
-          <tbody>
-
-          <?php
-            foreach($pending_payment as $row){
+            <tr>
+              <thread>
+                <th>Username</th>
+                <th>Name</th>
+                <th>Priced Date</th>
+                <th>Status</th>
+              </thread>
+            </tr>
+            <?php foreach ($pending_payment as $row) {
             ?>
             <tr>
               <td><?php echo $row["netlink_id"]; ?></td>
                 <td><a href="admin-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
               <td><?php echo $row["priced_date"]; ?></td>
+              <td><?php echo $row["status"]; ?></td>
             </tr>
             <?php
             }
             ?>
-          </tbody>
-        </table>
-
-            <h3>Ready to Print</h3>
-            <div class="py-3"></div>
-      <div class="table-responsive">
-        <table class="table table-striped table-md">
-          <thead>
             <tr>
-              <th>Username</th>
-              <th>Name</th>
-              <th>Payment Date</th>
+              <td> </td>
+              <td> </td>
+              <td> </td>
+              <td> </td>
             </tr>
-          </thead>
-          <tbody>
-          <?php
-            foreach($ready_to_print as $row){
+            <tr>
+            <tr>
+              <thread>
+                <th>Username</th>
+                <th>Name</th>
+                <th>Payment Date</th>
+                <th>Status</th>
+              </thread>
+            </tr>
+            <?php foreach ($ready_to_print as $row) {
             ?>
             <tr>
               <td><?php echo $row["netlink_id"]; ?></td>
                 <td><a href="admin-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
               <td><?php echo $row["ready_to_prnt_date"]; ?></td>
+              <td><?php echo $row["status"]; ?></td>
             </tr>
             <?php
             }
             ?>
-          </tbody>
-        </table>
-
-            <h3>Printing</h3>
-            <div class="py-3"></div>
-      <div class="table-responsive">
-        <table class="table table-striped table-md">
-          <thead>
             <tr>
-              <th>Username</th>
-              <th>Name</th>
-              <th>Print Start Date</th>
+              <td> </td>
+              <td> </td>
+              <td> </td>
+              <td> </td>
             </tr>
-          </thead>
-          <tbody>
-          <?php
-            foreach($printing as $row){
+            <tr>
+            <tr>
+              <thread>
+                <th>Username</th>
+                <th>Name</th>
+                <th>Print Start Date</th>
+                <th>Status</th>
+              </thread>
+            </tr>
+            <?php foreach ($printing as $row) {
             ?>
             <tr>
               <td><?php echo $row["netlink_id"]; ?></td>
                 <td><a href="admin-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
               <td><?php echo $row["printing_date"]; ?></td>
+              <td><?php echo $row["status"]; ?></td>
             </tr>
             <?php
             }
             ?>
-          </tbody>
-        </table>
-
-            <h3>Complete</h3>
-            <div class="py-3"></div>
-      <div class="table-responsive">
-        <table class="table table-striped table-md">
-          <thead>
             <tr>
-              <th>Username</th>
-              <th>Name</th>
-              <th>Completed Date</th>
+              <td> </td>
+              <td> </td>
+              <td> </td>
+              <td> </td>
             </tr>
-          </thead>
-         <tbody>
-          <?php
-            foreach($complete as $row){
+            <tr>
+            <tr>
+              <thread>
+                <th>Username</th>
+                <th>Name</th>
+                <th>Completion Date</th>
+                <th>Status</th>
+              </thread>
+            </tr>
+            <?php foreach ($complete as $row) {
             ?>
             <tr>
               <td><?php echo $row["netlink_id"]; ?></td>
                 <td><a href="admin-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
               <td><?php echo $row["complete_date"]; ?></td>
+              <td><?php echo $row["status"]; ?></td>
             </tr>
             <?php
-            }        
+            }
             ?>
+
           </tbody>
         </table>
       </div>
