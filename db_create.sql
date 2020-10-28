@@ -40,7 +40,7 @@ INSERT INTO `printer` (`id`, `printer_name`, `make_model`, `comments`) VALUES
 
 --
 -- Table structure for table `print_job`
---
+--price decimal(4,2) = 9999.99 is maximum charge.
 
 CREATE TABLE `print_job` (
   `id` int(11) NOT NULL,
@@ -58,7 +58,7 @@ CREATE TABLE `print_job` (
   `staff_notes` text,
   `status` varchar(100) NOT NULL,
   `submission_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `price` float DEFAULT NULL,
+  `price` decimal(4,2) DEFAULT NULL,
   `priced_date` date DEFAULT NULL,
   `pending_pmt_date` date DEFAULT NULL,
   `ready_to_prnt_date` date DEFAULT NULL,
@@ -83,9 +83,9 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `netlink_id`, `name`, `user_type`) VALUES
-(1, 'rmccue', 'Rich McCue', 0),
-(2, 'libmedia', 'Music and Media desk', 1);
+INSERT INTO `users` (`id`, `netlink_id`, `name`, `user_type`, 'email') VALUES
+(1, 'rmccue', 'Rich McCue', 0, 'kenziewong@gmail.com'),
+(2, 'libmedia', 'Music and Media desk', 1, 'kenziewong@gmail.com');
 
 --
 -- Indexes for dumped tables
