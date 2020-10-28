@@ -50,7 +50,7 @@ CREATE TABLE `print_job` (
   `model_name_2` varchar(250) DEFAULT NULL,
   `infill` int(11) NOT NULL,
   `scale` int(11) NOT NULL,
-  `layer_height` decimal(1,2) NOT NULL,
+  `layer_height` decimal(2,2) NOT NULL,
   `supports` int(11) NOT NULL,
   `copies` int(11) NOT NULL,
   `material_type` varchar(100) NOT NULL,
