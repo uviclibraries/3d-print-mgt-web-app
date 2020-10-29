@@ -1,7 +1,7 @@
 <?php
-$servername = "localhost:8889";
-$username = "root";
-$password = "root";
+$servername = "3d_print_jobs";
+$username = "3d_print";
+$password = "Hx_27!PfQ";
 try {
   $conn = new PDO("mysql:host=$servername;dbname=3d_print_mgt", $username, $password);
   // set the PDO error mode to exception
