@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $stmt->bindParam(':ready_to_prnt_date', $_GET['ready_to_prnt_date']);
   $stmt->bindParam(':printing_date', $_GET['printing_date']);
   $stmt->bindParam(':complete_date', $_GET['complete_date']);
-  
+
   //need variable to check if admin wants to send email. case: updating notes but dont send email
   if ($_POST['status'] == "pending_payment") {
     $stmt->bindParam(':priced_date', $current_date);
@@ -41,8 +41,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $headers = "MIME-Version: 1.0" . "\r\n";
     $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
     mail("kenziewong@gmail.com","3D Print - Make Payment",$msg,$headers); # *** change email to users  ***
-  } elseif($_POST['status'] == "ready_to_print"){ 
-    //this should be done automatically when payment is received. 
+  } elseif($_POST['status'] == "ready_to_print"){
+    //this should be done automatically when payment is received.
     $stmt->bindParam(':ready_to_prnt_date', $current_date);
 
   } elseif($_POST['status'] == "printing"){
@@ -121,7 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <div class="py-5 text-center">
     <h1><?php echo $job["job_name"]; ?></h1>
     </div>
-    
+
     <div class="col-md-12 order-md-1">
         <h4 class="mb-3">Status</h4>
           <div class="row">
@@ -175,8 +175,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <hr class="mb-6">
 
     <h3 class="mb-3">3D Model</h3>
-        
-        <a href="<?php echo "/uploads/" . $job['model_name']; ?>" > Download 3D file </a>
+
+        <a href="<?php echo "uploads/" . $job['model_name']; ?>" > Download 3D file </a>
       <br>
       <hr class="mb-6">
 
@@ -299,7 +299,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
         <hr class="mb-4">
-        <div class="row"> 
+        <div class="row">
             <div class="col-md-6 mb-3">
                 <a href="url">
                     <button class="btn btn-primary btn-lg btn-block" class="form-control" type="submit" data-inline="true">Save</button>
