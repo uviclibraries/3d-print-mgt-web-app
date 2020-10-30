@@ -13,8 +13,8 @@ SET time_zone = "+00:00";
 --
 -- Database: `3d_print_mgt`
 --
-CREATE DATABASE IF NOT EXISTS `3d_print_mgt` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
-USE `3d_print_mgt`;
+CREATE DATABASE IF NOT EXISTS `3d_print_jobs` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+USE `3d_print_jobs`;
 
 -- --------------------------------------------------------
 
@@ -38,9 +38,6 @@ INSERT INTO `printer` (`id`, `printer_name`, `make_model`, `comments`) VALUES
 
 -- --------------------------------------------------------
 
---
--- Table structure for table `print_job`
---price decimal(4,2) = 9999.99 is maximum charge.
 
 CREATE TABLE `print_job` (
   `id` int(11) NOT NULL,
@@ -57,7 +54,7 @@ CREATE TABLE `print_job` (
   `comments` text,
   `staff_notes` text,
   `status` varchar(100) NOT NULL,
-  `submission_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `submission_date` date DEFAULT NULL,
   `price` decimal(4,2) DEFAULT NULL,
   `priced_date` date DEFAULT NULL,
   `pending_pmt_date` date DEFAULT NULL,
@@ -76,7 +73,8 @@ CREATE TABLE `users` (
   `id` int(11) NOT NULL,
   `netlink_id` varchar(100) NOT NULL,
   `name` varchar(100) NOT NULL,
-  `user_type` int(11) NOT NULL
+  `user_type` int(11) NOT NULL,
+  'email' varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
