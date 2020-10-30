@@ -4,14 +4,14 @@ $stm = $conn->query("SELECT VERSION()");
 #$version = $stm->fetch();
 #echo $version;
 
-$netlink_id = "rmccue"; # Temporary 4 testing. Netlink ID will eventually be passed from login form. 
+$netlink_id = "rmccue"; # Temporary 4 testing. Netlink ID will eventually be passed from login form.
 $model_name = "test.stl"; # Temporary 4 testing...
 $status = "not_priced";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   try {
-    
+
       // Undefined | Multiple Files | $_FILES Corruption Attack
       // If this request falls under any of them, treat it invalid.
     //what? kw
@@ -83,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $stmt->bindParam(':model_name', $hash_name);
   $stmt->bindParam(':infill', intval($_POST["infill"]), PDO::PARAM_INT);
   $stmt->bindParam(':scale', intval($_POST["scale"]), PDO::PARAM_INT);
-  $stmt->bindParam(':layer_height', $_POST["layer_height"], PDO::PARAM_STR);
+  $stmt->bindParam(':layer_height', floatval(number_format((float)$_POST["layer_height"], 2, '.','')));
   $stmt->bindParam(':supports', intval($_POST["supports"]), PDO::PARAM_INT);
   $stmt->bindParam(':copies', intval($_POST["copies"]), PDO::PARAM_INT);
   $stmt->bindParam(':material_type', $_POST["material_type"]);
@@ -158,7 +158,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="container">
         <form method="POST" enctype="multipart/form-data">
   <div class="py-5 text-center">
-    
+
     <h1>New Print Job</h1>
     </div>
 
@@ -294,7 +294,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             Please enter additional comments.
             </div>
         </div>
-        
+
         <hr class="mb-4">
         <center>
             <a href="customer-dashboard.php">
