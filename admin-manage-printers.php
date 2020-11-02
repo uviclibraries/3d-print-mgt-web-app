@@ -1,3 +1,16 @@
+<?php
+require ('db.php');
+$stm = $conn->query("SELECT id, printer_name, make_model, comments, operational, color ,color2, 2extruder FROM printer ORDER BY id");
+$all_printers = $stm->fetchAll();
+
+$pritners = [];
+foreach ($all_printers as $printer) {
+  $printers[] = $printer;
+}
+
+
+ ?>
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -38,61 +51,68 @@
           font-size: 3.5rem;
         }
       }
-      html,
-body {
-  height: 100%;
-}
 
-body {
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-align: center;
-  align-items: center;
-  padding-top: 40px;
-  padding-bottom: 40px;
-  background-color: #f5f5f5;
-}
-
-.form-signin {
-  width: 100%;
-  max-width: 330px;
-  padding: 15px;
-  margin: auto;
-}
-.form-signin .checkbox {
-  font-weight: 400;
-}
-.form-signin .form-control {
-  position: relative;
-  box-sizing: border-box;
-  height: auto;
-  padding: 10px;
-  font-size: 16px;
-}
-.form-signin .form-control:focus {
-  z-index: 2;
-}
-.form-signin input[type="email"] {
-  margin-bottom: -1px;
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
-}
-.form-signin input[type="password"] {
-  margin-bottom: 10px;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-}
     </style>
     <!-- Custom styles for this template -->
-    
+
   </head>
   <body class="text-center">
     <form class="form-signin">
-  
+
   <h1 class="h3 mb-3 font-weight-normal">Manage Printers</h1>
 
-  <a class="btn btn-primary btn-lg btn-block" href="admin-dashboard.php" role="button">Back to Dashboard</a>
-
+  <a class="btn btn-primary btn-lg" href="admin-dashboard.php" role="button">Back to Dashboard</a>
+  <div class="container">
+  <div class="py-3"></div>
+  <div class="table-responsive">
+    <table class="table table-striped table-md">
+      <tbody>
+        <tr>
+          <thread>
+            <th>id</th>
+            <th>Printer Name</th>
+            <th>Model</th>
+            <th>Status</th>
+            <th>Extruder 1</th>
+            <th>Extruder 2</th>
+          </thread>
+        </tr>
+        <!------------------------------------------->
+        <?php foreach ($printers as $row) {
+        ?>
+        <tr>
+          <td><?php echo $row["id"]; ?></td>
+          <td><?php echo $row["printer_name"]; ?></td>
+          <td><?php echo $row["make_model"]; ?></td>
+          <td>
+            <select class="form-control" name="operating" id="operating">
+              <option  <?php if ($row["operational"]== true){echo "selected";} ?> > On
+              </option>
+              <option  <?php if ($row["operational"]== false){echo "selected";} ?> > Off
+              </option>
+            </select>
+          </td>
+          <td>
+            <input type="text" name="color" class "form-control" value="<?php echo $row["color"]; ?>">
+          </td>
+          <td>
+            <?php if ($row["2extruder"] == true){ ?>
+              <input type="text" name="color2" class "form-control" value = "<?php echo $row["color2"]; ?> ">
+            <?php
+            }else {
+              echo $row["color2"];
+            }
+            ?>
+          </td>
+        </tr>
+        <?php
+        }
+        ?>
+      <!------------------------------------------->
+      </tbody>
+    </table>
+  </div>
+</div>
 </form>
 </body>
 </html>
