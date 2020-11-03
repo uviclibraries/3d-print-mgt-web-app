@@ -6,7 +6,7 @@
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Jekyll v4.0.1">
-    <title>Checkout example · Bootstrap</title>
+    <title>Admin print history</title>
 
     <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/checkout/">
 
@@ -84,11 +84,11 @@ body {
 }
     </style>
     <!-- Custom styles for this template -->
-    
+
   </head>
   <body class="text-center">
     <form class="form-signin">
-  
+
   <h1 class="h3 mb-3 font-weight-normal">Print History</h1>
 
   <a class="btn btn-primary btn-lg btn-block" href="admin-dashboard.php" role="button">Back to Dashboard</a>

@@ -119,7 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Jekyll v4.0.1">
-    <title>Checkout example · Bootstrap</title>
+    <title>New 3D print request</title>
 
     <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/checkout/">
 

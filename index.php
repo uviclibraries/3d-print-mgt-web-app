@@ -27,7 +27,7 @@ if (isset($_REQUEST['logout'])) {
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Jekyll v4.0.1">
-    <title>Checkout example · Bootstrap</title>
+    <title>Welcome to the DSC 3D print page</title>
 
     <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/checkout/">
 
