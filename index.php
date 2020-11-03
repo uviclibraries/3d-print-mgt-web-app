@@ -1,3 +1,24 @@
+<?php
+//
+//  phpCAS/index.php  -  CAS authentication using phpCAS module
+//                    -  based on:  https://github.com/apereo/phpCAS/blob/master/docs/examples/example_simple.php
+//
+
+require_once 'CAS.php';
+
+phpCAS::setDebug();
+phpCAS::setVerbose(true);
+
+phpCAS::client(CAS_VERSION_2_0, 'www.uvic.ca', 443, '/cas');
+phpCAS::setNoCasServerValidation();
+phpCAS::forceAuthentication();
+
+// logout if desired
+if (isset($_REQUEST['logout'])) {
+	phpCAS::logout();
+}
+
+?>
 <!doctype html>
 <html lang="en">
   <head>
@@ -84,16 +105,19 @@ body {
 }
     </style>
     <!-- Custom styles for this template -->
-    
+
   </head>
   <body class="text-center">
     <form class="form-signin">
-  
+
   <h1 class="h3 mb-3 font-weight-normal">DSC 3D Print sign in</h1>
   <path fill-rule="evenodd" d="M.002 3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-12a2 2 0 0 1-2-2V3zm1 9l2.646-2.354a.5.5 0 0 1 .63-.062l2.66 1.773 3.71-3.71a.5.5 0 0 1 .577-.094L15.002 9.5V13a1 1 0 0 1-1 1h-12a1 1 0 0 1-1-1v-1zm5-6.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
 </svg>
 
-  <a class="btn btn-primary btn-lg btn-block" href="customer-dashboard.php" role="button">Sign In</a>
+  <a class="btn btn-primary btn-lg btn-block" href="customer-dashboard.php" role="button">Dashboard</a>
+  <p>Hello user: "<i><?php echo phpCAS::getUser(); ?></i>" Here I will talk about what this is and how it works. FAQ page link will also be on this page.</p>
+
+  <a class="btn btn-primary btn-lg btn-block" href="?logout=" role="button">Logout</a>
 
   <p class="mt-5 mb-3 text-muted">&copy; 2020</p>
 </form>
