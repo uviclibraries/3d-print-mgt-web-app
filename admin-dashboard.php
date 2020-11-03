@@ -89,7 +89,7 @@ foreach ($job5 as $job) {
   <body class="bg-light">
     <div class="container">
         <div class="py-5 text-center">
-            
+
             <div class="row">
                 <div class="col-md-4 mb-3">
                     <a href="admin-reports.php">
@@ -134,11 +134,11 @@ foreach ($job5 as $job) {
             <tr>
               <td><?php echo $row["netlink_id"]; ?></td>
                 <td><a href="admin-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
-              <td><?php echo $row["submission_date"]; ?></td>
+              <td> <?php echo $row["submission_date"]; ?></td>
               <td><?php echo $row["status"]; ?></td>
             </tr>
             <?php
-            } ?> 
+            } ?>
             <tr>
               <!-- empty row-->
               <td> </td>
