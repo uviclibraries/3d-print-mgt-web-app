@@ -1,3 +1,26 @@
+<?php
+require ('auth-sec.php'); //Gets CAS & db
+
+//Is user Admin check
+$user = phpCAS::getUser();
+$usersearch = $conn->query("SELECT user_type, name FROM users WHERE netlink_id = '$user'");
+//has to be a better way. $usersearch[0]["user_type"] == 1???
+foreach ($usersearch as $key) {
+  if ($key["user_type"] == 1) {
+    header("Location: customer-dashboard.php");
+    die();
+  }
+}
+
+$stm = $conn->query("SELECT id, job_name, netlink_id, status, complete_date FROM print_job WHERE status = 'complete' ORDER BY complete_date DESC");
+$jobs = $stm->fetchAll();
+
+$completed = [];
+foreach ($jobs as $job) {
+  $completed[] = $job;
+}
+
+?>
 <!doctype html>
 <html lang="en">
   <head>
@@ -38,61 +61,67 @@
           font-size: 3.5rem;
         }
       }
-      html,
-body {
-  height: 100%;
-}
 
-body {
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-align: center;
-  align-items: center;
-  padding-top: 40px;
-  padding-bottom: 40px;
-  background-color: #f5f5f5;
-}
-
-.form-signin {
-  width: 100%;
-  max-width: 330px;
-  padding: 15px;
-  margin: auto;
-}
-.form-signin .checkbox {
-  font-weight: 400;
-}
-.form-signin .form-control {
-  position: relative;
-  box-sizing: border-box;
-  height: auto;
-  padding: 10px;
-  font-size: 16px;
-}
-.form-signin .form-control:focus {
-  z-index: 2;
-}
-.form-signin input[type="email"] {
-  margin-bottom: -1px;
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
-}
-.form-signin input[type="password"] {
-  margin-bottom: 10px;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-}
     </style>
     <!-- Custom styles for this template -->
 
   </head>
-  <body class="text-center">
-    <form class="form-signin">
+  <body class="bg-light">
 
-  <h1 class="h3 mb-3 font-weight-normal">Print History</h1>
+    <div class="text-center">
+      <h1>Print History</h1>
+    </div>
 
-  <a class="btn btn-primary btn-lg btn-block" href="admin-dashboard.php" role="button">Back to Dashboard</a>
+  <div class="row">
 
-</form>
+  <div class="container">
+  <div class="py-5 text-left">
+
+  <h3>Archived &amp; Cancelled Jobs</h3>
+  <div class="py-3"></div>
+  <div class="table-responsive">
+  <table class="table table-striped table-md">
+  <thead>
+  <tr>
+    <!-- table header-->
+    <th>Job id</th>
+    <th>Username</th>
+    <th>Name</th>
+    <th>Completion Date</th>
+    <th>Status</th>
+  </tr>
+  </thead>
+  <tbody>
+
+  <?php foreach ($completed as $row) {
+  ?>
+  <tr>
+    <td><?php echo $row["id"]; ?></td>
+    <td><?php echo $row["netlink_id"]; ?></td>
+      <!--CHANGE TO UNEDITABLE SCREEN -->
+      <td><a href="admin-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+    <td><?php echo $row["complete_date"]; ?></td>
+    <td><?php echo $row["status"]; ?></td>
+  </tr>
+  <?php
+  }
+  ?>
+
+  </tbody>
+  </table>
+  </div>
+
+  <hr class="mb-12">
+
+  <!--<a class="btn btn-md btn-block" href="login.php" role="button">Log Out</a>
+  -->
+  </div>
+  </div>
+  </div>
+<div class="text-center">
+  <a class="btn btn-md btn-primary btn-lg" href="admin-dashboard.php" role="button">Back to Dashboard</a>
+</div>
+
+
 </body>
 </html>

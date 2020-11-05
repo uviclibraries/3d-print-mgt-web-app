@@ -1,5 +1,17 @@
 <?php
-require ('db.php');
+require ('auth-sec.php'); //Gets CAS & db
+
+//Is user Admin check
+$user = phpCAS::getUser();
+$usersearch = $conn->query("SELECT user_type, name FROM users WHERE netlink_id = '$user'");
+//has to be a better way. $usersearch[0]["user_type"] == 1???
+foreach ($usersearch as $key) {
+  if ($key["user_type"] == 1) {
+    header("Location: customer-dashboard.php");
+    die();
+  }
+}
+
 $stm = $conn->prepare("SELECT * FROM print_job WHERE id=?");
 $stm->execute([$_GET["job_id"]]);
 $job=$stm->fetch();
