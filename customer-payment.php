@@ -1,5 +1,5 @@
 <?php
-require ('db.php');
+require ('auth-sec.php'); //Gets CAS & db
 
 $job_id = $_GET['job_id'];
 $status = "ready_to_print";
@@ -215,7 +215,7 @@ mail("emily@msys.ca","3D Print - New Job",$msg,$headers); # *** change email to 
             Please enter additional comments.
             </div>
         </div>
-        
+
         <hr class="mb-4">
         <center>
             <a href="customer-dashboard.php">

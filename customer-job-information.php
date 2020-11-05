@@ -1,5 +1,5 @@
 <?php
-require ('db.php');
+require ('auth-sec.php'); //Gets CAS & db
 $stm = $conn->prepare("SELECT * FROM print_job WHERE id=?");
 $stm->execute([$_GET["job_id"]]);
 $job=$stm->fetch();

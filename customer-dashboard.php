@@ -1,5 +1,5 @@
 <?php
-require ('db.php');
+require ('auth-sec.php'); //Gets CAS & db
 $stm = $conn->query("SELECT id, job_name, status, submission_date FROM print_job ORDER BY id DESC");
 $data = $stm->fetchAll();
 ?>

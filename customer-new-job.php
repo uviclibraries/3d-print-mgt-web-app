@@ -1,5 +1,5 @@
 <?php
-require ('db.php');
+require ('auth-sec.php'); //Gets CAS & db
 $stm = $conn->query("SELECT VERSION()");
 #$version = $stm->fetch();
 #echo $version;
@@ -58,9 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $hash_name = sprintf("%s-%s.%s", sha1_file($_FILES["3d_model"]['tmp_name']),
       $date->getTimestamp(),
       $ext);
-      $savefilename = sprintf('./uploads/%s',
-        $hash_name,
-      );
+      $savefilename = sprintf('./uploads/%s', $hash_name,);
       if (!move_uploaded_file(
           $_FILES["3d_model"]['tmp_name'],
           $savefilename
