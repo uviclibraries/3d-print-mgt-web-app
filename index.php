@@ -1,23 +1,5 @@
 <?php
-//
-//  phpCAS/index.php  -  CAS authentication using phpCAS module
-//                    -  based on:  https://github.com/apereo/phpCAS/blob/master/docs/examples/example_simple.php
-//
-
-require_once 'CAS.php';
-
-phpCAS::setDebug();
-phpCAS::setVerbose(true);
-
-phpCAS::client(CAS_VERSION_2_0, 'www.uvic.ca', 443, '/cas');
-phpCAS::setNoCasServerValidation();
-phpCAS::forceAuthentication();
-
-// logout if desired
-if (isset($_REQUEST['logout'])) {
-	phpCAS::logout();
-}
-
+require ('auth-sec.php');
 ?>
 <!doctype html>
 <html lang="en">
