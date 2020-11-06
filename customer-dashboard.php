@@ -1,6 +1,7 @@
 <?php
 require ('auth-sec.php'); //Gets CAS & db
-$stm = $conn->query("SELECT id, job_name, status, submission_date FROM print_job ORDER BY id DESC");
+//auth-sec includes: $user, $user_email, $user_type, $user_name
+$stm = $conn->query("SELECT id, job_name, status, submission_date FROM print_job WHERE netlink_id = '$user' ORDER BY id DESC");
 $data = $stm->fetchAll();
 ?>
 <!doctype html>
@@ -70,7 +71,7 @@ $data = $stm->fetchAll();
         </div>
         <div class="col-md-4">
         <a href="3dfaq.php">
-          <button class="btn btn-primary btn-lg" type="submit">FAQ</button>
+          <button class="btn btn-danger btn-lg" type="submit">FAQ</button>
         </a>
       </div>
     </div>
@@ -105,7 +106,7 @@ $data = $stm->fetchAll();
 
         <hr class="mb-12">
 
-        <a class="btn btn-md btn-block" href="login.html" role="button">Log Out</a>
+        <a class="btn btn-md btn-block" href="?logout=" role="button">Log Out</a>
 
     </div>
   </div>
