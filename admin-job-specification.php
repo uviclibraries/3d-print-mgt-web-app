@@ -1,15 +1,10 @@
 <?php
 require ('auth-sec.php'); //Gets CAS & db
-
+//auth-sec includes: $user, $user_email, $user_type, $user_name
 //Is user Admin check
-$user = phpCAS::getUser();
-$usersearch = $conn->query("SELECT user_type, name FROM users WHERE netlink_id = '$user'");
-//has to be a better way. $usersearch[0]["user_type"] == 1???
-foreach ($usersearch as $key) {
-  if ($key["user_type"] == 1) {
-    header("Location: customer-dashboard.php");
-    die();
-  }
+if ($user_type == 1) {
+  header("Location: customer-dashboard.php");
+  die();
 }
 
 $stm = $conn->prepare("SELECT * FROM print_job WHERE id=?");
@@ -18,7 +13,7 @@ $job=$stm->fetch();
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  $stmt = $conn->prepare("UPDATE print_job SET price = :price, infill = :infill, scale = :scale, layer_height = :layer_height, supports = :supports, copies = :copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date, ready_to_prnt_date = :ready_to_prnt_date, printing_date = :printing_date, complete_date = :complete_date WHERE id = :job_id;
+  $stmt = $conn->prepare("UPDATE print_job SET price = :price, infill = :infill, scale = :scale, layer_height = :layer_height, supports = :supports, copies = :copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  = :ready_to_prnt_date, printing_date = :printing_date, complete_date = :complete_date WHERE id = :job_id;
   ");
   $current_date = date("Y-m-d");
   $prev_status = $job["status"];
@@ -32,10 +27,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $stmt->bindParam(':material_type', $_POST["material_type"]);
   $stmt->bindParam(':staff_notes', $_POST["staff_notes"]);
   $stmt->bindParam(':status', $_POST["status"]);
+  /* should dates be removed if steps are reverted: eg printing->ready_to_print
   $stmt->bindParam(':priced_date', $_GET['priced_date']);
   $stmt->bindParam(':ready_to_prnt_date', $_GET['ready_to_prnt_date']);
   $stmt->bindParam(':printing_date', $_GET['printing_date']);
   $stmt->bindParam(':complete_date', $_GET['complete_date']);
+*/
 
   //need variable to check if admin wants to send email. case: updating notes but dont send email
   if ($_POST['status'] == "pending_payment") {
@@ -46,13 +43,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>HTML email</title>
     </head>
     <body>
-    <p>Make " . (number_format((float)$_POST["price"], 2, '.','')) . " payment for " . $job['job_name'] . " using this link
+    <p> Hello". $user_name ."Make $" . (number_format((float)$_POST["price"], 2, '.','')) . " payment for " . $job['job_name'] . " using this link
     <a href='#'>link</a></p>
     </body>
     </html>";
     $headers = "MIME-Version: 1.0" . "\r\n";
     $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-    mail("kenziewong@gmail.com","3D Print - Make Payment",$msg,$headers); # *** change email to users  ***
+    mail($user_email,"3D Print - Make Payment",$msg,$headers);
   } elseif($_POST['status'] == "ready_to_print"){
     //this should be done automatically when payment is received.
     $stmt->bindParam(':ready_to_prnt_date', $current_date);
@@ -73,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </html>";
     $headers = "MIME-Version: 1.0" . "\r\n";
     $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-    mail("kenziewong@gmail.com","3D Print - Make Payment",$msg,$headers); # *** change email to users  ***
+    mail($user_email, "3D Print - Make Payment",$msg,$headers);
   }
   $stmt->execute();
 
@@ -237,11 +234,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <div class="col-md-3 mb-3">
             <label for="layer-height">Layer Height</label>
             <select class="custom-select d-block w-100" name="layer_height" id="layer-height">
-              <option <?php if ($job["layer_height"]== 0.2){echo "selected";} ?>>0.2</option>
-              <option <?php if ($job["layer_height"]== 0.1){echo "selected";} ?>>0.1</option>
-              <option <?php if ($job["layer_height"]== 0.15){echo "selected";} ?>>0.15</option>
+              <option <?php if ($job["layer_height"]== 0.4){echo "selected";} ?>>0.4</option>
               <option <?php if ($job["layer_height"]== 0.3){echo "selected";} ?>>0.3</option>
-              <option <?php if ($job["layer_height"]== 0.6){echo "selected";} ?>>0.6</option>
+              <option <?php if ($job["layer_height"]== 0.2){echo "selected";} ?>>0.2</option>
+              <option <?php if ($job["layer_height"]== 0.15){echo "selected";} ?>>0.15</option>
+              <option <?php if ($job["layer_height"]== 0.1){echo "selected";} ?>>0.1</option>
+              <option <?php if ($job["layer_height"]== 0.06){echo "selected";} ?>>0.06</option>
             </select>
           </div>
           <div class="col-md-3 mb-3">
