@@ -18,24 +18,44 @@ if (isset($_REQUEST['logout'])) {
 	phpCAS::logout();
 }
 
-//Access to db
 
-$user = phpCAS::getUser();
-$usersearch = $conn->query("SELECT id FROM users WHERE netlink_id = '$user'");
+$user = phpCAS::getUser();	//user netlink_id
+$user_email = "@uvic.ca";
+$user_type = 1;
+$user_name = "non-admin";
+
+$usersearch = $conn->query("SELECT name, user_type, email FROM users WHERE netlink_id = '$user'");
 //if user is not in the db create entry for new user.
 if ($usersearch->rowCount() < 1) {
+
+	//LDAP Start
+	require('ldap.inc.php');
+	list($user_name, $user_email, $error) = get_personal_info($user);
+	if ($error) {
+		//Do this if error occurs.
+    $redirect_url = 'error.php?mesg=' . urlencode($error);
+    header("Location: $redirect_url");
+    exit;
+  }
+	//LDAP end
+
 	$stm = $conn->prepare("INSERT INTO users (netlink_id, name, user_type, email) VALUES (:netlink_id, :name, :user_type, :email)");
 	$stm->bindParam(':netlink_id', $user);
-	$ldapName = "ldap name";
-	$stm->bindParam(':name', $ldapName);
-	$userType = 1;
-	$stm->bindParam(':user_type', $userType);
-	$ldapEmail = "kenziewong+newuser@gmail.com";
-	$stm->bindParam(':email', $ldapEmail);
+	$stm->bindParam(':name', $user_name);
+	$user_type = 1;
+	$stm->bindParam(':user_type', $user_type);
+	$stm->bindParam(':email', $user_email);
 	$stm->execute();
+}else {
+	foreach ($usersearch as $key) {
+		$user_email = $key["email"];
+		$user_type = $key["user_type"];
+		$user_name = $key["name"];
+	}
 }
 
 //have email address
 //check if in db, add if not.
+
 
 ?>
