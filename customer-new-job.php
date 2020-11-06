@@ -4,8 +4,7 @@ $stm = $conn->query("SELECT VERSION()");
 #$version = $stm->fetch();
 #echo $version;
 
-$netlink_id = "rmccue"; # Temporary 4 testing. Netlink ID will eventually be passed from login form.
-$model_name = "test.stl"; # Temporary 4 testing...
+$user = phpCAS::getUser();
 $status = "not_priced";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -78,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 //$a need to tody up.
   $layer_height_var = floatval(number_format((float)$_POST["layer_height"], 2, '.',''));
   $stmt = $conn->prepare("INSERT INTO print_job (netlink_id, job_name, model_name, infill, scale, layer_height, supports, copies, material_type, comments, status) VALUES (:netlink_id, :job_name, :model_name, :infill, :scale, :layer_height, :supports, :copies, :material_type, :comments, :status)");
-  $stmt->bindParam(':netlink_id', $netlink_id);
+  $stmt->bindParam(':netlink_id', $user);
   $stmt->bindParam(':job_name', $_POST["job_name"]);
   $stmt->bindParam(':model_name', $hash_name);
   $stmt->bindParam(':infill', $a = intval($_POST["infill"]), PDO::PARAM_INT);
@@ -91,18 +90,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $stmt->bindParam(':status', $status);
   $stmt->execute();
 
+
   $msg = "
   <html>
   <head>
   <title>HTML email</title>
   </head>
   <body>
-  <p>New print job submitted.</p>
+  <p>Hello, ".$user_name.". This is an autmated resposne from the DSC</p>
+  <p>Thank you for submiting your print request to the DSC at MacPherson Library. We will evalute the cost of the print and you'll be notified by email when it is ready for payment. If you have any questions about the process or the status of your print, please review our FAQ or email us at DSCommons@uvic.ca.</p>
   </body>
   </html>";
   $headers = "MIME-Version: 1.0" . "\r\n";
   $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-  mail("kenziewong@gmail.com","3D Print - New Job",$msg,$headers); # *** change email to users  ***
+  mail($user_email,"3D Print - New Job",$msg,$headers); # *** change email to users  ***
 
 #  header("location: customer-dashboard.php");
 }
@@ -219,11 +220,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <div class="col-md-3 mb-3">
             <label for="layer-height">Layer Height</label>
             <select class="custom-select d-block w-100" name="layer_height" id="layer-height" required>
-              <option>0.2</option>
-              <option>0.1</option>
-              <option>0.15</option>
+              <option>0.4</option>
               <option>0.3</option>
-              <option>0.6</option>
+              <option>0.2</option>
+              <option>0.15</option>
+              <option>0.1</option>
+              <option>0.06</option>
             </select>
             <div class="invalid-feedback">
               Please select a valid layer height.
@@ -297,9 +299,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <hr class="mb-4">
         <center>
-            <a href="customer-dashboard.php">
+            <form action="customer-dashboard.php">
                 <button class="btn btn-primary btn-lg" type="submit">Submit Print Job</button>
-            </a>
+            </form>
         </center>
     </div>
     </form>
