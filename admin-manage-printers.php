@@ -1,15 +1,10 @@
 <?php
 require ('auth-sec.php'); //Gets CAS & db
-
+//auth-sec includes: $user, $user_email, $user_type, $user_name
 //Is user Admin check
-$user = phpCAS::getUser();
-$usersearch = $conn->query("SELECT user_type, name FROM users WHERE netlink_id = '$user'");
-//has to be a better way. $usersearch[0]["user_type"] == 1???
-foreach ($usersearch as $key) {
-  if ($key["user_type"] == 1) {
-    header("Location: customer-dashboard.php");
-    die();
-  }
+if ($user_type == 1) {
+  header("Location: customer-dashboard.php");
+  die();
 }
 
 $stm = $conn->query("SELECT id, printer_name, make_model, comments, operational, color ,color2, 2extruder FROM printer ORDER BY id");
