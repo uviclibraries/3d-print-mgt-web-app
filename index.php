@@ -1,5 +1,6 @@
 <?php
 require ('auth-sec.php');
+header("Location: customer-dashboard.php");
 ?>
 <!doctype html>
 <html lang="en">

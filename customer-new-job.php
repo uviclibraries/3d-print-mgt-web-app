@@ -107,6 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 #  header("location: customer-dashboard.php");
 }
+header("Location: customer-dashboard.php");
 ?>
 
 
