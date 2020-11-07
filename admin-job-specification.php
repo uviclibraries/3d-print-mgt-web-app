@@ -13,7 +13,7 @@ $job=$stm->fetch();
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  $stmt = $conn->prepare("UPDATE print_job SET price = :price, infill = :infill, scale = :scale, layer_height = :layer_height, supports = :supports, copies = :copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  = :ready_to_prnt_date, printing_date = :printing_date, complete_date = :complete_date WHERE id = :job_id;
+  $stmt = $conn->prepare("UPDATE print_job SET price = :price, infill = :infill, scale = :scale, layer_height = :layer_height, supports = :supports, copies = :copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  ready_to_prnt_date = :ready_to_prnt_date, printing_date = :printing_date, complete_date = :complete_date WHERE id = :job_id;
   ");
   $current_date = date("Y-m-d");
   $prev_status = $job["status"];
@@ -37,14 +37,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   //need variable to check if admin wants to send email. case: updating notes but dont send email
   if ($_POST['status'] == "pending_payment") {
     $stmt->bindParam(':priced_date', $current_date);
+    $stmt->bindParam(':ready_to_prnt_date', $job['ready_to_prnt_date']);
+    $stmt->bindParam(':printing_date', $job['printing_date']);
+    $stmt->bindParam(':complete_date', $job['complete_date']);
+    //ADD link to FAQ page.
     $msg = "
     <html>
     <head>
     <title>HTML email</title>
     </head>
     <body>
-    <p> Hello". $user_name ."Make $" . (number_format((float)$_POST["price"], 2, '.','')) . " payment for " . $job['job_name'] . " using this link
-    <a href='#'>link</a></p>
+    <p> Hello ". $user_name .". This is an automated resposne from the DSC. </p>
+    <p> Your 3D print job; " . $job['job_name'] . " has been evaluated at a cost of $" . (number_format((float)$_POST["price"], 2, '.','')) . " </p>
+    <p> Please make your payment <a href='customer-job-information.php?job_id=<?php echo $job["id"]; ?>'>here</a> for the DSC to place it in our printing queue.</p>
+    <p>If you have any questions please review our FAQ or email us at DSCommons@uvic.ca.</p>
     </body>
     </html>";
     $headers = "MIME-Version: 1.0" . "\r\n";
@@ -52,12 +58,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     mail($user_email,"3D Print - Make Payment",$msg,$headers);
   } elseif($_POST['status'] == "ready_to_print"){
     //this should be done automatically when payment is received.
+    $stmt->bindParam(':priced_date', $job['priced_date']);
     $stmt->bindParam(':ready_to_prnt_date', $current_date);
+    $stmt->bindParam(':printing_date', $job['printing_date']);
+    $stmt->bindParam(':complete_date', $job['complete_date']);
 
   } elseif($_POST['status'] == "printing"){
+    $stmt->bindParam(':priced_date', $job['priced_date']);
+    $stmt->bindParam(':ready_to_prnt_date', $job['ready_to_prnt_date']);
     $stmt->bindParam(':printing_date', $current_date);
+    $stmt->bindParam(':complete_date', $job['complete_date']);
 
   } elseif ($_POST['status'] == "complete") {
+    $stmt->bindParam(':priced_date', $job['priced_date']);
+    $stmt->bindParam(':ready_to_prnt_date', $job['ready_to_prnt_date']);
+    $stmt->bindParam(':printing_date', $job['printing_date']);
     $stmt->bindParam(':complete_date', $current_date);
     $msg = "
     <html>
@@ -65,7 +80,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>HTML email</title>
     </head>
     <body>
-    <p>Your " . $job['job_name'] . " is complete. You can pick it up at...</p>
+    <p>Hello ". $user_name .". This is an automated resposne from the DSC. </p>
+    <p> Your 3D print job; " . $job['job_name'] . " is complete. You can pick it up from the front desk at the MacPherson Library.</p>
     </body>
     </html>";
     $headers = "MIME-Version: 1.0" . "\r\n";
