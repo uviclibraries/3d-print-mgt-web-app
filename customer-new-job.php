@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <title>HTML email</title>
   </head>
   <body>
-  <p>Hello, ".$user_name.". This is an automated resposne from the DSC</p>
+  <p>Hello, ".$user_name.". This is an automated resposne from the DSC.</p>
   <p>Thank you for submiting your print request to the DSC at MacPherson Library. We will evalute the cost of the print and you'll be notified by email when it is ready for payment. If you have any questions about the process or the status of your print, please review our FAQ or email us at DSCommons@uvic.ca.</p>
   </body>
   </html>";
@@ -105,9 +105,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
   mail($user_email,"3D Print - New Job",$msg,$headers);
 
-#  header("location: customer-dashboard.php");
+header("location: customer-dashboard.php");
 }
-header("Location: customer-dashboard.php");
+
 ?>
 
 
