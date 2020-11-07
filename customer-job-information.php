@@ -112,7 +112,7 @@ $job=$stm->fetch();
         <!-- if its priced and not payed-->
         <?php if ($job["status"] == "pending_payment") { ?>
 
-                    <a href="customer-payment.php">
+                    <a href="customer-payment.php?job_id=<?php echo $job["id"]; ?>">
                         <button type="button" class="btn btn-primary btn-lg" type="submit">Payment</button>
                         <!--
                         <FORM METHOD="POST" ACTION= https://esqa.moneris.com/HPPDP/index.php >
