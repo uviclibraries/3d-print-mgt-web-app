@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $stmt->bindParam(':printing_date', $_GET['printing_date']);
   $stmt->bindParam(':complete_date', $_GET['complete_date']);
 */
-
+  //WIll crash if status not changed.
   //need variable to check if admin wants to send email. case: updating notes but dont send email
   if ($_POST['status'] == "pending_payment") {
     $stmt->bindParam(':priced_date', $current_date);
@@ -41,6 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bindParam(':printing_date', $job['printing_date']);
     $stmt->bindParam(':complete_date', $job['complete_date']);
     //ADD link to FAQ page.
+    $direct_link = "customer-job-information.php?job_id=". $job['id']; // change to absoulte link
     $msg = "
     <html>
     <head>
@@ -49,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <body>
     <p> Hello ". $user_name .". This is an automated resposne from the DSC. </p>
     <p> Your 3D print job; " . $job['job_name'] . " has been evaluated at a cost of $" . (number_format((float)$_POST["price"], 2, '.','')) . " </p>
-    <p> Please make your payment <a href='customer-job-information.php?job_id=<?php echo $job["id"]; ?>'>here</a> for the DSC to place it in our printing queue.</p>
+    <p> Please make your payment <a href=". $direct_link .">here</a> for the DSC to place it in our printing queue.</p>
     <p>If you have any questions please review our FAQ or email us at DSCommons@uvic.ca.</p>
     </body>
     </html>";
