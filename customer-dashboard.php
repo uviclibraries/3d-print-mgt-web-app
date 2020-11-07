@@ -53,7 +53,7 @@ $data = $stm->fetchAll();
     <div class="container">
   <div class="py-5 text-center">
 
-    <h1><b> Welcome John,</b></h1>
+    <h1><b> Welcome <?php echo $user_name; ?>, to your 3D printing dashboard</b></h1>
   </div>
 
   <div class="row">
@@ -64,16 +64,23 @@ $data = $stm->fetchAll();
     <div class="col-md-12 order-md-1">
 
       <div class="row">
-        <div class="col-md-4">
+        <div class="btn-auto mr-auto">
         <a href="customer-new-job.php">
           <button class="btn btn-primary btn-lg" type="submit">Create New Print Job</button>
         </a>
         </div>
-        <div class="col-md-4">
+        <div class="btn-auto mr-auto">
         <a href="3dfaq.php">
           <button class="btn btn-danger btn-lg" type="submit">FAQ</button>
         </a>
       </div>
+      <?php if ($user_type == 0){ ?>
+        <div class="btn-auto mr-auto">
+          <a href="admin-dashboard.php">
+            <button class="btn btn-primary btn-lg" type="submit">Admin Dashboard</button>
+          </a>
+        </div>
+    <?php } ?>
     </div>
 
         <hr class="mb-12">
