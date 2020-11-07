@@ -116,6 +116,22 @@ foreach ($job5 as $job) {
                     </a>
                 </div>
 
+                <div class="col-md-4 mb-3">
+                    <a href="customer-dashboard.php">
+                        <button class="btn btn-primary btn-lg btn-block" class="form-control" type="submit" data-inline="true">Personal Dashboard</button>
+                    </a>
+                </div>
+
+                <div class="col-md-4 mb-3">
+
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <a href="admin-manage-users.php">
+                        <button class="btn btn-primary btn-lg btn-block" class="form-control" type="submit" data-inline="true">Manage Users</button>
+                    </a>
+                </div>
+
             <div class="container">
           <div class="py-5 text-left">
 
