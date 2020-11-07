@@ -3,30 +3,32 @@ require ('auth-sec.php'); //Gets CAS & db
 
 $job_id = $_GET['job_id'];
 $status = "ready_to_print";
-$stmt = $conn->prepare("UPDATE print_job SET status = :status WHERE id = :job_id;
-");
-$stmt->bindParam(':job_id', intval($_GET["job_id"]), PDO::PARAM_INT);
+$current_date = date("Y-m-d");
+$stmt = $conn->prepare("UPDATE print_job SET ready_to_prnt_date = :ready_to_prnt_date, status = :status WHERE id = :job_id;");
+$stmt->bindParam(':ready_to_prnt_date', $current_date);
+$stmt->bindParam(':job_id', $job_id);
 $stmt->bindParam(':status', $status);
 $stmt->execute();
 
 $stm = $conn->prepare("SELECT * FROM print_job WHERE id=?");
 $stm->execute([$_GET["job_id"]]);
 $job=$stm->fetch();
-
+//ADD link to FAQ page.
 $msg = "
 <html>
 <head>
 <title>HTML email</title>
 </head>
 <body>
-<p>Payment is successful for print job " . $job['job_name'] . " for $" . $job['price'] . "</p>
+<p>Hello ". $user_name .". Payment of  $" . $job['price'] . " is successful for print job " . $job['job_name'] . ". It has been placed into the printing queue and you'll be alerted when it is complete. </p>
+<p>If you have any questions please review our FAQ or email us at DSCommons@uvic.ca.</p>
 </body>
 </html>";
 $headers = "MIME-Version: 1.0" . "\r\n";
 $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-mail("emily@msys.ca","3D Print - New Job",$msg,$headers); # *** change email to users  ***
+mail($user_email,"3D Print - New Job",$msg,$headers); 
 
-#  header("location: customer-dashboard.php");
+header("location: customer-dashboard.php");
 
 ?>
 
