@@ -6,8 +6,15 @@ if ($user_type == 1) {
   header("Location: customer-dashboard.php");
   die();
 }
+if ($_GET["user_id"] == "" OR $_GET["user_id"] == NULL) {
+  $stm = $conn->query("SELECT * FROM users ORDER BY id");
+}
+else{
+  $stm = $conn->prepare("SELECT * FROM users WHERE netlink_id~*? OR name~*? ORDER BY id");
+  $searching = "%". $_GET["user_id"]."%";
+  $stm->execute([$searching,$searching]);
+}
 
-$stm = $conn->query("SELECT id, netlink_id, name, user_type, email FROM users ORDER BY id");
 $all_users = $stm->fetchAll();
 
  ?>
@@ -64,7 +71,12 @@ $all_users = $stm->fetchAll();
   <div class="container">
   <div class="py-3 text-left">
     <h3>Users</h3>
-
+    <br>
+    <form class="" action="index.html" method="post">
+        <label for="searchbar">Search</label>
+        <input type="text" id= "searchbar" name="searchbar">
+        <input type="submit" name="" value="">
+    </form>
   <div class="table-responsive">
     <table class="table table-striped table-md">
       <tbody>
@@ -82,16 +94,9 @@ $all_users = $stm->fetchAll();
         ?>
         <tr>
           <td><?php echo $row["id"]; ?></td>
-          <td><?php echo $row["netlink_id"]; ?></td>
+          <td> <a href="admin-user-specification.php?user_id=<?php echo $row["id"]; ?> "></a> <?php echo $row["netlink_id"]; ?></td>
           <td><?php echo $row["name"]; ?></td>
-          <td>
-            <select class="form-control" name="admin" id="admin">
-              <option  <?php if ($row["user_type"]== 0){echo "selected";} ?> > Admin
-              </option>
-              <option  <?php if ($row["user_type"]== 1){echo "selected";} ?> > Regular
-              </option>
-            </select>
-          </td>
+          <td><?php echo $row["user_type"]; ?></td>
           <td><?php echo $row["email"]; ?></td>
         </tr>
         <?php
