@@ -1,7 +1,7 @@
 <?php
 require ('auth-sec.php'); //Gets CAS & db
-$stm = $conn->prepare("SELECT * FROM print_job WHERE id=? AND netlink_id=?");
-$stm->execute([$_GET["job_id"], $user]);
+$stm = $conn->prepare("SELECT * FROM print_job WHERE id=?");
+$stm->execute([$_GET["job_id"]]);
 $job=$stm->fetch();
 ?>
 
