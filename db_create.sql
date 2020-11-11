@@ -23,25 +23,32 @@ USE `3d_print_jobs`;
 --
 
 CREATE TABLE `printer` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
   `printer_name` varchar(60) NOT NULL,
   `make_model` varchar(100) NOT NULL,
-  `comments` text NOT NULL
+  `comments` text NOT NULL,
+  `operational` boolean NOT NULL,
+  `2extruder` boolean NOT NULL DEFAULT 0,
+  `color` varchar(50),
+  `color2` varchar(50)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `printer`
 --
 
-INSERT INTO `printer` (`id`, `printer_name`, `make_model`, `comments`) VALUES
-(1, 'Ada', 'Ultamaker 3', 'Dual extruder printer, supports dissolving filament.');
+INSERT INTO `printer` (`id`, `printer_name`, `make_model`, `comments`, `operational`, `2extruder`, `color`,`color2`) VALUES
+(1, 'Ada', 'Ultamaker 3', 'Dual extruder printer, supports dissolving filament.', 1,1, 'yellow','PVA'),
+(2, 'Brunel', 'Ultamaker 3', 'Dual extruder printer, supports dissolving filament.', 1,1, 'green',NULL),
+(3, 'Makerbot1', 'Replicator 5th gen', 'Single extruder printer. No heated build plate.', 1,0, 'orange',NULL),
+(4, 'Makerbot2', 'Replicator 5th gen', 'Single extruder printer. No heated build plate.', 1,0, 'green',NULL);
 
 -- --------------------------------------------------------
 
 
 CREATE TABLE `print_job` (
-  `id` int(11) NOT NULL,
-  `netlink_id` varchar(100) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `netlink_id` varchar(100) NOT NULL UNIQUE,
   `job_name` varchar(100) NOT NULL,
   `model_name` varchar(250) NOT NULL,
   `model_name_2` varchar(250) DEFAULT NULL,
@@ -57,7 +64,6 @@ CREATE TABLE `print_job` (
   `submission_date` date DEFAULT NULL,
   `price` decimal(4,2) DEFAULT NULL,
   `priced_date` date DEFAULT NULL,
-  `pending_pmt_date` date DEFAULT NULL,
   `ready_to_prnt_date` date DEFAULT NULL,
   `printing_date` date DEFAULT NULL,
   `complete_date` date DEFAULT NULL
@@ -70,64 +76,19 @@ CREATE TABLE `print_job` (
 --
 
 CREATE TABLE `users` (
-  `id` int(11) NOT NULL,
-  `netlink_id` varchar(100) NOT NULL,
+  `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `netlink_id` varchar(100) NOT NULL UNIQUE,
   `name` varchar(100) NOT NULL,
   `user_type` int(11) NOT NULL,
-  'email' varchar(100) NOT NULL
+  `email` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `netlink_id`, `name`, `user_type`, 'email') VALUES
-(1, 'rmccue', 'Rich McCue', 0, 'kenziewong@gmail.com'),
-(2, 'libmedia', 'Music and Media desk', 1, 'kenziewong@gmail.com');
+INSERT INTO `users` (`id`, `netlink_id`, `name`, `user_type`, `email`) VALUES
+(1, 'kenziewo', 'Kenzie Wong', 0, 'kenziewong+fromcreate@gmail.com');
 
 --
--- Indexes for dumped tables
 --
-
---
--- Indexes for table `printer`
---
-ALTER TABLE `printer`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `print_job`
---
-ALTER TABLE `print_job`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `netlink_id` (`netlink_id`),
-  ADD KEY `status` (`status`);
-
---
--- Indexes for table `users`
---
-ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `netlink_id` (`netlink_id`);
-
---
--- AUTO_INCREMENT for dumped tables
---
-
---
--- AUTO_INCREMENT for table `printer`
---
-ALTER TABLE `printer`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
--- AUTO_INCREMENT for table `print_job`
---
-ALTER TABLE `print_job`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `users`
---
-ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
