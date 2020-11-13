@@ -10,13 +10,17 @@ if ($_GET["user_id"] == "" OR $_GET["user_id"] == NULL) {
   $stm = $conn->query("SELECT * FROM users ORDER BY id");
 }
 else{
-  $stm = $conn->prepare("SELECT * FROM users WHERE netlink_id~*? OR name~*? ORDER BY id");
+  $stm = $conn->prepare("SELECT * FROM users WHERE netlink_id LIKE ? OR name LIKE ? ORDER BY id");
   $searching = "%". $_GET["user_id"]."%";
   $stm->execute([$searching,$searching]);
 }
 
 $all_users = $stm->fetchAll();
 
+if($_SERVER['REQUEST_METHOD'] === 'POST'){
+  $searchpage = $_POST["searchbar"];
+  header("Location: admin-manage-users.php?user_id=".$searchpage);
+}
  ?>
 
 <!doctype html>
@@ -27,7 +31,7 @@ $all_users = $stm->fetchAll();
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Jekyll v4.0.1">
-    <title>Printer Management</title>
+    <title>User Management</title>
 
     <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/checkout/">
 
@@ -72,19 +76,20 @@ $all_users = $stm->fetchAll();
   <div class="py-3 text-left">
     <h3>Users</h3>
     <br>
-    <form class="" action="index.html" method="post">
+    <form method="POST">
         <label for="searchbar">Search</label>
         <input type="text" id= "searchbar" name="searchbar">
-        <input type="submit" name="" value="">
+        <input type="submit" name="Search" value="Search">
     </form>
+  <br>
   <div class="table-responsive">
     <table class="table table-striped table-md">
       <tbody>
         <tr>
           <thread>
             <th>id</th>
-            <th>Netlink</th>
             <th>Name</th>
+            <th>Netlink</th>
             <th>User Type</th>
             <th>email</th>
           </thread>
@@ -94,9 +99,15 @@ $all_users = $stm->fetchAll();
         ?>
         <tr>
           <td><?php echo $row["id"]; ?></td>
-          <td> <a href="admin-user-specification.php?user_id=<?php echo $row["id"]; ?> "></a> <?php echo $row["netlink_id"]; ?></td>
           <td><?php echo $row["name"]; ?></td>
-          <td><?php echo $row["user_type"]; ?></td>
+          <td><a href="admin-user-specification.php?user_id=<?php echo $row["id"]; ?>"><?php echo $row["netlink_id"]; ?></a></td>
+          <td>
+            <?php if ($row["user_type"] == 0) {
+              echo "Admin";
+            }else{
+              echo "Regular";
+            } ?>
+          </td>
           <td><?php echo $row["email"]; ?></td>
         </tr>
         <?php

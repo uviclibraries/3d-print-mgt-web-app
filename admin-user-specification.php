@@ -15,14 +15,18 @@ $job=$stm->fetch();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $stmt = $conn->prepare("UPDATE users SET user_type = :user_type, email = :email WHERE id = :user_id;
   ");
-
-  $stmt->bindParam(':user_type', $_POST["user_type"]);
+  $stmt->bindParam(':user_id', $_GET["user_id"]);
+  if ($_POST["user_type"] == "Admin") {
+    $stmt->bindParam(':user_type', $a = 0);
+  }
+  else{
+      $stmt->bindParam(':user_type', $a = 1);
+  }
   $stmt->bindParam(':email', $_POST["email"]);
-
   $stmt->execute();
 
 
-  header("location: admin-manage-users.php");
+  header("admin-manage-users.php?user_id=");
 }
 ?>
 
@@ -34,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Jekyll v4.0.1">
-    <title>Job id: <?php echo $job["name"] ?></title>
+    <title>User id: <?php echo $job["id"] ?></title>
 
     <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/checkout/">
 
@@ -75,55 +79,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="container">
     <form method="POST">
   <div class="py-5 text-center">
-    <h1><?php echo $job["job_name"]; ?></h1>
+    <h1><?php echo $job["netlink_id"]; ?></h1>
     </div>
 
+    <div class="col-md-12 order-md-1">
 
+
+    <hr class="mb-6">
 
     <div class="col-md-12 order-md-1">
-      <h4 class="mb-3">User Details</h4>
+      <h4 class="mb-3">Specifications</h4>
         <div class="row">
             <div class="col-md-3 mb-3">
-                <label for="username">WebApp ID number</label>
+                <label for="username">ID</label>
                 <div class="input-group">
                   <div class="input-group mb-3">
-                    <input type="text" class="form-control" value="<?php echo $job["id"]; ?>" readonly>
-                    </div>
+                    <input type="text" name="infill" class="form-control" value="<?php echo $job["id"]; ?>" readonly>
                 </div>
             </div>
-          </div>
+            </div>
             <div class="col-md-3 mb-3">
-                <label for="username">Netlink ID</label>
+                <label for="username">Netlink</label>
                 <div class="input-group">
                 <div class="input-group mb-3">
-                    <input type="text" class="form-control" value="<?php echo $job["netlink_id"]; ?>" readonly>
-                </div>
+                    <input type="text" class="form-control" name="scale" value="<?php echo $job["netlink_id"]; ?>"  readonly>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="row">
           <div class="col-md-3 mb-3">
-            <label for="user_type">User Type</label>
+            <label for="layer-height">User Type</label>
             <select class="custom-select d-block w-100" name="user_type" id="user_type">
               <option <?php if ($job["user_type"]== 0){echo "selected";} ?>>Admin</option>
               <option <?php if ($job["user_type"]== 1){echo "selected";} ?>>Regular</option>
             </select>
           </div>
           <div class="col-md-3 mb-3">
-            <label for="supports">Email</label>
-            <div class="input-group">
-            <div class="input-group mb-3">
-                <input type="email" class="form-control" name="email" value="<?php echo $job["email"]; ?>" >
-                </div>
-            <div class="invalid-feedback" style="width: 100%;">
-                email is required.
-            </div>
-            </div>
+            <label for="email">Email</label>
+            <input type="email" class="form-control" id = "email" name="email" value="<?php echo $job["email"]; ?>">
           </div>
         </div>
-
-        </div>
+    </div>
 
         <hr class="mb-4">
         <div class="row">
@@ -133,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </a>
             </div>
             <div class="col-md-6 mb-3">
-                <a class="btn btn-primary btn-lg btn-block" href="admin-dashboard.php" role="button">Back to Dashboard</a>
+                <a class="btn btn-primary btn-lg btn-block" href="admin-manage-users.php?user_id=" role="button">Back to Manage Users</a>
         </div>
     </div>
     </form>
