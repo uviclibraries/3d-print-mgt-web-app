@@ -16,7 +16,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $stmt = $conn->prepare("UPDATE print_job SET price = :price, infill = :infill, scale = :scale, layer_height = :layer_height, supports = :supports, copies = :copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  ready_to_prnt_date = :ready_to_prnt_date, printing_date = :printing_date, complete_date = :complete_date WHERE id = :job_id;
   ");
   $current_date = date("Y-m-d");
-  $prev_status = $job["status"];
   $stmt->bindParam(':job_id', $a = intval($_GET["job_id"]), PDO::PARAM_INT);
   $stmt->bindParam(':price', $a = floatval(number_format((float)$_POST["price"], 2, '.','')));
   $stmt->bindParam(':infill', $a = intval($_POST["infill"]), PDO::PARAM_INT);
@@ -27,19 +26,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $stmt->bindParam(':material_type', $_POST["material_type"]);
   $stmt->bindParam(':staff_notes', $_POST["staff_notes"]);
   $stmt->bindParam(':status', $_POST["status"]);
-  /* should dates be removed if steps are reverted: eg printing->ready_to_print
-  $stmt->bindParam(':priced_date', $_GET['priced_date']);
-  $stmt->bindParam(':ready_to_prnt_date', $_GET['ready_to_prnt_date']);
-  $stmt->bindParam(':printing_date', $_GET['printing_date']);
-  $stmt->bindParam(':complete_date', $_GET['complete_date']);
-*/
-  //WIll crash if status not changed.
+  /*
+  should dates be removed if steps are reverted: eg printing->ready_to_print
+  */
+  $d1 = $_GET['priced_date'];
+  $d2 = $_GET['ready_to_prnt_date'];
+  $d3 = $_GET['printing_date'];
+  $d4 = $_GET['complete_date'];
+  $stmt->bindParam(':priced_date', $d1);
+  $stmt->bindParam(':ready_to_prnt_date', $d2);
+  $stmt->bindParam(':printing_date', $d3);
+  $stmt->bindParam(':complete_date', $d4);
+
   //need variable to check if admin wants to send email. case: updating notes but dont send email
   if ($_POST['status'] == "pending_payment") {
-    $stmt->bindParam(':priced_date', $current_date);
-    $stmt->bindParam(':ready_to_prnt_date', $job['ready_to_prnt_date']);
-    $stmt->bindParam(':printing_date', $job['printing_date']);
-    $stmt->bindParam(':complete_date', $job['complete_date']);
+    $d1 = $current_date;
     //ADD link to FAQ page.
     $direct_link = "customer-job-information.php?job_id=". $job['id']; // change to absoulte link
     $msg = "
@@ -59,22 +60,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     mail($user_email,"3D Print - Make Payment",$msg,$headers);
   } elseif($_POST['status'] == "ready_to_print"){
     //this should be done automatically when payment is received.
-    $stmt->bindParam(':priced_date', $job['priced_date']);
-    $stmt->bindParam(':ready_to_prnt_date', $current_date);
-    $stmt->bindParam(':printing_date', $job['printing_date']);
-    $stmt->bindParam(':complete_date', $job['complete_date']);
+    $d2 = $current_date;
+
 
   } elseif($_POST['status'] == "printing"){
-    $stmt->bindParam(':priced_date', $job['priced_date']);
-    $stmt->bindParam(':ready_to_prnt_date', $job['ready_to_prnt_date']);
-    $stmt->bindParam(':printing_date', $current_date);
-    $stmt->bindParam(':complete_date', $job['complete_date']);
+    $d3 = $current_date;
 
   } elseif ($_POST['status'] == "complete") {
-    $stmt->bindParam(':priced_date', $job['priced_date']);
-    $stmt->bindParam(':ready_to_prnt_date', $job['ready_to_prnt_date']);
-    $stmt->bindParam(':printing_date', $job['printing_date']);
-    $stmt->bindParam(':complete_date', $current_date);
+    $d4 = $current_date;
     $msg = "
     <html>
     <head>
