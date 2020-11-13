@@ -127,7 +127,7 @@ foreach ($job5 as $job) {
                 </div>
 
                 <div class="col-md-4 mb-3">
-                    <a href="admin-manage-users.php">
+                    <a href="admin-manage-users.php?user_id=">
                         <button class="btn btn-primary btn-lg btn-block" class="form-control" type="submit" data-inline="true">Manage Users</button>
                     </a>
                 </div>
