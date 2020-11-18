@@ -1,6 +1,7 @@
 <?php
 require ('auth-sec.php');
 header("Location: customer-dashboard.php");
+# UVic Libraries Header for navigation purposes would go here.
 ?>
 <!doctype html>
 <html lang="en">
