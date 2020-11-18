@@ -3,6 +3,18 @@ require ('auth-sec.php'); //Gets CAS & db
 $stm = $conn->prepare("SELECT * FROM print_job WHERE id=?");
 $stm->execute([$_GET["job_id"]]);
 $job=$stm->fetch();
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST'){
+  session_start();
+  $_SESSION['user_name'] = $user_name;
+  $_SESSION['user_email'] = $user_email;
+  $_SESSION['job_id'] = $job['id'];
+  $_SESSION['price'] = $job['price'];
+}
+
+
+
 ?>
 
 <!doctype html>
@@ -88,10 +100,7 @@ $job=$stm->fetch();
           <hr class="mb-6">
 
     <h3 class="mb-3">Upload 3D Model</h3>
-    <small class="text-muted">(Max 200MB)</small>
-    <form action="/action_page.php">
-        <input type="file" id="myFile" name="filename" disabled> <!-- *need*display 3d file -->
-      </form>
+    <a href="<?php echo "uploads/" . $job['model_name']; ?>" > Download 3D file </a>
       <br>
 
     <!-- if its priced/payed-->
@@ -111,25 +120,25 @@ $job=$stm->fetch();
             </div>
         <!-- if its priced and not payed-->
         <?php if ($job["status"] == "pending_payment") { ?>
+          <a href="moneris/customer-payment.php">
+            <button type="button" class="btn btn-primary btn-lg" type="submit">
+              Payment
+            </button>
+          </a>
+                <form action="moneris/customer-payment.php" method="post">
 
-                    <a href="customer-payment.php?job_id=<?php echo $job["id"]; ?>">
-                        <button type="button" class="btn btn-primary btn-lg" type="submit">Payment</button>
+                  <button type="button" class="btn btn-primary btn-lg" type="submit">Payment</button>
+
+                </form>
                         <!--
                         <FORM METHOD="POST" ACTION= https://esqa.moneris.com/HPPDP/index.php >
-
                             <INPUT TYPE="HIDDEN" NAME="netlink_id" VALUE="AF4Fs1024">
-
                             <INPUT TYPE="HIDDEN" NAME="job_id" VALUE="Hsjh4GSr4g">
-
                             <INPUT TYPE="HIDDEN" NAME="price" VALUE="1.00">
-
                             ** MORE OPTIONAL VARIABLES CAN BE DEFINED HERE
-
                             <INPUT TYPE="SUBMIT" NAME="SUBMIT" VALUE="Click to proceed to Secure Page">
-
                         </FORM>
                      -->
-                    </a>
 
         <?php } ?>
     <?php }  ?>
