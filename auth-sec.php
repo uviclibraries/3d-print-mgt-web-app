@@ -49,7 +49,6 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] != true) {
 	}
 	//user exists in db
 	else {
-		echo "\n\n\n\n\nexists and creating sessions deats\n\n\n\n\n" . session_status();
 		foreach ($usersearch as $key) {
 			$_SESSION['user'] = $user;
 			$_SESSION['user_name'] = $key["name"];
@@ -69,6 +68,7 @@ $user_type = $_SESSION['user_type'];
 // logout if desired
 if (isset($_REQUEST['logout'])) {
 	$_SESSION['loggedin'] = false;
+	phpCAS::client(CAS_VERSION_2_0, 'www.uvic.ca', 443, '/cas');
 	phpCAS::logout();
 	session_unset();
 	session_destroy();
