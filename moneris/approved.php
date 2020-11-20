@@ -3,9 +3,10 @@
   // approved.php  -  display Moneris transaction details/receipt
   //               -  Moneris returns user to this page on approved payment
   //
+  session_start();
   include 'moneris.inc.php';
 
-  session_start();
+
   $job_id = $_SESSION['id'];
   $user_name = $_SESSION['user_name'];
   $user_email = $_SESSION['user_email'];

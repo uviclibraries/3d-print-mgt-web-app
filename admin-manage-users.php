@@ -1,4 +1,5 @@
 <?php
+session_start();
 require ('auth-sec.php'); //Gets CAS & db
 //auth-sec includes: $user, $user_email, $user_type, $user_name
 //Is user Admin check
@@ -77,7 +78,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     <h3>Users</h3>
     <br>
     <form method="POST">
-        <label for="searchbar">Search</label>
         <input type="text" id= "searchbar" name="searchbar">
         <input type="submit" name="Search" value="Search">
     </form>

@@ -3,10 +3,10 @@
   // declined.php  -  display Moneris transaction details/receipt
   //               -  Moneris returns user to this page on declined payment
   //
-
+  session_start();
   include 'moneris.inc.php';
 
-  session_start();
+
   $job_id = $_SESSION['id'];
   $user_name = $_SESSION['user_name'];
   $user_email = $_SESSION['user_email'];
@@ -43,7 +43,7 @@ The complete Moneris transaction response fields are:
 </table>
 <p>
 This data must be stored in the database so the admin user(s) can review
-it if/when required.
+it if/when required. hello.
 </p>
 
 <a href="../customer-dashboard.php">

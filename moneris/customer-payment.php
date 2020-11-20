@@ -1,20 +1,26 @@
 <?php
-include '../auth-sec.php'; //Gets CAS & db
-
 session_start();
+include '../auth-sec.php'; //Gets CAS & db
 include 'moneris.inc.php';
 
+
+$x1 = $_SESSION['user_name'];
+$x2 = $_SESSION['user_email'];
+$x3 = $_SESSION['job_id'];
+$x4 = strval($_SESSION['price']);
+
+$order_id = date('YmdHis') ."-". $x3;
 //
 // initiate Moneris HPP preload request
 //
 $post_fields= [
     'ps_store_id' => $moneris_store_id,
     'hpp_key' => $moneris_hpp_key,
-    'order_id' => $_SESSION['job_id'],
-    'charge_total' => $_SESSION['price'],
+    'order_id' => $order_id,
+    'charge_total' => $x4,
     'hpp_preload' => '',
-    'cust_id' => $_SESSION['user_name'],
-    'email' => $_SESSION['user_email'],
+    'cust_id' => $x1,
+    'email' => $x2,
     'note' => $moneris_note
   ];
 

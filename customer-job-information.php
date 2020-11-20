@@ -1,4 +1,5 @@
 <?php
+session_start();
 require ('auth-sec.php'); //Gets CAS & db
 $stm = $conn->prepare("SELECT * FROM print_job WHERE id=?");
 $stm->execute([$_GET["job_id"]]);
@@ -6,7 +7,7 @@ $job=$stm->fetch();
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST'){
-  session_start();
+
   $_SESSION['user_name'] = $user_name;
   $_SESSION['user_email'] = $user_email;
   $_SESSION['job_id'] = $job['id'];

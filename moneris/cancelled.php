@@ -2,6 +2,7 @@
   //
   // cancelled.php  -  Moneris returns user to this when they cancel
   //
+  session_start();
   include 'moneris.inc.php';
 ?>
 <!doctype html>

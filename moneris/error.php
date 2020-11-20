@@ -2,6 +2,7 @@
   //
   // error.php  -  display an error message
   //
+  session_start();
   include 'moneris.inc.php';
 
   $message = $_GET['mesg'];

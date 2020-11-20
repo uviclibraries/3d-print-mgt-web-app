@@ -1,4 +1,5 @@
 <?php
+session_start();
 require ('auth-sec.php'); //Gets CAS & db
 $stm = $conn->query("SELECT VERSION()");
 #$version = $stm->fetch();

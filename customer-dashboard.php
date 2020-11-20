@@ -1,4 +1,5 @@
 <?php
+session_start();
 require ('auth-sec.php'); //Gets CAS & db
 //auth-sec includes: $user, $user_email, $user_type, $user_name
 $stm = $conn->query("SELECT id, job_name, status, submission_date FROM print_job WHERE netlink_id = '$user' ORDER BY id DESC");

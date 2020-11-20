@@ -1,4 +1,5 @@
 <?php
+session_start();
 require ('auth-sec.php'); //Gets CAS & db
 //auth-sec includes: $user, $user_email, $user_type, $user_name
 //Is user Admin check

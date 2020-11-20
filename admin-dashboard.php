@@ -1,4 +1,5 @@
 <?php
+session_start();
 require ('auth-sec.php'); //Gets CAS & db
 //auth-sec includes: $user, $user_email, $user_type, $user_name
 //Is user Admin check
@@ -156,7 +157,7 @@ foreach ($job5 as $job) {
             ?>
             <tr>
               <td><?php echo $row["netlink_id"]; ?></td>
-                <td><a href="admin-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+              <td><a href="admin-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
               <td> <?php echo $row["submission_date"]; ?></td>
               <td><?php echo $row["status"]; ?></td>
             </tr>
