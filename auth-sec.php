@@ -57,6 +57,10 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] != true) {
 		}
 	}
 	$_SESSION['loggedin'] = true;
+	$getUserID = $conn->query("SELECT id FROM users WHERE netlink_id = '$user'");
+	foreach ($getUserID as $key) {
+		$_SESSION['user_id'] = $key['id'];
+	}
 }
 //user = loggedin
 
