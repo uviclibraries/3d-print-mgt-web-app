@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if ($_POST['status'] == "pending_payment") {
     $d1 = $current_date;
     //ADD link to FAQ page.
-    $direct_link = "customer-job-information.php?job_id=". $job['id']; // change to absoulte link
+    $direct_link = "https://devwebapp.library.uvic.ca/demo/3dwebapp/customer-job-information.php?job_id=". $job['id']; // change to absoulte link
     $msg = "
     <html>
     <head>
@@ -182,7 +182,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <div class="input-group-prepend">
                               <!-- ** catch non floatable input-->
                                 <span class="input-group-text">$</span>
-                          <input type="text" name="price" autocomplete="off" class="form-control" value="<?php echo number_format((float)$job["price"], 2, '.',''); ?>">
+                          <input type="text" name="price" autocomplete="off" class="form-control" value="<?php echo number_format((float)$job["price"], 2, '.',''); ?>"
+                          <?php if ($job["status"] != "not_priced" && $job["status"] != "pending_payment"): ?>
+                            readonly
+                          <?php endif; ?>
+                          >
                           </div>
                       </div>
                       <div class="invalid-feedback" style="width: 100%;">
