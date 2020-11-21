@@ -5,7 +5,7 @@ $stm = $conn->query("SELECT VERSION()");
 #$version = $stm->fetch();
 #echo $version;
 
-$user = phpCAS::getUser();
+
 $status = "not_priced";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
