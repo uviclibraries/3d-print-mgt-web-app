@@ -273,7 +273,7 @@ foreach ($job5 as $job) {
       </div>
 
         <hr class="mb-12">
-        <a class="btn btn-md btn-block" href="login.php" role="button">Log Out</a>
+        <a class="btn btn-md btn-block" href="?logout=" role="button">Log Out</a>
     </div>
   </div>
 </div>
