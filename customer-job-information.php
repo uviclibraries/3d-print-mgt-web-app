@@ -6,15 +6,6 @@ $stm->execute([$_GET["job_id"]]);
 $job=$stm->fetch();
 
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST'){
-
-  $_SESSION['user_name'] = $user_name;
-  $_SESSION['user_email'] = $user_email;
-  $_SESSION['job_id'] = $job['id'];
-  $_SESSION['price'] = $job['price'];
-}
-
-
 
 ?>
 
@@ -120,17 +111,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
 
             </div>
         <!-- if its priced and not payed-->
-        <?php if ($job["status"] == "pending_payment") { ?>
+        <?php
+        if ($job["status"] == "pending_payment") {
+          $_SESSION['price'] = strval($job["price"]);
+          $_SESSION['job_id'] = $job['id'];
+          ?>
           <a href="moneris/customer-payment.php">
             <button type="button" class="btn btn-primary btn-lg" type="submit">
               Payment
             </button>
           </a>
-                <form action="moneris/customer-payment.php" method="post">
-
-                  <button type="button" class="btn btn-primary btn-lg" type="submit">Payment</button>
-
-                </form>
                         <!--
                         <FORM METHOD="POST" ACTION= https://esqa.moneris.com/HPPDP/index.php >
                             <INPUT TYPE="HIDDEN" NAME="netlink_id" VALUE="AF4Fs1024">
