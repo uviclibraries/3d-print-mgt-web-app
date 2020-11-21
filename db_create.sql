@@ -83,6 +83,30 @@ CREATE TABLE `users` (
   `email` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+
+CREATE TABLE `moneris_fields` (
+  `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `response_order_id` varchar(50),
+  `response_code` int(3),
+  `date_stamp` date,
+  `time_stamp` time,
+  `result` varchar(5),
+  `trans_name` varchar(20),
+  `cardholder` varchar(50),
+  `card` varchar(2),
+  `charge_total` decimal(9),
+  `f4l4` varchar(16),
+  `message` varchar(50),
+  `iso_code` int(2),
+  `bank_approval_code` varchar(8),
+  `bank_transaction_id` varchar(20),
+  `txn_num` varchar(20),
+  `avs_response_code` varchar(1),
+  `cavv_result_code` varchar(1),
+  `INVOICE` varchar (50),
+  `ISSCONF` varchar (50),
+  `ISSNAME` varchar (50)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 --
 -- Dumping data for table `users`
 --
