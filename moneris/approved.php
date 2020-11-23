@@ -29,24 +29,6 @@ The complete Moneris transaction response fields are:
 </p>
 <table>
 <?php
-  $input   = array();
-  $columns = implode(", ",$moneris_response_fields);
-  foreach ($moneris_response_fields as $field) {
-    if (array_key_exists($field, $_POST)) {
-      $value = $_POST[$field];
-    }
-    else {
-      $value = '';
-    }
-    $input[] = $value;
-    echo "<tr><td>$field</td><td>$value</td></tr>\n";
-  }
-$inputStr = implode(", ", $input);
-
-/* need to add to moneris_fields
-$stm = $conn->prepare("INSERT INTO moneris_fields (".$columns.") VALUES ('$inputStr')");
-$stm->execute();
-*/
 
 //Change Status
 $current_date = date("Y-m-d");
@@ -57,6 +39,37 @@ $stmt->bindParam(':rdy', $current_date);
 $stmt->bindParam(':job_id', $_SESSION['job_id']);
 $stmt->execute();
 
+
+
+  $input   = array();
+  $columns = implode(", ",$moneris_response_fields);
+  foreach ($moneris_response_fields as $field) {
+    if (array_key_exists($field, $_POST)) {
+      $value = $_POST[$field];
+    }
+    else {
+      $value = '';
+    }
+    echo "<tr><td>$field</td><td>$value</td></tr>\n";
+    if ($value == '' OR $value == "" OR $value == NULL) {
+      $input[] = "NULL";
+    }else{
+      $input[] = $value;
+    }
+  }
+$inputStr = implode(", ", $input);
+
+?>
+<p><?php echo $columns ?> </p>
+<p> <?php echo $inputStr ?> </p>
+
+<?php
+//add to moneris_fields
+/*
+$sql = "INSERT INTO moneris_fields  " . $columns ." VALUES " . $inputStr;
+$stm = $conn->prepare($sql);
+$stm->execute();
+*/
 
 ?>
 </table>
