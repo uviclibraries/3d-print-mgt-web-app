@@ -14,7 +14,7 @@ $job=$stm->fetch();
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  $stmt = $conn->prepare("UPDATE print_job SET price = :price, infill = :infill, scale = :scale, layer_height = :layer_height, supports = :supports, copies = :copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  ready_to_prnt_date = :ready_to_prnt_date, printing_date = :printing_date, complete_date = :complete_date WHERE id = :job_id;
+  $stmt = $conn->prepare("UPDATE print_job SET price = :price, infill = :infill, scale = :scale, layer_height = :layer_height, supports = :supports, copies = :copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date WHERE id = :job_id;
   ");
   $current_date = date("Y-m-d");
   $stmt->bindParam(':job_id', $a = intval($_GET["job_id"]), PDO::PARAM_INT);
@@ -28,19 +28,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $stmt->bindParam(':staff_notes', $_POST["staff_notes"]);
   $stmt->bindParam(':status', $_POST["status"]);
   /*
-  should dates be removed if steps are reverted: eg printing->ready_to_print
+  should dates be removed if steps are reverted: eg printing->paid
   */
   $d1 = $_GET['priced_date'];
-  $d2 = $_GET['ready_to_prnt_date'];
+  $d2 = $_GET['paid_date'];
   $d3 = $_GET['printing_date'];
-  $d4 = $_GET['complete_date'];
+  $d4 = $_GET['completed_date'];
   $stmt->bindParam(':priced_date', $d1);
-  $stmt->bindParam(':ready_to_prnt_date', $d2);
+  $stmt->bindParam(':paid_date', $d2);
   $stmt->bindParam(':printing_date', $d3);
-  $stmt->bindParam(':complete_date', $d4);
+  $stmt->bindParam(':completed_date', $d4);
 
   //need variable to check if admin wants to send email. case: updating notes but dont send email
-  if ($_POST['status'] == "pending_payment") {
+  if ($_POST['status'] == "pending payment") {
     $d1 = $current_date;
     //ADD link to FAQ page.
     $direct_link = "https://devwebapp.library.uvic.ca/demo/3dwebapp/customer-job-information.php?job_id=". $job['id']; // change to absoulte link
@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $headers = "MIME-Version: 1.0" . "\r\n";
     $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
     mail($user_email,"3D Print - Make Payment",$msg,$headers);
-  } elseif($_POST['status'] == "ready_to_print"){
+  } elseif($_POST['status'] == "paid"){
     //this should be done automatically when payment is received.
     $d2 = $current_date;
 
@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   } elseif($_POST['status'] == "printing"){
     $d3 = $current_date;
 
-  } elseif ($_POST['status'] == "complete") {
+  } elseif ($_POST['status'] == "completed") {
     $d4 = $current_date;
     $msg = "
     <html>
@@ -148,10 +148,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="col-md-3 mb-3">
                 <select class="custom-select d-block w-100" name="status" id="layer-height">
                   <option value="not_priced" <?php if ($job["status"]== "not_priced"){echo "selected";} ?>>Not Priced</option>
-                  <option value="pending_payment" <?php if ($job["status"]== "pending_payment"){echo "selected";} ?>>Pending Payment</option>
-                  <option value="ready_to_print" <?php if ($job["status"]== "ready_to_print"){echo "selected";} ?>>Ready to Print</option>
+                  <option value="pending payment" <?php if ($job["status"]== "pending payment"){echo "selected";} ?>>Pending Payment</option>
+                  <option value="paid" <?php if ($job["status"]== "paid"){echo "selected";} ?>>Paid</option>
                   <option value="printing" <?php if ($job["status"]== "printing"){echo "selected";} ?>>Printing</option>
-                  <option value="complete" <?php if ($job["status"]== "complete"){echo "selected";} ?>>Complete</option>
+                  <option value="completed" <?php if ($job["status"]== "completed"){echo "selected";} ?>>Completed</option>
                 </select>
               </div>
               </div>
@@ -183,7 +183,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                               <!-- ** catch non floatable input-->
                                 <span class="input-group-text">$</span>
                           <input type="text" name="price" autocomplete="off" class="form-control" value="<?php echo number_format((float)$job["price"], 2, '.',''); ?>"
-                          <?php if ($job["status"] != "not_priced" && $job["status"] != "pending_payment"): ?>
+                          <?php if ($job["status"] != "submitted" && $job["status"] != "pending payment"): ?>
                             readonly
                           <?php endif; ?>
                           >

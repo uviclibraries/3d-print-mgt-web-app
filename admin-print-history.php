@@ -8,7 +8,7 @@ if ($user_type == 1) {
   die();
 }
 
-$stm = $conn->query("SELECT id, job_name, netlink_id, status, complete_date FROM print_job WHERE status = 'complete' ORDER BY complete_date DESC");
+$stm = $conn->query("SELECT id, job_name, netlink_id, status, completed_date FROM print_job WHERE status = 'completed' ORDER BY completed_date DESC");
 $jobs = $stm->fetchAll();
 
 $completed = [];
@@ -96,7 +96,7 @@ foreach ($jobs as $job) {
     <td><?php echo $row["netlink_id"]; ?></td>
       <!--CHANGE TO UNEDITABLE SCREEN -->
       <td><a href="admin-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
-    <td><?php echo $row["complete_date"]; ?></td>
+    <td><?php echo $row["completed_date"]; ?></td>
     <td><?php echo $row["status"]; ?></td>
   </tr>
   <?php

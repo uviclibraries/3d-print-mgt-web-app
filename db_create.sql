@@ -64,9 +64,9 @@ CREATE TABLE `print_job` (
   `submission_date` date DEFAULT NULL,
   `price` decimal(4,2) DEFAULT NULL,
   `priced_date` date DEFAULT NULL,
-  `ready_to_prnt_date` date DEFAULT NULL,
+  `paid_date` date DEFAULT NULL,
   `printing_date` date DEFAULT NULL,
-  `complete_date` date DEFAULT NULL
+  `completed_date` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------

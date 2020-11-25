@@ -63,7 +63,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] != true) {
 	}
 }
 //user = loggedin
-
+//set session variables
 $user = $_SESSION['user'];
 $user_name =$_SESSION['user_name'];
 $user_email = $_SESSION['user_email'];

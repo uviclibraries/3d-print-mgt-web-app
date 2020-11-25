@@ -32,8 +32,8 @@ The complete Moneris transaction response fields are:
 
 //Change Status
 $current_date = date("Y-m-d");
-$current_status = "ready_to_print";
-$stmt = $conn->prepare("UPDATE print_job SET status = :status, ready_to_prnt_date = :rdy WHERE id = :job_id");
+$current_status = "paid";
+$stmt = $conn->prepare("UPDATE print_job SET status = :status, paid_date = :rdy WHERE id = :job_id");
 $stmt->bindParam(':status', $current_status);
 $stmt->bindParam(':rdy', $current_date);
 $stmt->bindParam(':job_id', $_SESSION['job_id']);

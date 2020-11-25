@@ -6,7 +6,7 @@ $stm = $conn->query("SELECT VERSION()");
 #echo $version;
 
 
-$status = "not_priced";
+$status = "submitted";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 

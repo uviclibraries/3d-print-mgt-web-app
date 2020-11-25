@@ -96,7 +96,7 @@ $job=$stm->fetch();
       <br>
 
     <!-- if its priced/payed-->
-    <?php if($job["status"] != "not_priced"){?>
+    <?php if($job["status"] != "submitted"){?>
 
 
         <div class="col-md-3 mb-3">
@@ -112,7 +112,7 @@ $job=$stm->fetch();
             </div>
         <!-- if its priced and not payed-->
         <?php
-        if ($job["status"] == "pending_payment") {
+        if ($job["status"] == "pending payment") {
           $_SESSION['price'] = strval($job["price"]);
           $_SESSION['job_id'] = $job['id'];
           ?>
