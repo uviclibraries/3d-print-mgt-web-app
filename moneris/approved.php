@@ -39,7 +39,13 @@ $stmt->bindParam(':rdy', $current_date);
 $stmt->bindParam(':job_id', $_SESSION['job_id']);
 $stmt->execute();
 
-
+echo "post";
+foreach ($_POST as $key=>$result) {
+  echo $key. " >--holds--> " . $result;
+  ?>
+  <br>
+  <?php
+}
 
   $input   = array();
   $columns = implode(", ",$moneris_response_fields);
