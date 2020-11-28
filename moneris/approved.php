@@ -4,7 +4,7 @@
   //               -  Moneris returns user to this page on approved payment
   //
   session_start();
-  include '../auth-sec.php';
+  include '../db.php';
   include 'moneris.inc.php';
 
 
@@ -14,15 +14,14 @@
 <head>
   <meta charset="utf-8" />
   <link rel="stylesheet" type="text/css" href="css/style.css" />
-  <title>Moneris Demo Approved</title>
+  <title>Moneris Transaction Approved</title>
 </head>
 <body>
 <p>
-<b>Moneris Demo</b>
+<b>Moneris Transaction Approved</b>
 </p>
 <p>
-Your payment has been approved.  A receipt should have been sent to
-<?php echo $user_email; ?> from Moneris.
+Your payment has been approved.  A receipt should have been sent from Moneris.
 </p>
 <p>
 The complete Moneris transaction response fields are:
@@ -30,33 +29,39 @@ The complete Moneris transaction response fields are:
 <table>
 <?php
 
+
+
+//Fill array with returned values.
+$input   = array();
+foreach ($moneris_response_fields as $field) {
+  if (array_key_exists($field, $_POST)) {
+    $value = $_POST[$field];
+  }
+  else {
+    $value = '';
+  }
+  echo "<tr><td>$field</td><td>$value</td></tr>\n";
+  if ($value == '' OR $value == "" OR $value == NULL) {
+    $input[$field] = "NULL";
+  }else{
+    $input[$field] = $value;
+  }
+}
+
+
 //Change Status
 $current_date = date("Y-m-d");
 $current_status = "paid";
-$stmt = $conn->prepare("UPDATE print_job SET status = :status, paid_date = :rdy WHERE id = :job_id");
+$job_id = explode("-", $input['response_order_id']);
+
+$stmt = $conn->prepare("UPDATE print_job SET status = :status, paid_date = :paid_date WHERE id = :job_id");
 $stmt->bindParam(':status', $current_status);
-$stmt->bindParam(':rdy', $current_date);
-$stmt->bindParam(':job_id', $_SESSION['job_id']);
+$stmt->bindParam(':paid_date', $current_date);
+$stmt->bindParam(':job_id', $job_id[2]);  //taken from order_id. any better way?
 $stmt->execute();
 
 
 
-//Fill array with returned values.
-  $input   = array();
-  foreach ($moneris_response_fields as $field) {
-    if (array_key_exists($field, $_POST)) {
-      $value = $_POST[$field];
-    }
-    else {
-      $value = '';
-    }
-    echo "<tr><td>$field</td><td>$value</td></tr>\n";
-    if ($value == '' OR $value == "" OR $value == NULL) {
-      $input[$field] = "NULL";
-    }else{
-      $input[$field] = $value;
-    }
-  }
 
 $escaped_values = array_map('addslashes', $input);
 //add to moneris_fields
@@ -83,14 +88,9 @@ $stm->bindParam(':INVOICE', $input['INVOICE']);
 $stm->bindParam(':ISSCONF', $input['ISSCONF']);
 $stm->bindParam(':ISSNAME', $input['ISSNAME']);
 $stm->execute();
-
-
 ?>
 </table>
-<p>
-This data must be stored in the database so the admin user(s) can review
-it if/when required.
-</p>
+<br>
 <a href="../customer-dashboard.php">
 <button type="button" type="submit">Return</button>
 </a>

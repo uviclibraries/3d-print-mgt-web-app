@@ -4,7 +4,7 @@
   //               -  Moneris returns user to this page on declined payment
   //
   session_start();
-  include '../auth-sec.php';
+  include '../db.php';
   include 'moneris.inc.php';
 
 ?>
@@ -13,11 +13,11 @@
 <head>
   <meta charset="utf-8" />
   <link rel="stylesheet" type="text/css" href="css/style.css" />
-  <title>Moneris Demo Declined</title>
+  <title>Moneris Transaction Declined</title>
 </head>
 <body>
 <p>
-<b>Moneris Demo</b>
+<b>Moneris Transaction Declined</b>
 </p>
 <p>
 Your payment attempt has been declined.
@@ -27,12 +27,6 @@ The complete Moneris transaction response fields are:
 </p>
 <table>
 <?php
-foreach ($_POST as $key=>$result) {
-  echo $key. " --holds-- " . $result;
-  ?>
-  <br>
-  <?php
-}
 
 //Fill array with returned values.
 $input   = array();
@@ -77,11 +71,7 @@ $input   = array();
   $stm->execute();
 ?>
 </table>
-<p>
-This data must be stored in the database so the admin user(s) can review
-it if/when required. hello.
-</p>
-
+<br>
 <a href="../customer-dashboard.php">
 <button type="button" type="submit">Return</button>
 </a>
