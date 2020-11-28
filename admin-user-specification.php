@@ -18,16 +18,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   ");
   $stmt->bindParam(':user_id', $_GET["user_id"]);
   if ($_POST["user_type"] == "Admin") {
-    $stmt->bindParam(':user_type', $a = 0);
+    $a = 0;
+    $stmt->bindParam(':user_type', $a);
   }
   else{
-      $stmt->bindParam(':user_type', $a = 1);
+    $a = 1;
+      $stmt->bindParam(':user_type', $a);
   }
   $stmt->bindParam(':email', $_POST["email"]);
   $stmt->execute();
-
-
-  header("admin-manage-users.php?user_id=");
+  //refresh pageto display new values.
+  echo "<meta http-equiv='refresh' content='0'>";
 }
 ?>
 
