@@ -16,19 +16,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $stmt = $conn->prepare("UPDATE printer SET operational = :operational, color = :color, color2 = :color2 WHERE id = :printer_id");
   //Goes through whole table
   foreach ($all_printers as $rowupdate) {
-    $operationalUP = 'operating:'.$rowupdate['id'];
+
+    $operationalUP = false;
     $colorUP ="color:".$rowupdate['id'];
     $color2UP ="color2:".$rowupdate['id'];
-    echo $_POST[$operationalUP]."--";
-    echo $_POST[$colorUP]."--";
-    echo $_POST[$color2UP]."  ";
+    if ($_POST[('operating:'.$rowupdate['id'])] == "On") {
+      $operationalUP = true;
+    }
+
     $stmt->bindParam(':printer_id', $rowupdate['id']);
-    $stmt->bindParam(':operational',$_POST[$operationalUP]);
+    $stmt->bindParam(':operational',$operationalUP);
     $stmt->bindParam(':color', $_POST[$colorUP]);
     $stmt->bindParam(':color2', $_POST[$color2UP]);
     $stmt->execute();
   }
-
+  //refresh pageto display new values.
+  echo "<meta http-equiv='refresh' content='0'>";
 }
 
  ?>
@@ -106,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <td><?php echo $row["printer_name"]; ?></td>
           <td><?php echo $row["make_model"]; ?></td>
           <td>
-            <select class="form-control" name="operating" id="operating:<?php echo $row["id"]; ?>" >
+            <select class="form-control" name="operating:<?php echo $row["id"]; ?>" >
               <option  <?php if ($row["operational"]== true){echo "selected";} ?> > On
               </option>
               <option  <?php if ($row["operational"]== false){echo "selected";} ?> > Off
@@ -114,10 +117,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </select>
           </td>
           <td>
-            <input type="text" name="color" class="form-control" id="color:<?php echo $row["id"]; ?>" value="<?php echo $row["color"]; ?>">
+            <input type="text" class="form-control" name="color:<?php echo $row["id"]; ?>" value="<?php echo $row["color"]; ?>">
           </td>
           <td>
-              <input type="text" name="color2" id="color2:<?php echo $row["id"]; ?>" class="form-control"
+              <input type="text" name="color2:<?php echo $row["id"]; ?>" class="form-control"
                 <?php if ($row["2extruder"] == true){ ?>
                   value = <?php echo $row["color2"];
                 }else { ?>
@@ -136,9 +139,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </table>
     <hr class="mb-4">
     <center>
-      <form action="customer-dashboard.php">
-        <button class="btn btn-primary btn-lg" type="submit">Update Printers</button>
-      </form>
+      <button class="btn btn-primary btn-lg" type="submit">Update Printers</button>
     </center>
   </div>
 </div>
