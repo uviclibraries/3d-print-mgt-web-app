@@ -81,11 +81,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </html>";
     $headers = "MIME-Version: 1.0" . "\r\n";
     $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-    mail($user_email, "3D Print - Make Payment",$msg,$headers);
+    mail($user_email, "3D Print - Ready for Collection",$msg,$headers);
   }
   $stmt->execute();
 
-
+  //exit to dashboard after button
   header("location: admin-dashboard.php");
 }
 ?>
