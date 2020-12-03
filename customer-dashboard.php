@@ -71,7 +71,7 @@ $data = $stm->fetchAll();
         </a>
         </div>
         <div class="btn-auto mr-auto">
-        <a href="3dfaq.php">
+        <a href="3dfaq.html">
           <button class="btn btn-danger btn-lg" type="submit">FAQ</button>
         </a>
       </div>
