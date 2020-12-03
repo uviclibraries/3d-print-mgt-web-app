@@ -13,7 +13,9 @@ if ($_GET["user_id"] == "" OR $_GET["user_id"] == NULL) {
 else{
   $stm = $conn->prepare("SELECT * FROM users WHERE netlink_id LIKE ? OR name LIKE ? ORDER BY id");
   $searching = "%". $_GET["user_id"]."%";
-  $stm->execute([$searching,$searching]);
+  $stm->bindParam(1, $searching, PDO::PARAM_STR);
+  $stm->bindParam(2, $searching, PDO::PARAM_STR);
+  $stm->execute();
 }
 
 $all_users = $stm->fetchAll();
@@ -77,10 +79,19 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
   <div class="py-3 text-left">
     <h3>Users</h3>
     <br>
-    <form method="POST">
-        <input type="text" id= "searchbar" name="searchbar">
-        <input type="submit" name="Search" value="Search">
-    </form>
+
+    <div class="row">
+      <div class="col-md-4">
+        <form method="POST">
+          <input type="text" id= "searchbar" name="searchbar">
+          <input type="submit" name="Search" value="Search">
+        </form>
+      </div>
+      <div class="col-md-4 offset-md-4">
+        <a class="btn btn-md btn-primary btn-" href="admin-dashboard.php" role="button">Back to Dashboard</a>
+      </div>
+    </div>
+
   <br>
   <div class="table-responsive">
     <table class="table table-striped table-md">
@@ -122,10 +133,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 
 </div>
 </div>
-</div>
-
-<div class="text-center">
-  <a class="btn btn-md btn-primary btn-lg" href="admin-dashboard.php" role="button">Back to Dashboard</a>
 </div>
 
 </body>
