@@ -41,6 +41,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   //need variable to check if admin wants to send email. case: updating notes but dont send email
   if ($_POST['status'] == "pending payment") {
+    //get job owner details
+    $userSQL = $conn->prepare("SELECT * FROM users WHERE netlink_id = :netlink_id");
+    $userSQL->bindParam(':netlink_id', $job['netlink_id']);
+    $userSQL->execute();
+    $job_owner = $userSQL->fetch();
+
     $d1 = $current_date;
     //ADD link to FAQ page.
     $direct_link = "https://devwebapp.library.uvic.ca/demo/3dwebapp/customer-job-information.php?job_id=". $job['id']; // change to absoulte link
@@ -50,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>HTML email</title>
     </head>
     <body>
-    <p> Hello ". $user_name .". This is an automated resposne from the DSC. </p>
+    <p> Hello ". $job_owner['name'] .". This is an automated resposne from the DSC. </p>
     <p> Your 3D print job; " . $job['job_name'] . " has been evaluated at a cost of $" . (number_format((float)$_POST["price"], 2, '.','')) . " </p>
     <p> Please make your payment <a href=". $direct_link .">here</a> for the DSC to place it in our printing queue.</p>
     <p>If you have any questions please review our FAQ or email us at DSCommons@uvic.ca.</p>
@@ -58,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </html>";
     $headers = "MIME-Version: 1.0" . "\r\n";
     $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-    mail($user_email,"3D Print - Make Payment",$msg,$headers);
+    mail($job_owner['email'],"3D Print - Make Payment",$msg,$headers);
   } elseif($_POST['status'] == "paid"){
     //this should be done automatically when payment is received.
     $d2 = $current_date;
@@ -68,6 +74,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $d3 = $current_date;
 
   } elseif ($_POST['status'] == "completed") {
+
+    $userSQL = $conn->prepare("SELECT * FROM users WHERE netlink_id = :netlink_id");
+    $userSQL->bindParam(':netlink_id', $job['netlink_id']);
+    $userSQL->execute();
+    $job_owner = $userSQL->fetch();
+
+
     $d4 = $current_date;
     $msg = "
     <html>
@@ -75,13 +88,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>HTML email</title>
     </head>
     <body>
-    <p>Hello ". $user_name .". This is an automated resposne from the DSC. </p>
+    <p>Hello ". $job_owner['name'] .". This is an automated resposne from the DSC. </p>
     <p> Your 3D print job; " . $job['job_name'] . " is complete. You can pick it up from the front desk at the MacPherson Library.</p>
     </body>
     </html>";
     $headers = "MIME-Version: 1.0" . "\r\n";
     $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-    mail($user_email, "3D Print - Ready for Collection",$msg,$headers);
+    mail($job_owner['email'], "3D Print - Ready for Collection",$msg,$headers);
   }
   $stmt->execute();
 
@@ -147,7 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <div class="row">
             <div class="col-md-3 mb-3">
                 <select class="custom-select d-block w-100" name="status" id="layer-height">
-                  <option value="not_priced" <?php if ($job["status"]== "not_priced"){echo "selected";} ?>>Not Priced</option>
+                  <option value="submitted" <?php if ($job["status"]== "submitted"){echo "selected";} ?>>Not Priced</option>
                   <option value="pending payment" <?php if ($job["status"]== "pending payment"){echo "selected";} ?>>Pending Payment</option>
                   <option value="paid" <?php if ($job["status"]== "paid"){echo "selected";} ?>>Paid</option>
                   <option value="printing" <?php if ($job["status"]== "printing"){echo "selected";} ?>>Printing</option>
