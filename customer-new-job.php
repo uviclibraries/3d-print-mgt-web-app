@@ -76,16 +76,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 /*  Check inputs here */
 
 //$a need to tidy up.
-  $layer_height_var = floatval(number_format((float)$_POST["layer_height"], 2, '.',''));
+  $infill_bind = intval($_POST["infill"]);
+  $scale_bind = intval($_POST["scale"]);
+  $layer_bind = floatval(number_format((float)$_POST["layer_height"], 2, '.',''));
+  $support_bind = intval($_POST["supports"]);
+  $copies_bind = intval($_POST["copies"]);
   $stmt = $conn->prepare("INSERT INTO print_job (netlink_id, job_name, model_name, infill, scale, layer_height, supports, copies, material_type, comments, status) VALUES (:netlink_id, :job_name, :model_name, :infill, :scale, :layer_height, :supports, :copies, :material_type, :comments, :status)");
   $stmt->bindParam(':netlink_id', $user);
   $stmt->bindParam(':job_name', $_POST["job_name"]);
   $stmt->bindParam(':model_name', $hash_name);
-  $stmt->bindParam(':infill', $a = intval($_POST["infill"]), PDO::PARAM_INT);
-  $stmt->bindParam(':scale', $a = intval($_POST["scale"]), PDO::PARAM_INT);
-  $stmt->bindParam(':layer_height', $layer_height_var);
-  $stmt->bindParam(':supports', $a =  intval($_POST["supports"]), PDO::PARAM_INT);
-  $stmt->bindParam(':copies', $a =  intval($_POST["copies"]), PDO::PARAM_INT);
+  $stmt->bindParam(':infill', $infill_bind, PDO::PARAM_INT);
+  $stmt->bindParam(':scale', $scale_bind , PDO::PARAM_INT);
+  $stmt->bindParam(':layer_height', $layer_bind);
+  $stmt->bindParam(':supports', $support_bind, PDO::PARAM_INT);
+  $stmt->bindParam(':copies', $copies_bind, PDO::PARAM_INT);
   $stmt->bindParam(':material_type', $_POST["material_type"]);
   $stmt->bindParam(':comments', $_POST["comments"]);
   $stmt->bindParam(':status', $status);
