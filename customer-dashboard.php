@@ -2,8 +2,27 @@
 session_start();
 require ('auth-sec.php'); //Gets CAS & db
 //auth-sec includes: $user, $user_email, $user_type, $user_name
-$stm = $conn->query("SELECT id, job_name, status, submission_date FROM print_job WHERE netlink_id = '$user' ORDER BY id DESC");
+$stm = $conn->query("SELECT id, job_name, status, submission_date, priced_date, paid_date, printing_date, completed_date FROM print_job WHERE netlink_id = '$user' ORDER BY id DESC");
 $data = $stm->fetchAll();
+//split results by Status
+$pending_payment = [];
+$complete = [];
+$paid_print_subm = [];
+$other_jobs = [];
+foreach ($data as $job) {
+  if ($job['status'] == "pending payment") {
+    $pending_payment[] = $job;
+  }elseif ($job['status'] == "completed") {
+    $complete[] = $job;
+  }elseif ($job['status'] == "paid" || $job['status'] == "printing" || $job['status'] == "submitted") {
+    $paid_print_subm[] = $job;
+  }else{
+    $other_jobs[] = $job;
+  }
+
+}
+
+
 ?>
 <!doctype html>
 <html lang="en">
@@ -86,29 +105,100 @@ $data = $stm->fetchAll();
 
         <hr class="mb-12">
 
-        <h2>Print Job Status</h2>
+        <h2>Your Print Job</h2>
       <div class="table-responsive">
         <table class="table table-striped table-md">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Name</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php
-            foreach($data as $row){
+        <tbody>
+          <?php
+          //pending payment jobs
+          if (!empty($pending_payment)) {
+            ?>
+            <thead>
+              <tr>
+                <th>Priced Date</th>
+                <th>Name</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <?php foreach ($pending_payment as $row) {
             ?>
             <tr>
-              <td><?php echo $row["submission_date"]; ?></td>
-                <td><a href="customer-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+              <td><?php echo $row["priced_date"]; ?></td>
+              <td><a href="customer-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
               <td><?php echo $row["status"]; ?></td>
             </tr>
             <?php
             }
+          }
+          //Completed jobs
+          if (!empty($complete)) {
             ?>
-          </tbody>
+            <thead>
+              <tr>
+                <th>Completed Date</th>
+                <th>Name</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <?php foreach ($complete as $row) {
+            ?>
+            <tr>
+              <td><?php echo $row["completed_date"]; ?></td>
+              <td><a href="customer-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+              <td><?php echo $row["status"]; ?></td>
+            </tr>
+            <?php
+            }
+          }
+          //Paid & printing jobs
+          if (!empty($paid_print_subm)) {
+            ?>
+            <thead>
+              <tr>
+                <th>Last Updated</th>
+                <th>Name</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <?php foreach ($paid_print_subm as $row) {
+            ?>
+            <tr>
+              <?php if ($row["status"] == "paid") { ?>
+                <td><?php echo $row["paid_date"]; ?></td>
+              <?php }elseif ($row["status"] == "printing") { ?>
+                <td><?php echo $row["printing_date"]; ?></td>
+              <?php } else { ?>
+                <td><?php echo $row["submission_date"]; ?></td>
+              <?php } ?>
+              <td><a href="customer-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+              <td><?php echo $row["status"]; ?></td>
+            </tr>
+            <?php
+            }
+          }
+          //Other jobs
+          if (!empty($other_jobs)) {
+            ?>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Name</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <?php foreach ($other_jobs as $row) {
+            ?>
+            <tr>
+              <td><?php echo $row["completed_date"]; ?></td>
+              <td><a href="customer-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+              <td><?php echo $row["status"]; ?></td>
+            </tr>
+            <?php
+            }
+          }
+          ?>
+
+           </tbody>
         </table>
       </div>
 
