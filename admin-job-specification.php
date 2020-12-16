@@ -79,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $userSQL->bindParam(':netlink_id', $job['netlink_id']);
     $userSQL->execute();
     $job_owner = $userSQL->fetch();
-
+    $direct_link = "https://www.uvic.ca/library/";
 
     $d4 = $current_date;
     $msg = "
@@ -88,8 +88,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>HTML email</title>
     </head>
     <body>
-    <p>Hello ". $job_owner['name'] .". This is an automated resposne from the DSC. </p>
+    <p>Hello ". $job_owner['name'] .". This is an automated response from the DSC. </p>
     <p> Your 3D print job; " . $job['job_name'] . " is complete. You can pick it up from the front desk at the MacPherson Library.</p>
+    <p>Please check up to date library hours and safety guidlines by checking the library website <a href=". $direct_link .">here</a></p>
     </body>
     </html>";
     $headers = "MIME-Version: 1.0" . "\r\n";
@@ -213,7 +214,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <h3 class="mb-3">3D Model</h3>
 
-        <a href="<?php echo "uploads/" . $job['model_name']; ?>" > Download 3D file </a>
+        <a href="<?php echo "uploads/" . $job['model_name']; ?>" download> Download 3D file </a>
       <br>
       <hr class="mb-6">
 
