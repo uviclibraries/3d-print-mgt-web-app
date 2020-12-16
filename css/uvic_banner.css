@@ -1,0 +1,70 @@
+/* This stuff is for the standard UVic page header */
+#banner {
+overflow: hidden;
+padding: 2em 0 0;
+min-height: 4em;
+overflow: visible;
+}
+.edge{
+background:url(https://www.uvic.ca/assets/template3-3/images/header-inside-bg.png) right center no-repeat;
+}
+.wrapper {
+padding: 2em 0 0;
+min-height: 4em;
+background-color: #0A3B73; //#2d559b;
+}
+#logo {
+background: transparent url("https://www.uvic.ca/assets2012/template3-2/images/uvic_logo.png") 0 0 no-repeat;
+background-size: auto 100%;
+margin-left: 1.66667em;
+width: 11.1667em;
+display: block;
+text-decoration: none;
+height: 3em;
+}
+#logo span, #unit span{
+visibility: hidden;
+}
+#unit {
+background-image: url("https://www.uvic.ca/library/assets/images/logos/unit_logo.png");
+border-left: 1px solid white;
+background-position:8px 0px;
+background-size: auto 100%;
+line-height: 2em;
+width: 10em;
+display: block;
+float: right;
+margin: 0 .6666em 2em 0;
+text-decoration: none;
+height: 3em;
+}
+
+/* This stuff is specific to the forms on these pages */
+body {
+margin: 0px;
+padding: 0px;
+}
+h1 {
+margin: 25px 10px;
+font-style: normal;
+font-size: 120%;
+font-family:"Arial Unicode MS",Verdana,Arial,Helvetica,sans-serif;
+}
+td {
+padding: 10px;
+font-size: 10pt;
+font-family:"Arial Unicode MS",Verdana,Arial,Helvetica,sans-serif;	
+font-weight: normal;
+}
+p {
+margin: 12px 10px;
+}
+pre {
+margin: 12px 10px;
+}
+a {
+text-decoration: none;
+}
+a:hover {
+text-decoration: underline;
+}

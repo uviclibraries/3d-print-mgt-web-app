@@ -126,6 +126,8 @@ header("location: customer-dashboard.php");
     <meta name="generator" content="Jekyll v4.0.1">
     <title>New 3D print request</title>
 
+    <!--header link-->
+    <link rel="stylesheet" href="css/uvic_banner.css">
     <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/checkout/">
 
     <!-- Bootstrap core CSS -->
@@ -162,6 +164,19 @@ header("location: customer-dashboard.php");
     <link href="form-validation.css" rel="stylesheet">
   </head>
   <body class="bg-light">
+
+    <!--Header-->
+    <div id="custom_header"><div class="wrapper" style="min-height: 6em;" id="banner">
+     <div style="position:absolute; left: 5px; top: 26px;">
+      <a href="http://www.uvic.ca/" id="logo"><span>University of Victoria</span></a>
+     </div>
+     <div style="position:absolute; left: 176px; top: 26px;">
+      <a href="http://www.uvic.ca/library/" id="unit"><span>Libraries</span></a>
+     </div>
+     <div class="edge" style="position:absolute; margin: 0px;right: 0px; top: 0px; height: 96px; width:200px;">&nbsp;</div>
+    </div>
+    <!--Header end-->
+
     <div class="container">
         <form method="POST" enctype="multipart/form-data">
   <div class="py-5 text-center">
@@ -228,7 +243,7 @@ header("location: customer-dashboard.php");
             <select class="custom-select d-block w-100" name="layer_height" id="layer-height" required>
               <option>0.4</option>
               <option>0.3</option>
-              <option>0.2</option>
+              <option selected="selected">0.2</option>
               <option>0.15</option>
               <option>0.1</option>
               <option>0.06</option>

@@ -33,7 +33,8 @@ foreach ($data as $job) {
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Jekyll v4.0.1">
     <title>Your Dashboard</title>
-
+    <!--header link-->
+    <link rel="stylesheet" href="css/uvic_banner.css">
     <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/checkout/">
 
     <!-- Bootstrap core CSS -->
@@ -70,10 +71,23 @@ foreach ($data as $job) {
     <link href="form-validation.css" rel="stylesheet">
   </head>
   <body class="bg-light">
+
+    <!--Header-->
+    <div id="custom_header"><div class="wrapper" style="min-height: 6em;" id="banner">
+     <div style="position:absolute; left: 5px; top: 26px;">
+      <a href="http://www.uvic.ca/" id="logo"><span>University of Victoria</span></a>
+     </div>
+     <div style="position:absolute; left: 176px; top: 26px;">
+      <a href="http://www.uvic.ca/library/" id="unit"><span>Libraries</span></a>
+     </div>
+     <div class="edge" style="position:absolute; margin: 0px;right: 0px; top: 0px; height: 96px; width:200px;">&nbsp;</div>
+    </div>
+    <!--Header end-->
+
     <div class="container">
   <div class="py-5 text-center">
 
-    <h1><b> Welcome <?php echo $user_name; ?>, to your 3D printing dashboard</b></h1>
+    <h1><b> DSC 3D printing dashboard</b></h1>
   </div>
 
   <div class="row">

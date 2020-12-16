@@ -42,6 +42,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="generator" content="Jekyll v4.0.1">
     <title>User id: <?php echo $job["id"] ?></title>
 
+    <!--header link-->
+    <link rel="stylesheet" href="css/uvic_banner.css">
     <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/checkout/">
 
     <!-- Bootstrap core CSS -->
@@ -78,10 +80,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="form-validation.css" rel="stylesheet">
   </head>
   <body class="bg-light">
+
+    <!--Header-->
+    <div id="custom_header"><div class="wrapper" style="min-height: 6em;" id="banner">
+     <div style="position:absolute; left: 5px; top: 26px;">
+      <a href="http://www.uvic.ca/" id="logo"><span>University of Victoria</span></a>
+     </div>
+     <div style="position:absolute; left: 176px; top: 26px;">
+      <a href="http://www.uvic.ca/library/" id="unit"><span>Libraries</span></a>
+     </div>
+     <div class="edge" style="position:absolute; margin: 0px;right: 0px; top: 0px; height: 96px; width:200px;">&nbsp;</div>
+    </div>
+    <!--Header end-->
+
     <div class="container">
     <form method="POST">
   <div class="py-5 text-center">
-    <h1><?php echo $job["netlink_id"]; ?></h1>
+    <h1><?php echo $job["name"]; ?></h1>
     </div>
 
     <div class="col-md-12 order-md-1">
