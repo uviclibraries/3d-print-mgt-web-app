@@ -229,7 +229,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <h3 class="mb-3">3D Model</h3>
 
-        <a href="<?php echo "uploads/" . $job['model_name']; ?>" download> Download 3D file </a>
+        <!--Grabs file and renames it to the job name-->
+        <a
+          href="<?php echo "uploads/" . $job['model_name']; ?>" download="<?php
+            $filetype = explode(".", $job['model_name']);
+            echo $job['job_name'] . "." . $filetype[1]; ?>">
+            Download 3D file
+        </a>
         <button type="btn btn-danger btn-lg"> Delete </button>
       <br>
       <hr class="mb-6">
