@@ -203,12 +203,18 @@ header("location: customer-dashboard.php");
       <br>
       <hr class="mb-6">
 
+      <!--allows popup for Specifications-->
+      <script>
+      $(function () {
+          $('[data-toggle="tooltip"]').tooltip()
+      })
+      </script>
 
     <div class="col-md-12 order-md-1">
       <h3 class="mb-3">Specifications</h3>
         <div class="row">
-            <div class="col-md-3 mb-3">
-                <label for="username">Infill</label>
+            <div class="col-md-3 mb-3" data-toggle="tooltip" data-placement="right" data-trigger="click" title="The percentage of the interior that is made up of material. More infill increases strength and the cost.">
+                <label for="infill">Infill</label>
                 <div class="input-group">
                   <div class="input-group mb-3">
                     <input type="number" max="100" min="0" class="form-control" name="infill" value="10" aria-label="100" aria-describedby="basic-addon2" required>
@@ -221,8 +227,8 @@ header("location: customer-dashboard.php");
                 </div>
             </div>
             </div>
-            <div class="col-md-3 mb-3">
-                <label for="username">Scale</label>
+            <div class="col-md-3 mb-3" data-toggle="tooltip" data-placement="right" title="The size based on the design of the file.">
+                <label for="scale">Scale</label>
                 <div class="input-group">
                 <div class="input-group mb-3">
                     <input type="number" min="1" class="form-control" name="scale" value="100" aria-label="100" aria-describedby="basic-addon2" required>
@@ -238,7 +244,7 @@ header("location: customer-dashboard.php");
         </div>
 
         <div class="row">
-          <div class="col-md-3 mb-3">
+          <div class="col-md-3 mb-3" data-toggle="tooltip" data-placement="right" title="Thickness of each layer. Smaller heights increases detail and print times.">
             <label for="layer-height">Layer Height</label>
             <select class="custom-select d-block w-100" name="layer_height" id="layer-height" required>
               <option>0.4</option>
@@ -252,7 +258,7 @@ header("location: customer-dashboard.php");
               Please select a valid layer height.
             </div>
           </div>
-          <div class="col-md-3 mb-3">
+          <div class="col-md-3 mb-3" data-toggle="tooltip" data-placement="right" title="3D printers cannot print in the air and supports allow builing portions that hang or are suspended. Supports use material and increase cost.">
             <label for="supports">Supports</label>
             <select class="custom-select d-block w-100" name="supports" id="supports" required>
               <option value="1">Yes</option>
