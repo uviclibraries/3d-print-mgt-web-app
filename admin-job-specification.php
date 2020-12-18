@@ -41,13 +41,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   //need variable to check if admin wants to send email. case: updating notes but dont send email
   if ($_POST['status'] == "pending payment") {
+    $d1 = $current_date;
     //get job owner details
     $userSQL = $conn->prepare("SELECT * FROM users WHERE netlink_id = :netlink_id");
     $userSQL->bindParam(':netlink_id', $job['netlink_id']);
     $userSQL->execute();
     $job_owner = $userSQL->fetch();
 
-    $d1 = $current_date;
+
     //ADD link to FAQ page.
     $direct_link = "https://devwebapp.library.uvic.ca/demo/3dwebapp/customer-job-information.php?job_id=". $job['id']; // change to absoulte link
     $msg = "
@@ -74,28 +75,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $d3 = $current_date;
 
   } elseif ($_POST['status'] == "completed") {
-
-    $userSQL = $conn->prepare("SELECT * FROM users WHERE netlink_id = :netlink_id");
-    $userSQL->bindParam(':netlink_id', $job['netlink_id']);
-    $userSQL->execute();
-    $job_owner = $userSQL->fetch();
-    $direct_link = "https://www.uvic.ca/library/";
-
     $d4 = $current_date;
-    $msg = "
-    <html>
-    <head>
-    <title>HTML email</title>
-    </head>
-    <body>
-    <p>Hello ". $job_owner['name'] .". This is an automated response from the DSC. </p>
-    <p> Your 3D print job; " . $job['job_name'] . " is complete. You can pick it up from the front desk at the MacPherson Library.</p>
-    <p>Please check up to date library hours and safety guidlines by checking the library website <a href=". $direct_link .">here</a></p>
-    </body>
-    </html>";
-    $headers = "MIME-Version: 1.0" . "\r\n";
-    $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-    mail($job_owner['email'], "3D Print - Ready for Collection",$msg,$headers);
+
+    //email user?
+    if ($_POST['email_enabaled'] == "enabled") {
+      //Get users name & email
+      $userSQL = $conn->prepare("SELECT * FROM users WHERE netlink_id = :netlink_id");
+      $userSQL->bindParam(':netlink_id', $job['netlink_id']);
+      $userSQL->execute();
+      $job_owner = $userSQL->fetch();
+      $direct_link = "https://www.uvic.ca/library/";
+
+      $msg = "
+      <html>
+      <head>
+      <title>HTML email</title>
+      </head>
+      <body>
+      <p>Hello ". $job_owner['name'] .". This is an automated response from the DSC. </p>
+      <p> Your 3D print job; " . $job['job_name'] . " is complete. You can pick it up from the front desk at the MacPherson Library.</p>
+      <p>Please check up to date library hours and safety guidlines by checking the library website <a href=". $direct_link .">here</a></p>
+      </body>
+      </html>";
+      $headers = "MIME-Version: 1.0" . "\r\n";
+      $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+      mail($job_owner['email'], "3D Print - Ready for Collection",$msg,$headers);
+    }
   }
   $stmt->execute();
 
@@ -357,6 +362,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="invalid-feedback">
             Please enter additional comments.
             </div>
+        </div>
+
+
+        <hr class="mb-4">
+        <h5 class="mb-2">Enable Email</h5>
+        <div class="d-block my-3">
+          <div class="custom-control custom-checkbox">
+            <input id="en_email" name="email_enabaled" value= "enabled" type="checkbox" class="custom-control-input" <?php if ($job["status"] != "pending payment" && $job["status"] != "completed"){echo "checked";} ?>>
+            <label class="custom-control-label" for="en_email">Send email for pending payment or completed when saved.</label>
+          </div>
         </div>
 
         <hr class="mb-4">
