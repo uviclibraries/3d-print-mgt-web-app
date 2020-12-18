@@ -114,7 +114,7 @@ foreach ($job5 as $job) {
 
             <div class="row">
                 <div class="col-md-4 mb-3">
-                    <a href="admin-reports.php">
+                    <a href="admin-reports.php?searchdate_start=<?php echo date("Y-m-d") ?>">
                         <button class="btn btn-primary btn-lg btn-block" class="form-control" type="submit" data-inline="true">Reports</button>
                     </a>
                 </div>
