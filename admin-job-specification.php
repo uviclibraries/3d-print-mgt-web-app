@@ -42,30 +42,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   //need variable to check if admin wants to send email. case: updating notes but dont send email
   if ($_POST['status'] == "pending payment") {
     $d1 = $current_date;
-    //get job owner details
-    $userSQL = $conn->prepare("SELECT * FROM users WHERE netlink_id = :netlink_id");
-    $userSQL->bindParam(':netlink_id', $job['netlink_id']);
-    $userSQL->execute();
-    $job_owner = $userSQL->fetch();
 
+    //email user?
+    if ($_POST['email_enabaled'] == "enabled") {
+      //get job owner details
+      $userSQL = $conn->prepare("SELECT * FROM users WHERE netlink_id = :netlink_id");
+      $userSQL->bindParam(':netlink_id', $job['netlink_id']);
+      $userSQL->execute();
+      $job_owner = $userSQL->fetch();
 
-    //ADD link to FAQ page.
-    $direct_link = "https://devwebapp.library.uvic.ca/demo/3dwebapp/customer-job-information.php?job_id=". $job['id']; // change to absoulte link
-    $msg = "
-    <html>
-    <head>
-    <title>HTML email</title>
-    </head>
-    <body>
-    <p> Hello ". $job_owner['name'] .". This is an automated resposne from the DSC. </p>
-    <p> Your 3D print job; " . $job['job_name'] . " has been evaluated at a cost of $" . (number_format((float)$_POST["price"], 2, '.','')) . " </p>
-    <p> Please make your payment <a href=". $direct_link .">here</a> for the DSC to place it in our printing queue.</p>
-    <p>If you have any questions please review our FAQ or email us at DSCommons@uvic.ca.</p>
-    </body>
-    </html>";
-    $headers = "MIME-Version: 1.0" . "\r\n";
-    $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-    mail($job_owner['email'],"3D Print - Make Payment",$msg,$headers);
+      //ADD link to FAQ page.
+      $direct_link = "https://devwebapp.library.uvic.ca/demo/3dwebapp/customer-job-information.php?job_id=". $job['id']; // change to absoulte link
+      $msg = "
+      <html>
+      <head>
+      <title>HTML email</title>
+      </head>
+      <body>
+      <p> Hello ". $job_owner['name'] .". This is an automated resposne from the DSC. </p>
+      <p> Your 3D print job; " . $job['job_name'] . " has been evaluated at a cost of $" . (number_format((float)$_POST["price"], 2, '.','')) . " </p>
+      <p> Please make your payment <a href=". $direct_link .">here</a> for the DSC to place it in our printing queue.</p>
+      <p>If you have any questions please review our FAQ or email us at DSCommons@uvic.ca.</p>
+      </body>
+      </html>";
+      $headers = "MIME-Version: 1.0" . "\r\n";
+      $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+      mail($job_owner['email'],"3D Print - Make Payment",$msg,$headers);
+    }
   } elseif($_POST['status'] == "paid"){
     //this should be done automatically when payment is received.
     $d2 = $current_date;
