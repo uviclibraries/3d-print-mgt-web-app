@@ -1,10 +1,16 @@
 <?php
 session_start();
 require ('auth-sec.php'); //Gets CAS & db
+
 $stm = $conn->prepare("SELECT * FROM print_job WHERE id=?");
 $stm->execute([$_GET["job_id"]]);
 $job=$stm->fetch();
 
+//Only owner and admin can see.
+if ($user != $job["netlink_id"] || $user_type == 1) {
+  header("Location: customer-dashboard.php");
+  die();
+}
 
 
 ?>
