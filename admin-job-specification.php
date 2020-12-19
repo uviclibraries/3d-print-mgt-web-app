@@ -17,23 +17,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $stmt = $conn->prepare("UPDATE print_job SET price = :price, infill = :infill, scale = :scale, layer_height = :layer_height, supports = :supports, copies = :copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date WHERE id = :job_id;
   ");
   $current_date = date("Y-m-d");
-  $stmt->bindParam(':job_id', $a = intval($_GET["job_id"]), PDO::PARAM_INT);
-  $stmt->bindParam(':price', $a = floatval(number_format((float)$_POST["price"], 2, '.','')));
-  $stmt->bindParam(':infill', $a = intval($_POST["infill"]), PDO::PARAM_INT);
-  $stmt->bindParam(':scale', $a = intval($_POST["scale"]), PDO::PARAM_INT);
+  //temp is to prevent php notice: only variables should be passed by reference.
+  $stmt->bindParam(':job_id', $job['id']);
+  $price = floatval(number_format((float)$_POST["price"], 2, '.',''));
+  $stmt->bindParam(':price', $price);
+  $infill = intval($_POST["infill"]);
+  $stmt->bindParam(':infill', $infill, PDO::PARAM_INT);
+  $scale = intval($_POST["scale"]);
+  $stmt->bindParam(':scale', $scale, PDO::PARAM_INT);
   $stmt->bindParam(':layer_height', $_POST["layer_height"], PDO::PARAM_STR);
-  $stmt->bindParam(':supports', $a = intval($_POST["supports"]), PDO::PARAM_INT);
-  $stmt->bindParam(':copies', $a = intval($_POST["copies"]), PDO::PARAM_INT);
+  $supports = intval($_POST["supports"]) ;
+  $stmt->bindParam(':supports', $supports , PDO::PARAM_INT);
+  $copies = intval($_POST["copies"]);
+  $stmt->bindParam(':copies', $copies , PDO::PARAM_INT);
   $stmt->bindParam(':material_type', $_POST["material_type"]);
   $stmt->bindParam(':staff_notes', $_POST["staff_notes"]);
   $stmt->bindParam(':status', $_POST["status"]);
   /*
   should dates be removed if steps are reverted: eg printing->paid
   */
-  $d1 = $_GET['priced_date'];
-  $d2 = $_GET['paid_date'];
-  $d3 = $_GET['printing_date'];
-  $d4 = $_GET['completed_date'];
+  $d1 = $job['priced_date'];
+  $d2 = $job['paid_date'];
+  $d3 = $job['printing_date'];
+  $d4 = $job['completed_date'];
   $stmt->bindParam(':priced_date', $d1);
   $stmt->bindParam(':paid_date', $d2);
   $stmt->bindParam(':printing_date', $d3);
@@ -44,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $d1 = $current_date;
 
     //email user?
-    if ($_POST['email_enabaled'] == "enabled") {
+    if (isset($_POST['email_enabaled']) && $_POST['email_enabaled'] == "enabled") {
       //get job owner details
       $userSQL = $conn->prepare("SELECT * FROM users WHERE netlink_id = :netlink_id");
       $userSQL->bindParam(':netlink_id', $job['netlink_id']);
@@ -81,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $d4 = $current_date;
 
     //email user?
-    if ($_POST['email_enabaled'] == "enabled") {
+    if (isset($_POST['email_enabaled']) && $_POST['email_enabaled'] == "enabled") {
       //Get users name & email
       $userSQL = $conn->prepare("SELECT * FROM users WHERE netlink_id = :netlink_id");
       $userSQL->bindParam(':netlink_id', $job['netlink_id']);
