@@ -5,8 +5,9 @@ require ('db.php');			//required to access db
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] != true) {
 	//go to login page.
 	header("Location: index.php");
+	die();
 }
-	
+
 //get session variables
 $user = $_SESSION['user'];
 $user_name =$_SESSION['user_name'];
