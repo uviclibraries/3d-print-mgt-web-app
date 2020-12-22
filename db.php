@@ -1,7 +1,7 @@
 <?php
 //$servername = "3d_print_jobs";
 $username = "3d_print";
-$password = "Hx_27!PfQ";
+$password = "PASSWORD";
 $dbname = "3d_print_jobs";
 try {
   $conn = new PDO("mysql:host=localhost;dbname=$dbname", $username, $password);
