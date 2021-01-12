@@ -114,13 +114,13 @@ foreach ($job5 as $job) {
 
             <div class="row">
                 <div class="col-md-4 mb-3">
-                    <a href="admin-reports.php?searchdate_start=<?php echo date("Y-m-d") ?>">
+                    <a href="admin-reports.php?searchdate_start=<?php echo date("Y-m-d") ?>&approved=on">
                         <button class="btn btn-primary btn-lg btn-block" class="form-control" type="submit" data-inline="true">Reports</button>
                     </a>
                 </div>
 
                 <div class="col-md-4 mb-3">
-                    <a href="admin-print-history.php">
+                    <a href="admin-print-history.php?searchdate_start=<?php echo date("Y-m-d") ?>">
                         <button class="btn btn-primary btn-lg btn-block" class="form-control" type="submit" data-inline="true">Print History</button>
                     </a>
                 </div>
@@ -138,11 +138,13 @@ foreach ($job5 as $job) {
                 </div>
 
                 <div class="col-md-4 mb-3">
-
+                  <form action="cronjob.php">
+                    <input type="submit" value="delete, cancel, and archive">
+                  </form>
                 </div>
 
                 <div class="col-md-4 mb-3">
-                    <a href="admin-manage-users.php?user_id=">
+                    <a href="admin-manage-users.php?admin_only=on">
                         <button class="btn btn-primary btn-lg btn-block" class="form-control" type="submit" data-inline="true">Manage Users</button>
                     </a>
                 </div>
