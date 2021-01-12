@@ -7,7 +7,7 @@ $stm->execute([$_GET["job_id"]]);
 $job=$stm->fetch();
 
 //Only owner and admin can see.
-if ($user != $job["netlink_id"] || $user_type == 1) {
+if ($user != $job["netlink_id"] && $user_type == 1) {
   header("Location: customer-dashboard.php");
   die();
 }
