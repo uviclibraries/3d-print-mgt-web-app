@@ -7,22 +7,50 @@ if ($user_type == 1) {
   header("Location: customer-dashboard.php");
   die();
 }
-if ($_GET["user_id"] == "" OR $_GET["user_id"] == NULL) {
+
+$getcheck = array_fill(0,2, FALSE);
+if (isset($_GET["user_id"]) && ($_GET["user_id"] != "" OR $_GET["user_id"] != NULL)) {
+  $getcheck[0] = True;
+  $sql_line[] = "(netlink_id LIKE :netlink_id OR name LIKE :name)";
+}if (isset($_GET['admin_only'])) {
+  $getcheck[1] = True;
+  $sql_line[] = "user_type = 0";
+}
+
+//Check if parameters are empty
+if ($getcheck[0]==FALSE && $getcheck[1]==FALSE) {
   $stm = $conn->query("SELECT * FROM users ORDER BY id");
 }
+//find out what parameters are being searched for
 else{
-  $stm = $conn->prepare("SELECT * FROM users WHERE netlink_id LIKE ? OR name LIKE ? ORDER BY id");
-  $searching = "%". $_GET["user_id"]."%";
-  $stm->bindParam(1, $searching, PDO::PARAM_STR);
-  $stm->bindParam(2, $searching, PDO::PARAM_STR);
+  //build sql query line based on search parameters
+  $searchline = "SELECT * FROM users WHERE " . implode(" AND ", $sql_line) . " ORDER BY id";
+  $stm = $conn->prepare($searchline);
+  //echo $searchline . "\n";
+
+  //Bind search parameters
+  if ($getcheck[0] == TRUE) {
+    $searching = "%". $_GET["user_id"]."%";
+    $stm->bindParam(':netlink_id', $searching, PDO::PARAM_STR);
+    $stm->bindParam(':name', $searching, PDO::PARAM_STR);
+  }
+
   $stm->execute();
+
 }
+
 
 $all_users = $stm->fetchAll();
 
+$get_line = array();
+//Seach button clicked
 if($_SERVER['REQUEST_METHOD'] === 'POST'){
-  $searchpage = $_POST["searchbar"];
-  header("Location: admin-manage-users.php?user_id=".$searchpage);
+  if (isset($_POST["searchbar"])) {
+    $get_line[] = "user_id=" . $_POST["searchbar"];
+  }if (isset($_POST["admin_only"])) {
+    $get_line[] = "admin_only=" . $_POST["admin_only"];
+  }
+  header("Location: admin-manage-users.php?".implode("&", $get_line));
 }
  ?>
 
@@ -97,6 +125,10 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     <div class="row">
       <div class="col-md-4">
         <form method="POST">
+          <div class="">
+            <label for = "admin_only">Only Admin: </label>
+            <input type="checkbox" id= "admin_only" name="admin_only">
+          </div>
           <input type="text" id= "searchbar" name="searchbar">
           <input type="submit" name="Search" value="Search">
         </form>
