@@ -11,23 +11,24 @@ if ($user_type == 1) {
 //record search parameters
 $sql_line =array(); //sql builder
 $getcheck = array_fill(0,4, FALSE);
-if (isset($_GET['searchdate_start']) && $_GET['searchdate_start'] != "" && $_GET['searchdate_start'] != NULL) {
+if (isset($_GET['searchdate_start']) && ($_GET['searchdate_start'] != "" && $_GET['searchdate_start'] != NULL)) {
   $getcheck[0] = True;
   $sql_line[] = "date_stamp >= :searchdate_start";
-}if (isset($_GET['searchdate_end']) && $_GET['searchdate_end'] != "" && $_GET['searchdate_end'] != NULL) {
+}if (isset($_GET['searchdate_end']) && ($_GET['searchdate_end'] != "" && $_GET['searchdate_end'] != NULL)) {
   $getcheck[1] = True;
   $sql_line[] = "date_stamp <= :searchdate_end";
-}if (isset($_GET['searchorder_id']) && $_GET['searchorder_id'] != "" && $_GET['searchorder_id'] != NULL) {
+}if (isset($_GET['searchorder_id']) && ($_GET['searchorder_id'] != "" && $_GET['searchorder_id'] != NULL)) {
   $getcheck[2] = True;
   $sql_line[] = "response_order_id LIKE :searchorder_id";
 }if (isset($_GET['approved'])) {
   $getcheck[3] = True;
   $sql_line[] = "response_code >= 0 AND response_code <= 27";
 }
-
+$dateline = ""; //Used for table description
 //Check if parameters are empty
 if ($getcheck[0]==FALSE && $getcheck[1]==FALSE && $getcheck[2]==FALSE && $getcheck[3]==FALSE) {
   $stm = $conn->query("SELECT * FROM moneris_fields ORDER BY id");
+  $dateline .= " Until " . date("Y-m-d");
 }
 //find out what parameters are being searched for
 else{
@@ -37,14 +38,24 @@ else{
   $stm = $conn->prepare($searchline);
   //echo $searchline . "\n";
 
-  //Bind search parameters
+  //Bind search parameters & fill dateline to be displayed
   if ($getcheck[0] == TRUE) {
     $stm->bindParam(':searchdate_start', $_GET['searchdate_start'], PDO::PARAM_STR);
-  }if ($getcheck[1] == TRUE) {
+    $dateline .= " From " . $_GET["searchdate_start"];
+  }
+  if ($getcheck[1] == TRUE) {
     $stm->bindParam(':searchdate_end', $_GET['searchdate_end'], PDO::PARAM_STR);
-  }if ($getcheck[2] == TRUE) {
+    $dateline .= " Until " . $_GET["searchdate_end"];
+  }
+  else {
+    $dateline .= " Until " . date("Y-m-d");
+  }
+  if ($getcheck[2] == TRUE) {
     $temp = $_GET['searchorder_id']."%";
     $stm->bindParam(':searchorder_id', $temp, PDO::PARAM_STR);
+  }
+  if ($getcheck[3] == TRUE) {
+    $dateline .= " Only Paid Transaction. ";
   }
 
   $stm->execute();
@@ -140,65 +151,71 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 
   <div class="container">
   <div class="py-3 text-left">
-    <h3>Users</h3>
-    <br>
 
     <div class="row">
       <div class="col-md-4">
         <form method="POST">
           <div>
             <label for = "searchdate_start">Start date:</label>
-            <input type="date" id= "searchdate_start" name="searchdate_start">
+            <input type="date" id= "searchdate_start" name="searchdate_start"
+            <?php if ($getcheck[0]){ ?> value = <?php echo $_GET["searchdate_start"]; } ?> >
           </div>
           <div class="">
             <label for = "searchdate_end">End date:</label>
-            <input type="date" id= "searchdate_end" name="searchdate_end">
+            <input type="date" id= "searchdate_end"  name="searchdate_end"
+            <?php if ($getcheck[1]){ ?> value = <?php echo $_GET["searchdate_end"]; } ?> >
           </div>
           <div class="">
             <label for = "searchorder_id">order_id:</label>
-            <input type="text" id= "searchorder_id" name="searchorder_id">
+            <input type="text" id= "searchorder_id" name="searchorder_id"
+            <?php if ($getcheck[2]){ ?> value = <?php echo $_GET["searchorder_id"]; } ?> >
           </div>
           <div class="">
-            <label for = "approved">Only Approved: </label>
-            <input type="checkbox" id= "approved" name="approved">
+            <label for = "approved">Paid: </label>
+            <input type="checkbox" id= "approved" name="approved"
+            <?php if ($getcheck[3]){ ?> checked <?php } ?> >
           </div>
           <input type="submit" name="Search" value="Search">
         </form>
       </div>
       <div class="col-md-4 offset-md-4">
         <a class="btn btn-md btn-primary btn-" href="admin-dashboard.php" role="button">Back to Dashboard</a>
-        <div class="">
-          <p>Sum: $<?php echo $sum; ?></p>
-        </div>
       </div>
     </div>
 
+  <br>
+  <h3>Moneris Report: <?php echo date("Y/m/d-h:ia"); ?></h3>
+  <div class="">
+    <p><?php echo $dateline . " Sum: "?><b><?php echo "$" . number_format((float)$sum, 2, '.',''); ?></b></p>
+  </div>
   <br>
   <div class="table-responsive">
     <table class="table table-striped table-md">
       <tbody>
         <tr>
           <thread>
-            <th>response_order_id</th>
-            <th>response_code</th>
-            <th>date_stamp</th>
-            <th>time_stamp</th>
-            <th>result</th>
-            <th>trans_name</th>
-            <th>cardholder</th>
-            <th>card</th>
-            <th>charge_total</th>
-            <th>f4l4</th>
-            <th>message</th>
-            <th>iso_code</th>
-            <th>bank_approval_code</th>
-            <th>bank_transaction_id</th>
-            <th>txn_num</th>
-            <th>avs_response_code</th>
-            <th>cavv_result_code</th>
+            <th>Order ID</th>
+            <th>netlink ID</th>
+            <th>Full Name</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Message</th>
+            <th>TRXN Num</th>
+            <th>Cardholder</th>
+            <th>Charge</th>
+            <th>Card</th>
+            <th>Bank Approval Code</th>
+            <th>Bank Transaction ID</th>
             <th>INVOICE</th>
             <th>ISSCONF</th>
             <th>ISSNAME</th>
+            <th>ISO Code</th>
+            <th>AVS Response Code</th>
+            <th>CAVV Result Code</th>
+            <th>Response Code</th>
+            <th>Result</th>
+            <th>Trans Name</th>
+            <th>f4l4</th>
           </thread>
         </tr>
         <!------------------------------------------->
@@ -206,25 +223,27 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
         ?>
         <tr>
           <td><?php echo $row["response_order_id"]; ?></td>
-          <td><?php echo $row["response_code"]; ?></td>
+          <td><?php echo $row["netlink_id"]; ?></td>
+          <td><?php echo $row["full_name"]; ?></td>
           <td><?php echo $row["date_stamp"]; ?></td>
           <td><?php echo $row["time_stamp"]; ?></td>
-          <td><?php echo $row["result"]; ?></td>
-          <td><?php echo $row["trans_name"]; ?></td>
-          <td><?php echo $row["cardholder"]; ?></td>
-          <td><?php echo $row["card"]; ?></td>
-          <td><?php echo $row["charge_total"]; ?></td>
-          <td><?php echo $row["f4l4"]; ?></td>
           <td><?php echo $row["message"]; ?></td>
-          <td><?php echo $row["iso_code"]; ?></td>
+          <td><?php echo $row["txn_num"]; ?></td>
+          <td><?php echo $row["cardholder"]; ?></td>
+          <td><?php echo $row["charge_total"]; ?></td>
+          <td><?php echo $row["card"]; ?></td>
           <td><?php echo $row["bank_approval_code"]; ?></td>
           <td><?php echo $row["bank_transaction_id"]; ?></td>
-          <td><?php echo $row["txn_num"]; ?></td>
-          <td><?php echo $row["avs_response_code"]; ?></td>
-          <td><?php echo $row["cavv_result_code"]; ?></td>
           <td><?php echo $row["INVOICE"]; ?></td>
           <td><?php echo $row["ISSCONF"]; ?></td>
           <td><?php echo $row["ISSNAME"]; ?></td>
+          <td><?php echo $row["iso_code"]; ?></td>
+          <td><?php echo $row["avs_response_code"]; ?></td>
+          <td><?php echo $row["cavv_result_code"]; ?></td>
+          <td><?php echo $row["response_code"]; ?></td>
+          <td><?php echo $row["result"]; ?></td>
+          <td><?php echo $row["trans_name"]; ?></td>
+          <td><?php echo $row["f4l4"]; ?></td>
         </tr>
         <?php
         }
