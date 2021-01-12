@@ -148,7 +148,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </a>
             </div>
             <div class="col-md-6 mb-3">
-                <a class="btn btn-primary btn-lg btn-block" href="admin-manage-users.php?user_id=" role="button">Back to Manage Users</a>
+                <a class="btn btn-primary btn-lg btn-block" href="admin-manage-users.php?user_id=<?php echo $job["name"]; ?>" role="button">Back to Manage Users</a>
         </div>
     </div>
     </form>
