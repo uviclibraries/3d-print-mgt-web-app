@@ -14,7 +14,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       // Undefined | Multiple Files | $_FILES Corruption Attack
       // If this request falls under any of them, treat it invalid.
-    //what? kw
       if (
           !isset($_FILES["3d_model"]['error']) ||
           is_array($_FILES["3d_model"]['error'])
@@ -75,7 +74,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 /*  Check inputs here */
 
-//$a need to tidy up.
   $infill_bind = intval($_POST["infill"]);
   $scale_bind = intval($_POST["scale"]);
   $layer_bind = floatval(number_format((float)$_POST["layer_height"], 2, '.',''));
@@ -211,7 +209,7 @@ header("location: customer-dashboard.php");
       </script>
 
     <div class="col-md-12 order-md-1">
-      <h3 class="mb-3">Specifications</h3>
+      <h3 class="mb-3">Specifications <a href="3dfaq.html#specs" target="_blank" data-toggle="tooltip" data-placement="right" title="FAQ Specifications section">?</a></h3>
         <div class="row">
             <div class="col-md-3 mb-3" data-toggle="tooltip" data-placement="right" data-trigger="click" title="The percentage of the interior that is made up of material. More infill increases strength and the cost.">
                 <label for="infill">Infill</label>
@@ -293,7 +291,7 @@ header("location: customer-dashboard.php");
         </div>
 
         <hr class="mb-4">
-        <h3 class="mb-2">Material Type</h3>
+        <h3 class="mb-2">Material Type <a href="3dfaq.html#mats" target="_blank" data-toggle="tooltip" data-placement="right" title="FAQ Material section">?</a></h3>
         <div class="d-block my-3">
           <div class="custom-control custom-radio">
             <input id="pla" name="material_type" value="PLA" type="radio" class="custom-control-input" checked required>
