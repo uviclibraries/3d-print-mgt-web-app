@@ -79,7 +79,7 @@ CREATE TABLE `users` (
   `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
   `netlink_id` varchar(100) NOT NULL UNIQUE,
   `name` varchar(100) NOT NULL,
-  `user_type` int(11) NOT NULL,
+  `user_type` int(11) NOT NULL DEFAULT 1,
   `email` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -87,6 +87,8 @@ CREATE TABLE `users` (
 CREATE TABLE `moneris_fields` (
   `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
   `response_order_id` varchar(50),
+  `netlink_id` varchar(100) NOT NULL,
+  `full_name` varchar(100) NOT NULL,
   `response_code` int(3),
   `date_stamp` date,
   `time_stamp` time,
@@ -111,8 +113,8 @@ CREATE TABLE `moneris_fields` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `netlink_id`, `name`, `user_type`, `email`) VALUES
-(1, 'kenziewo', 'Kenzie Wong', 0, 'kenziewong+fromcreate@gmail.com');
+INSERT INTO `users` (`netlink_id`, `name`, `user_type`, `email`) VALUES
+('rmccue', 'Rich McCue', 0, 'rmccue@uvic.ca');
 
 --
 --
