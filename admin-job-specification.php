@@ -14,6 +14,74 @@ $job=$stm->fetch();
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+//want to upload additional
+  try {
+
+      // Undefined | Multiple Files | $_FILES Corruption Attack
+      // If this request falls under any of them, treat it invalid.
+      if (
+          !isset($_FILES["modify"]['error']) ||
+          is_array($_FILES["3d_model"]['error'])
+      ) {
+  #         throw new RuntimeException('Invalid parameters.');
+      }
+
+      // Check $_FILES["3d_model"]['error'] value.
+      switch ($_FILES["3d_model"]['error']) {
+          case UPLOAD_ERR_OK:
+              break;
+          case UPLOAD_ERR_NO_FILE:
+              throw new RuntimeException('No file sent.');
+          case UPLOAD_ERR_INI_SIZE:
+          case UPLOAD_ERR_FORM_SIZE:
+              throw new RuntimeException('Exceeded filesize limit.');
+          default:
+              throw new RuntimeException('Unknown errors.');
+      }
+
+      // You should also check filesize here.
+      if ($_FILES["3d_model"]['size'] > 200000000) {
+
+          throw new RuntimeException('Exceeded filesize limit.');
+      }
+
+      // DO NOT TRUST $_FILES["3d_model"]['mime'] VALUE !!
+      // Check MIME Type by yourself.
+      $file_name = $_FILES["3d_model"]['name'];
+      $file_array = explode(".",$file_name);
+      $ext = end($file_array);
+      $explode_len = count($file_array);
+      if (!in_array($ext, ["stl", "obj", "3mf", "gcode"])|| $explode_len > 2) {
+          throw new RuntimeException('Invalid file format.');
+      }
+
+      // You should name it uniquely.
+      // DO NOT USE $_FILES["3d_model"]['name'] WITHOUT ANY VALIDATION !!
+      // On this example, obtain safe unique name from its binary data.
+      $date = new DateTime();
+      $hash_name = sprintf("%s-%s.%s", sha1_file($_FILES["3d_model"]['tmp_name']),
+      $date->getTimestamp(),
+      $ext);
+      $savefilename = sprintf('./uploads/%s', $hash_name,);
+      if (!move_uploaded_file(
+          $_FILES["3d_model"]['tmp_name'],
+          $savefilename
+      )) {
+          throw new RuntimeException('Failed to move uploaded file.');
+      }
+
+      echo 'File is uploaded successfully.';
+
+  } catch (RuntimeException $e) {
+
+      echo $e->getMessage();
+
+  }
+
+
+
+
   $stmt = $conn->prepare("UPDATE print_job SET price = :price, infill = :infill, scale = :scale, layer_height = :layer_height, supports = :supports, copies = :copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date WHERE id = :job_id;
   ");
   $current_date = date("Y-m-d");
@@ -49,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if ($_POST['status'] == "pending payment") {
     $d1 = $current_date;
 
-    //email user?
+    //email user
     if (isset($_POST['email_enabaled']) && $_POST['email_enabaled'] == "enabled") {
       //get job owner details
       $userSQL = $conn->prepare("SELECT * FROM users WHERE netlink_id = :netlink_id");
@@ -65,19 +133,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <title>HTML email</title>
       </head>
       <body>
-      <p> Hello ". $job_owner['name'] .". This is an automated resposne from the DSC. </p>
+      <p> Hello, ". $job_owner['name'] .". This is an automated email from the DSC. </p>
       <p> Your 3D print job; " . $job['job_name'] . " has been evaluated at a cost of $" . (number_format((float)$_POST["price"], 2, '.','')) . " </p>
-      <p> Please make your payment <a href=". $direct_link .">here</a> for the DSC to place it in our printing queue.</p>
-      <p>If you have any questions please review our FAQ or email us at DSCommons@uvic.ca.</p>
+      <p> Please make your payment <a href=". $direct_link .">here</a> for it to be placed in our printing queue.</p>
+      <p>If you have any questions please review our FAQ or email us at dscommons@uvic.ca.</p>
       </body>
       </html>";
       $headers = "MIME-Version: 1.0" . "\r\n";
       $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
       $headers .= "From: dscommons@uvic.ca" . "\r\n";
-      mail($job_owner['email'],"3D Print - Make Payment",$msg,$headers);
+      mail($job_owner['email'],"Your 3D Print is ready for payment",$msg,$headers);
     }
   } elseif($_POST['status'] == "paid"){
-    //this should be done automatically when payment is received.
+    //this is done automatically when payment is received.
     $d2 = $current_date;
 
 
@@ -87,7 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   } elseif ($_POST['status'] == "completed") {
     $d4 = $current_date;
 
-    //email user?
+    //email user
     if (isset($_POST['email_enabaled']) && $_POST['email_enabaled'] == "enabled") {
       //Get users name & email
       $userSQL = $conn->prepare("SELECT * FROM users WHERE netlink_id = :netlink_id");
@@ -102,20 +170,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <title>HTML email</title>
       </head>
       <body>
-      <p>Hello ". $job_owner['name'] .". This is an automated response from the DSC. </p>
-      <p> Your 3D print job; " . $job['job_name'] . " is complete. You can pick it up from the front desk at the MacPherson Library.</p>
-      <p>Please check up to date library hours and safety guidlines by checking the library website <a href=". $direct_link .">here</a></p>
+      <p>Hello, ". $job_owner['name'] .". This is an automated email from the DSC. </p>
+      <p> Your 3D print job; " . $job['job_name'] . " has been printed. You can pick it up from the front desk at the MacPherson Library.</p>
+      <p>Please check up to date library hours and safety guidelines by checking the library website <a href=". $direct_link .">here</a></p>
       </body>
       </html>";
       $headers = "MIME-Version: 1.0" . "\r\n";
       $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
       $headers .= "From: dscommons@uvic.ca" . "\r\n";
-      mail($job_owner['email'], "3D Print - Ready for Collection",$msg,$headers);
+      mail($job_owner['email'], "Your 3D Print is ready for collection",$msg,$headers);
     }
   }
   $stmt->execute();
 
-  //exit to dashboard after button
+  //exit to dashboard after saving
   header("location: admin-dashboard.php");
 }
 ?>
@@ -244,15 +312,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <hr class="mb-6">
 
     <h3 class="mb-3">3D Model</h3>
-
-        <!--Grabs file and renames it to the job name-->
-        <a
-          href="<?php echo "uploads/" . $job['model_name']; ?>" download="<?php
-            $filetype = explode(".", $job['model_name']);
-            echo $job['job_name'] . "." . $filetype[1]; ?>">
-            Download 3D file
-        </a>
-        <button type="btn btn-danger btn-lg"> Delete </button>
+        <?php
+        if (is_file(("uploads/" . $job['model_name']))) {
+            ?>
+            <!--Grabs file and renames it to the job name when downloaded-->
+            <a
+              href="<?php echo "uploads/" . $job['model_name']; ?>" download="<?php
+                $filetype = explode(".", $job['model_name']);
+                echo $job['job_name'] . "." . $filetype[1]; ?>">
+                Download 3D file
+            </a>
+        <?php
+        }
+        else{ ?>
+          <p>File Deleted</p>
+        <?php } ?>
       <br>
       <hr class="mb-6">
 
@@ -260,7 +334,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <small class="text-muted">Only if needed</small>
     <br />
     <small class="text-muted">(Max 200MB)</small>
-        <input type="file" id="myFile" name="filename">
+        <input type="file" id="myFile" name="modify">
       <br>
       <hr class="mb-6">
 
