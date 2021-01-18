@@ -98,6 +98,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 
     <!--header link-->
     <link rel="stylesheet" href="css/uvic_banner.css">
+    <link rel="icon" href="https://www.uvic.ca/assets/core-4-0/img/favicon-32.png">
     <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/checkout/">
 
     <!-- Bootstrap core CSS -->

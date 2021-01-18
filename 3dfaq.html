@@ -2,8 +2,10 @@
 <html lang="en" dir="ltr">
   <head>
     <link rel="stylesheet" href="css/uvic_banner.css">
+    <link rel="stylesheet" href="css/faq.css">
+    <link rel="icon" href="https://www.uvic.ca/assets/core-4-0/img/favicon-32.png">
     <meta charset="utf-8">
-    <title></title>
+    <title>3D printing FAQ</title>
   </head>
   <body>
     <!--Header-->
@@ -17,7 +19,7 @@
      <div class="edge" style="position:absolute; margin: 0px;right: 0px; top: 0px; height: 96px; width:200px;">&nbsp;</div>
     </div>
     <!--Header end-->
-
+    <div class="quick-links">
     <h1>Frequently Asked Questions for 3D pritning</h1>
     <p>
       <a href="#what-is"><strong>What is 3D printing?</strong></a>
@@ -42,71 +44,90 @@
       <br>
       <a href="#appearence"><strong>Why does my print look different than the file I sent?</strong></a>
     </p>
+  </div>
     <!--Basics of 3D printing-->
     <br>
-    <p>
-      <a name="how-submit"></a><br><b>How to submit a 3D print</b>
-    </p>
-    <p>
-      Log into your <a href="customer-dashboard.php">dashboard</a> and click on submit new print job. Upload a 3D file and fill out the fields. Click submit. If you want to know what infill, layer height, scale, and whether to use supports or not please read what those specifications mean below. If you have specific questions regarding your print; email us at dscommons@uvic.ca or submit a job with what you think you want and leave a note in the options. We will help out and answer any questions you may have.
-    </p>
+    <div class="answers">
 
+    <a name="how-submit"></a><br><b>How to submit a 3D print</b>
 
     <p>
+      Log into your <a href="customer-dashboard.php">dashboard</a> and click on submit new print job. Upload a 3D file and fill out the fields. Click submit. If you want to know what infill, layer height, scale, and whether to use supports or not please read what those specifications mean below. If you have specific questions regarding your print; email us at dscommons@uvic.ca or submit a job with what you think you want and leave a note in the options. We will help out and answer any questions you may have. Once submitted, your print job will go through the following steps:
+    </p>
+    <ol>
+      <li>Submitted: Your print job has been submitted via the create new print in the <a href="customer-dashboard.php">customer dashboard.</a> After submission, the DSC will evaluate the cost. If we have any concerns or require clarification with your request, the DSC will email you prior to pricing your print job.</li>
+      <li>Pending Payment: Once the print is accepted, you'll receive an email with the cost and link to the online payment.</li>
+      <li>Paid: After payment is received, your print will be placed in the print queue on a first come, first served basis.</li>
+      <li>Printing: The item is currently being printed.</li>
+      <li>Completed: The item has finished printing and can be collected from the front desk in the MacPherson library.</li>
+    </ol>
+    <ul>
+      <li>Canceled: After 2 weeks of pending payment, the print will automatically be cancelled and need to be resubmitted should it need to be printed. The DSC will not cancel a print if it has not been priced or if it has been paid.</li>
+      <li>Archived: The item has been printed. The .stl or .obj file may have been deleted.</li>
+    </ul>
+
+
       <a name="specs"></a><br><b>Infill</b>
-    </p>
         <p>
-          The infill is the percentage of the inside of the print that is filled with material. A higher infill makes the object sturdy and able to bear more weight, but can significantly increase the cost. Most decorative items can have 5-10% infill. Having no infill is not advised, unless the object was specifically designed to be printed with zero infill.
+          The infill is the percentage of the inside of the print that is filled with material. A higher infill makes the object sturdy and able to bear more weight, but can significantly increase the cost. Most decorative items can have 5-10% infill. Having no infill is not advised, unless the object was specifically designed to be printed with zero infill. Increasing the size will also increase the amount of material used, increasing the cost. In the image below, you'll see the number of shells each print has. The number of shells or shell thickness is how thick the outside layer is. A thicker shell increase strength but also increase cost. Thicker shells can also be usefull for post processing, as sanding or refining a print can remove shells and extra shells prevent ruining the print. For additional shells please note this in the additional comment section of your print or jobs will be printed with default shell thickness.
         </p>
         <img src="img/infill.jpg" alt="10, 5, and 20 percent infill">
-        <p>
-          <b>Scale</b>
-        </p>
-        <p>
-          The scale is the size of the print by comparison to the size it was designed to be. Many models are printed at 100% scale, but it is also common to change the size. Keep in mind: when decreasing model size, you will also be decreasing wall thickness and the size of detail. This can result in a loss of quality when printing, if taken too far. Increasing the size will also increase the amount of material used, increasing the cost.
-        </p>
-        <p>
-          <b>Layer Height</b>
-        </p>
-        <p>3D printing is done by slicing the digital object horizontally into layers, then printing each layer one at a time. Layer height is the thickness of each slice. The smaller the layer height, the finer the detail of the finished print. Small layer heights take significantly longer to print because more layers are needed. Standard print jobs are printed at 0.2mm layer height and for most jobs, this is the best option. The Makerbot printers will print to as fine as 0.1mm and the Ultimaker 3 will print down to a 0.06mm layer height</p>
-        <p>
-          <b>Supports</b>
-        </p>
-        <p> It’s generally best to have Supports turned on. The printing software we use will only generate supports where needed. You have the option of regular PLA supports, which you break off once the model has finished printing, or the PVA supports, which dissolve in cold water. The PVA supports, while leaving a nicer finish on the model, are 20 cents per gram and increase printing times.</p>
         <br>
 
+        <b>Scale</b>
+
+        <p>
+          The scale is the size of the print by comparison to the size it was designed to be. Many models are printed at 100% scale, but it is also common to change the size. Keep in mind: when decreasing model size, you will also be decreasing wall thickness and the size of detail. This can result in a loss of quality when printing, if taken too far.
+        </p>
+
+        <b>Layer Height</b>
+
+        <p>
+          3D printing is done by slicing the digital object horizontally into layers, then printing each layer one at a time. Layer height is the thickness of each slice. The smaller the layer height, the finer the detail of the finished print. Small layer heights take significantly longer to print because more layers are needed. Standard print jobs are printed at 0.2mm layer height and for most jobs, this is the best option. The Makerbot printers will print to as fine as 0.1mm and the Ultimaker 3 will print down to a 0.06mm layer height
+        </p>
+
+        <b>Supports</b>
+
+        <p>
+          It’s generally best to have Supports turned on. The printing software we use will only generate supports where needed. We offer two option for support materials; regular PLA supports, which break off after printing but can leave aesthetic marks and may require sanding to get rid off. The alternative is water soluble PVA supports, which allow supports to be built in places that where PLA supports would be difficult or impossible to remove. PVA supports also dont leave aesthtic marks, creating a nicer initial finish. However, PVA costs more at 20 cents per gram and increase printing times.
+        </p>
+        <br>
+
+        <h4>Copies</h4>
+          <p>
+            Printing multiple copies at the same time can be more efficient, however it must fit on the printing area.
+          </p>
+
       <a name="mats"></a><b>Material</b>
-      <p>
-        There are these materials avaialble... la la la
-      </p>
-      <h4>Copies</h4>
-        <p>Printing multiple copies at the same time can be more efficient, however it must fit on the printing area.</p>
-      <h4>Material Type</h4>
         <ol>
           <li>PLA (Polylactic Acid)
             <ul>
-              <li>a form of plastic made from natural starches like cornstarch that will biodegrade in some industrial composting facilities.</li>
-              <li>We charge 10 cents per gram.</li>
+              <li>A form of plastic made from natural starches like cornstarch that will biodegrade in some industrial composting facilities.</li>
+              <li>Can be used for supports.</li>
+              <li>Comes in a variety of colors.</li>
+              <li>Costs 10 cents per gram.</li>
             </ul>
           </li>
           <li>PVA Dissolving Filament
             <ul>
               <li>Also made from starch. It dissolves when you put it in water.</li>
+              <li>Primarialy used for supports.</li>
               <li>We charge 20 cents per gram</li>
             </ul>
           </li>
           <li>TPU 95a
             <ul>
-              <li>a material with medium flex</li>
+              <li>A material with medium flex</li>
               <li>We charge 20 cents per gram</li>
             </ul>
           </li>
         </ol>
-      <h4>Wait Times</h4>
-        <p>This varies depending on the time of the semester. During end of term when projects are due, it may take a couple of weeks or more, since one print job can potentially take many hours. If it is a slow time, turnaround is less than a week.</p>
-      <h4>Pricing</h4>
+      <a name="time"></a><b>Wait Times</b>
+        <p>This varies depending on the time of the semester. During end of term, when projects are due, it may take a couple of weeks or more. A single print job can potentially take many hours and jobs are done on a first come, first served basis. If it is a slow time, turnaround is less than a week.</p>
+      <a name="cost"></a><b>Pricing</b>
         <p>The cost is determined by the amount of material used and what kind of material used. Depending on what material is chosen, the costs vary from 10 cents to 20 cents per gram.</p>
-      <h4>Color</h4>
+      <a name="color"></a><b>Color</b>
+        <p>We have a variety of colors in PLA filament available. If you have a color requiremnt, please mention it in the additional comment section.</p>
         <p>Two-colour printing is possible with the DSC’s Ultimaker 3. Here are some things to note while creating your object:</p>
         <ul>
           <li>To complete a print, projects need to be exported in either a .’obj’ file (TinkerCad and other software such as SolidWorks) or ‘.amf’ file (SolidWorks).</li>
@@ -115,30 +136,19 @@
           <li>Note: Dissolving PVA Supports are not available with two colour print jobs.</li>
         </ul>
       <h4>Where to collect a finished print</h4>
-        <p>Once a print is finished printed, and email will be sent and can be collected from the front desk of the library.</p>
-      <h4>Accepted File Types</h4>
-        <p>.stl and .obj files are accepted that are less than 200MB. For larger files, please contact the DSC first. dscommons@uvic.ca</p>
-      <h4>Process</h4>
-        <ol>
-          <li>Submitted: Submit the print via the create new print in the <a href="customer-dashboard.php">customer dashboard.</a> After submission, the DSC will evaluate the cost.</li>
-          <li>Pending Payment: If the print is accepted, an email regarding the cost will be sent. Else any feedback will be sent from the DSC</li>
-          <li>Paid: After paying for you print in will be in the print queue and start printing when items ahead in the queue are completed.</li>
-          <li>Printing: The item is currently being printed.</li>
-          <li>Completed: The item has finished printing and can be collected from the front desk in the library.</li>
-        </ol>
-        <ul>
-          <li>Canceled: After 2 weeks of pending payment, the print will automatically be cancelled and need to be resubmitted should it need to be printed. The DSC will not cancel a print if it has not been priced or if it has been paid.</li>
-          <li>Archived: The item has been printed and the .stl or .obj file has been deleted.</li>
-        </ul>
+        <p>Once a print is finished printing, an email will be sent and the print can be collected from the front desk of the MacPherson library.</p>
+      <a name="file"></a><b>Accepted File Types</b>
+        <p>.stl and .obj files are accepted that are less than 200MB. For larger files, please contact the DSC first at dscommons@uvic.ca</p>
+    <br>
+
     <h3>Basics</h3>
-    <p>
+
       <a name="what-is"></a><br><b>The basics of 3D printing</b>
-    </p>
-        <p>3D printing is.....</p>
-      <h4>3D Priners avaialble</h4>
+        <p>There are several ways to print objects in 3 dimensions. The printers at the DSC do it by material extrusion. Material in filament form on spools are taken into heated ejctor. The heat melts the material and </p>
+      <a name="printers"></a><b>3D printers Available</b>
         <p>Makerbot Replicator (5th Gen): Details about this printer***</p>
         <p>Ultimaker 3: deatilas about another printer***</p>
-      <h4>Where to design stuff</h4>
+      <a name="resource"></a><b>Where to design prints</b>
         <ul>
           <li>Link to tinkercad</li>
           <li>Link to fusion 360</li>
@@ -146,14 +156,14 @@
       <h4>Where to find already made items</h4>
       <ul>
         <li>Link to thingyverse</li>
-        <li>Link to heroforge</li>
+        <li>Link to heroforge?</li>
         <li>Additional links?</li>
       </ul>
       <h4>Where to learn</h4>
         <ul>
           <li>DSC classes/signup</li>
         </ul>
-
+    </div>
 
 
 

@@ -57,6 +57,7 @@ foreach ($job5 as $job) {
     <title>Admin Dashboard</title>
     <!--header link-->
     <link rel="stylesheet" href="css/uvic_banner.css">
+    <link rel="icon" href="https://www.uvic.ca/assets/core-4-0/img/favicon-32.png">
     <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/checkout/">
 
     <!-- Bootstrap core CSS -->
@@ -138,7 +139,7 @@ foreach ($job5 as $job) {
                 </div>
 
                 <div class="col-md-4 mb-3">
-                  <form action="cronjob.php">
+                  <form action="deletejob.php">
                     <input type="submit" value="delete, cancel, and archive">
                   </form>
                 </div>

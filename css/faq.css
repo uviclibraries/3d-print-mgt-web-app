@@ -1,0 +1,39 @@
+
+.quick-links{
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  padding-left: 50px;
+}
+.answers{
+  margin-left: 60px;
+  margin-right: 60px;
+  padding-left: 40px;
+  padding-right: 40px;
+  border: 4px groove #cccccc;
+}
+
+img{
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  border: 2px solid black;
+}
+a:link {
+  text-decoration: none;
+  color: #004f98;
+}
+
+a:visited {
+  text-decoration: none;
+  color: #004f98;
+}
+
+a:hover {
+  text-decoration: none;
+  color: #ffab00
+}
+
+a:active {
+  text-decoration: underline;
+}

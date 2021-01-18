@@ -13,7 +13,8 @@
   <meta charset="utf-8" />
   <!--header link-->
   <link rel="stylesheet" href="../css/uvic_banner.css">
-  <title>Moneris Demo</title>
+  <link rel="icon" href="https://www.uvic.ca/assets/core-4-0/img/favicon-32.png">
+  <title>Moneris Transaction Error</title>
 </head>
 <body>
 
@@ -30,7 +31,7 @@
       <!--Header end-->
 
 <p>
-<b>Moneris Demo</b>
+<b>An error with Moneris Occured. Please save the error message below and contact the dscommons@uvic.ca</b>
 </p>
 <p>
 <b>Error:</b> <?php echo "$message" ?>

@@ -126,7 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $job_owner = $userSQL->fetch();
 
       //ADD link to FAQ page.
-      $direct_link = "https://devwebapp.library.uvic.ca/demo/3dwebapp/customer-job-information.php?job_id=". $job['id']; // change to absoulte link
+      $direct_link = "https://webapp.library.uvic.ca/3dprint/customer-job-information.php?job_id=". $job['id']; // change to absoulte link
       $msg = "
       <html>
       <head>
@@ -200,6 +200,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <!--header link-->
     <link rel="stylesheet" href="css/uvic_banner.css">
+    <link rel="icon" href="https://www.uvic.ca/assets/core-4-0/img/favicon-32.png">
     <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/checkout/">
 
     <!-- Bootstrap core CSS -->

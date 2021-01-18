@@ -71,6 +71,7 @@
   <meta charset="utf-8" />
   <!--header link-->
   <link rel="stylesheet" href="../css/uvic_banner.css">
+  <link rel="icon" href="https://www.uvic.ca/assets/core-4-0/img/favicon-32.png">
   <title>Moneris Transaction Declined</title>
 </head>
 <body>

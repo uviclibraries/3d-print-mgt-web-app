@@ -8,13 +8,63 @@ if ($user_type == 1) {
   die();
 }
 
-$stm = $conn->query("SELECT id, job_name, netlink_id, status, completed_date FROM print_job WHERE status = 'completed' ORDER BY completed_date DESC");
-$jobs = $stm->fetchAll();
 
-$completed = [];
-foreach ($jobs as $job) {
-  $completed[] = $job;
+$sql_line =array(); //sql builder
+$getcheck = array_fill(0,3, FALSE);
+if (isset($_GET['searchdate_start']) && ($_GET['searchdate_start'] != "" && $_GET['searchdate_start'] != NULL)) {
+  $getcheck[0] = True;
+  $sql_line[] = "completed_date >= :searchdate_start";
+}if (isset($_GET['searchdate_end']) && ($_GET['searchdate_end'] != "" && $_GET['searchdate_end'] != NULL)) {
+  $getcheck[1] = True;
+  $sql_line[] = "completed_date <= :searchdate_end";
+}if (isset($_GET['search_id']) && ($_GET['search_id'] != "" && $_GET['search_id'] != NULL)) {
+  $getcheck[2] = True;
+  $sql_line[] = "netlink_id LIKE :search_id";
 }
+
+//Check if parameters are empty
+if ($getcheck[0]==FALSE && $getcheck[1]==FALSE && $getcheck[2]==FALSE) {
+  $stm = $conn->query("SELECT id, job_name, netlink_id, status, completed_date FROM print_job WHERE status = 'completed' OR status = 'archived' OR status = 'cancelled' ORDER BY completed_date DESC");
+}
+//find out what parameters are being searched for
+else{
+
+  //build sql query line based on search parameters
+  $searchline = "SELECT id, job_name, netlink_id, status, completed_date FROM print_job WHERE (status = 'completed' OR status = 'archived' OR status = 'cancelled') AND " . implode(" AND ", $sql_line) . " ORDER BY completed_date DESC";
+  $stm = $conn->prepare($searchline);
+  //echo $searchline . "\n";
+
+  //Bind search parameters
+  if ($getcheck[0] == TRUE) {
+    $stm->bindParam(':searchdate_start', $_GET['searchdate_start'], PDO::PARAM_STR);
+  }if ($getcheck[1] == TRUE) {
+    $stm->bindParam(':searchdate_end', $_GET['searchdate_end'], PDO::PARAM_STR);
+  }if ($getcheck[2] == TRUE) {
+    $temp = $_GET['search_id']."%";
+    $stm->bindParam(':search_id', $temp, PDO::PARAM_STR);
+  }
+
+  $stm->execute();
+
+}
+//SQL results
+$completed = $stm->fetchAll();
+
+$get_line = array();
+//Seach button clicked
+if($_SERVER['REQUEST_METHOD'] === 'POST'){
+  if (isset($_POST["searchdate_start"])) {
+    $get_line[] = "searchdate_start=" . $_POST["searchdate_start"];
+  }
+  if (isset($_POST["searchdate_end"])) {
+    $get_line[] = "searchdate_end=" . $_POST["searchdate_end"];
+  }
+  if (isset($_POST["search_id"])) {
+    $get_line[] = "search_id=" . $_POST["search_id"];
+  }
+  header("Location: admin-print-history.php?". implode("&", $get_line));
+}
+
 
 ?>
 <!doctype html>
@@ -29,6 +79,7 @@ foreach ($jobs as $job) {
 
     <!--header link-->
     <link rel="stylesheet" href="css/uvic_banner.css">
+    <link rel="icon" href="https://www.uvic.ca/assets/core-4-0/img/favicon-32.png">
     <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/checkout/">
 
     <!-- Bootstrap core CSS -->
@@ -87,6 +138,40 @@ foreach ($jobs as $job) {
   <div class="py-5 text-left">
 
   <h3>Archived &amp; Cancelled Jobs</h3>
+  <br>
+
+  <!--Search bar-->
+  <div class="row">
+    <div class="col-md-4">
+      <form method="POST">
+        <div>
+          <label for = "searchdate_start">Start date:</label>
+          <input type="date" id= "searchdate_start" name="searchdate_start">
+        </div>
+        <div class="">
+          <label for = "searchdate_end">End date  :</label>
+          <input type="date" id= "searchdate_end" name="searchdate_end">
+        </div>
+        <div class="">
+          <label for = "search_id">netlink id:</label>
+          <input type="text" id= "search_id" name="search_id">
+        </div>
+        <!-- extra search criteria
+        <div class="">
+          <label for = "approved">Only Approved: </label>
+          <input type="checkbox" id= "approved" name="approved">
+        </div>
+      -->
+        <input type="submit" name="Search" value="Search">
+      </form>
+    </div>
+    <div class="col-md-4 offset-md-4">
+      <a class="btn btn-md btn-primary btn-" href="admin-dashboard.php" role="button">Back to Dashboard</a>
+    </div>
+  </div>
+
+
+
   <div class="py-3"></div>
   <div class="table-responsive">
   <table class="table table-striped table-md">
