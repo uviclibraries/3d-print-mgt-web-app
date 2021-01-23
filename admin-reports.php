@@ -69,8 +69,8 @@ foreach ($all_users as $row) {
 }
 
 $get_line = array();
-//Seach button clicked
-if($_SERVER['REQUEST_METHOD'] === 'POST'){
+//Seach button clicked$_SERVER['REQUEST_METHOD'] === 'POST'
+if(isset($_POST["Search"])){
   if (isset($_POST["searchdate_start"])) {
     $get_line[] = "searchdate_start=" . $_POST["searchdate_start"];
   }
@@ -83,6 +83,19 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     $get_line[] = "approved=" . $_POST["approved"];
   }
   header("Location: admin-reports.php?". implode("&", $get_line));
+}
+//If clicked download CSV
+if (isset($_POST["getCSV"])) {
+  $filename = "3Dprint_Moneris_report.csv";
+  header("Content-Type: text/csv;");
+  header("Content-Disposition: attachment; filename=".$filename);
+
+  $fp = fopen("php://output", "a");
+  fputcsv($fp, array('Order ID','netlink ID', 'Full Name', 'Date', 'Time', 'Message', 'TRXN Num', 'Cardholder', 'Charge', 'Card', 'Bank Approval Code', 'Bank Transaction ID', 'INVOICE', 'ISSCONF', 'ISSNAME', 'ISO Code', 'AVS Response Code', 'CAVV Result Code', 'Response Code', 'Result', 'Trans Name', 'f4l4' ));
+  foreach ($all_users as $row) {
+    fputcsv($fp, $row);
+  }
+  fclose($fp);
 }
  ?>
 
@@ -177,6 +190,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
             <?php if ($getcheck[3]){ ?> checked <?php } ?> >
           </div>
           <input type="submit" name="Search" value="Search">
+          <input type="submit" name="getCSV" value="getCSV">
         </form>
       </div>
       <div class="col-md-4 offset-md-4">
@@ -186,8 +200,13 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 
   <br>
   <h3>Moneris Report: <?php echo date("Y/m/d-h:ia"); ?></h3>
-  <div class="">
+  <div class="row">
+    <div class="col align-self-start">
     <p><?php echo $dateline . " Sum: "?><b><?php echo "$" . number_format((float)$sum, 2, '.',''); ?></b></p>
+    </div>
+    <div class="col-md-4 align-self-end">
+      <a class="btn btn-md btn-danger btn-" href="admin-dashboard.php" role="button">Download CSV</a>
+    </div>
   </div>
   <br>
   <div class="table-responsive">
