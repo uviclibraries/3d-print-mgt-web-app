@@ -4,7 +4,9 @@
   flex-direction: column;
   align-content: center;
   padding-left: 50px;
+  font-size: 1.1em;
 }
+
 .answers{
   margin-left: 60px;
   margin-right: 60px;
@@ -12,13 +14,22 @@
   padding-right: 40px;
   border: 4px groove #cccccc;
 }
-
+.temp{
+  display: flex;
+  font-size: smaller;
+}
 img{
   display: block;
-  margin-left: auto;
-  margin-right: auto;
   border: 2px solid black;
 }
+img.support_img{
+  max-width: 75%;
+}
+img.mid{
+  margin-left: auto;
+  margin-right: auto;
+}
+
 a:link {
   text-decoration: none;
   color: #004f98;
@@ -36,4 +47,14 @@ a:hover {
 
 a:active {
   text-decoration: underline;
+}
+
+#printers td, #printers th{
+  border-collapse: collapse;
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+#printers th {
+  background-color: #002754;
+  color: white;
 }
