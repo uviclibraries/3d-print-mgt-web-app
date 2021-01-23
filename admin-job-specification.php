@@ -14,75 +14,34 @@ $job=$stm->fetch();
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-//want to upload additional
-  try {
-
-      // Undefined | Multiple Files | $_FILES Corruption Attack
-      // If this request falls under any of them, treat it invalid.
-      if (
-          !isset($_FILES["modify"]['error']) ||
-          is_array($_FILES["3d_model"]['error'])
-      ) {
-  #         throw new RuntimeException('Invalid parameters.');
-      }
-
-      // Check $_FILES["3d_model"]['error'] value.
-      switch ($_FILES["3d_model"]['error']) {
-          case UPLOAD_ERR_OK:
-              break;
-          case UPLOAD_ERR_NO_FILE:
-              throw new RuntimeException('No file sent.');
-          case UPLOAD_ERR_INI_SIZE:
-          case UPLOAD_ERR_FORM_SIZE:
-              throw new RuntimeException('Exceeded filesize limit.');
-          default:
-              throw new RuntimeException('Unknown errors.');
-      }
-
-      // You should also check filesize here.
-      if ($_FILES["3d_model"]['size'] > 200000000) {
-
-          throw new RuntimeException('Exceeded filesize limit.');
-      }
-
-      // DO NOT TRUST $_FILES["3d_model"]['mime'] VALUE !!
-      // Check MIME Type by yourself.
-      $file_name = $_FILES["3d_model"]['name'];
-      $file_array = explode(".",$file_name);
-      $ext = end($file_array);
-      $explode_len = count($file_array);
-      if (!in_array($ext, ["stl", "obj", "3mf", "gcode"])|| $explode_len > 2) {
-          throw new RuntimeException('Invalid file format.');
-      }
-
-      // You should name it uniquely.
-      // DO NOT USE $_FILES["3d_model"]['name'] WITHOUT ANY VALIDATION !!
-      // On this example, obtain safe unique name from its binary data.
-      $date = new DateTime();
-      $hash_name = sprintf("%s-%s.%s", sha1_file($_FILES["3d_model"]['tmp_name']),
-      $date->getTimestamp(),
-      $ext);
-      $savefilename = sprintf('./uploads/%s', $hash_name,);
-      if (!move_uploaded_file(
-          $_FILES["3d_model"]['tmp_name'],
-          $savefilename
-      )) {
-          throw new RuntimeException('Failed to move uploaded file.');
-      }
-
-      echo 'File is uploaded successfully.';
-
-  } catch (RuntimeException $e) {
-
-      echo $e->getMessage();
-
+  //used if modify is not updated.
+  $modify_value = $job["model_name_2"];
+  if (isset($_FILES["modify"]['name'])) {
+    // Check $_FILES["3d_model"]['error'] value.
+    switch ($_FILES["modify"]['error']) {
+        case UPLOAD_ERR_OK:
+          $file_name = $_FILES["modify"]['name'];
+          $file_array = explode(".",$file_name);
+          $ext = end($file_array);
+          $modify_value = "job" . $job['id'] . "_modify." .$ext;
+          $savefilename = sprintf('./uploads/%s', $modify_value,);
+          if (is_file($savefilename)) {
+            unlink($savefilename);
+          }
+          if (!move_uploaded_file($_FILES["modify"]['tmp_name'], $savefilename)) {
+              throw new RuntimeException('Failed to move uploaded file.');
+            }
+        case UPLOAD_ERR_NO_FILE:
+            break;
+        case UPLOAD_ERR_INI_SIZE:
+        case UPLOAD_ERR_FORM_SIZE:
+            throw new RuntimeException('Exceeded filesize limit.');
+        default:
+            throw new RuntimeException('Unknown errors.');
+    }
   }
 
-
-
-
-  $stmt = $conn->prepare("UPDATE print_job SET price = :price, infill = :infill, scale = :scale, layer_height = :layer_height, supports = :supports, copies = :copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date WHERE id = :job_id;
+  $stmt = $conn->prepare("UPDATE print_job SET price = :price, infill = :infill, scale = :scale, layer_height = :layer_height, supports = :supports, copies = :copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, model_name_2 =:model_name_2 WHERE id = :job_id;
   ");
   $current_date = date("Y-m-d");
   //temp is to prevent php notice: only variables should be passed by reference.
@@ -101,6 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $stmt->bindParam(':material_type', $_POST["material_type"]);
   $stmt->bindParam(':staff_notes', $_POST["staff_notes"]);
   $stmt->bindParam(':status', $_POST["status"]);
+  $stmt->bindParam(':model_name_2', $modify_value);
   /*
   should dates be removed if steps are reverted: eg printing->paid
   */
@@ -251,7 +211,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!--Header end-->
 
     <div class="container">
-    <form method="POST">
+    <form method="POST" enctype="multipart/form-data">
   <div class="py-5 text-center">
     <h1><?php echo $job["job_name"]; ?></h1>
     </div>
@@ -303,6 +263,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                           >
                           </div>
                       </div>
+                      <small class="text-muted">Reminder: Minimum payment is $2.00.</small>
                       <div class="invalid-feedback" style="width: 100%;">
                       Status is required.
                       </div>
@@ -317,8 +278,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (is_file(("uploads/" . $job['model_name']))) {
             ?>
             <!--Grabs file and renames it to the job name when downloaded-->
-            <a
-              href="<?php echo "uploads/" . $job['model_name']; ?>" download="<?php
+            <a href="<?php echo "uploads/" . $job['model_name']; ?>" download="<?php
                 $filetype = explode(".", $job['model_name']);
                 echo $job['job_name'] . "." . $filetype[1]; ?>">
                 Download 3D file
@@ -332,10 +292,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <hr class="mb-6">
 
       <h3 class="mb-3">Modified 3D Model</h3>
-    <small class="text-muted">Only if needed</small>
-    <br />
-    <small class="text-muted">(Max 200MB)</small>
-        <input type="file" id="myFile" name="modify">
+
+    <?php //checks if there is a modify file
+    if ($job['model_name_2'] != NULL && is_file(("uploads/" . $job['model_name_2']))) { ?>
+      <a href="<?php echo "uploads/" . $job['model_name_2']; ?>" download>Download Modify 3D file</a>
+    <?php } ?>
+    <br/>
+
+    <?php //Allow file upload if status is pp or submitted
+    if ($job["status"] == "pending payment" || $job["status"] == "submitted"): ?>
+
+      <small class="text-muted">(Max 200MB)</small>
+      <input type="file" id="myFile" name="modify">
+    <?php endif; ?>
+
       <br>
       <hr class="mb-6">
 
