@@ -106,6 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </html>";
   $headers = "MIME-Version: 1.0" . "\r\n";
   $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+  $headers .= "From: dscommons@uvic.ca" . "\r\n";
   mail($user_email,"3D Print - New Job",$msg,$headers);
 
 header("location: customer-dashboard.php");
