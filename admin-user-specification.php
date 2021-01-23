@@ -14,12 +14,18 @@ $job=$stm->fetch();
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  $stmt = $conn->prepare("UPDATE users SET user_type = :user_type, email = :email WHERE id = :user_id;
+  $stmt = $conn->prepare("UPDATE users SET user_type = :user_type, email = :email, cron_report = :cron_report WHERE id = :user_id;
   ");
   $stmt->bindParam(':user_id', $_GET["user_id"]);
+  $b = 0;
+  $stmt->bindParam(':cron_report', $b);
   if ($_POST["user_type"] == "Admin") {
     $a = 0;
     $stmt->bindParam(':user_type', $a);
+    if (isset($_POST["cron_report"]) && $_POST["cron_report"] == "Reports") {
+      //isset means the option was available, must be Admin from parent if, and reports was selected.
+        $b = 1;
+    }
   }
   else{
     $a = 1;
@@ -27,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
   $stmt->bindParam(':email', $_POST["email"]);
   $stmt->execute();
-  //refresh pageto display new values.
+  //refresh page to display new values.
   echo "<meta http-equiv='refresh' content='0'>";
 }
 ?>
@@ -136,8 +142,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           </div>
           <div class="col-md-3 mb-3">
             <label for="email">Email</label>
-            <input type="email" class="form-control" id = "email" name="email" value="<?php echo $job["email"]; ?>">
+            <input type="email" class="form-control" id = "email" name="email" value="<?php echo $job["email"]; ?>" autocomplete="off">
           </div>
+          <?php if ($job["user_type"] == 0) {
+            //if user is admin, show cron option
+            ?>
+          <div class="col-md-3 mb-3">
+            <label for="cron">Email Reports</label>
+            <select class="custom-select d-block w-100" name="cron_report" id="cron_report">
+              <option <?php if ($job["cron_report"]== 0){echo "selected";} ?>>None</option>
+              <option <?php if ($job["cron_report"]== 1){echo "selected";} ?>>Reports</option>
+            </select>
+          </div>
+          <?php } ?>
+
         </div>
     </div>
 
