@@ -104,7 +104,7 @@ foreach ($data as $job) {
         </a>
         </div>
         <div class="btn-auto mr-auto">
-        <a href="3dfaq.html">
+        <a href="https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/">
           <button class="btn btn-danger btn-lg" type="submit">FAQ</button>
         </a>
       </div>

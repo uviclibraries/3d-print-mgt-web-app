@@ -85,8 +85,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $userSQL->execute();
       $job_owner = $userSQL->fetch();
 
-      //ADD link to FAQ page.
-      $direct_link = "https://webapp.library.uvic.ca/3dprint/customer-job-information.php?job_id=". $job['id']; // change to absoulte link
+      $direct_link = "https://webapp.library.uvic.ca/3dprint/customer-job-information.php?job_id=". $job['id'];
+      $direct_link2 = "https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/";
       $msg = "
       <html>
       <head>
@@ -96,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <p> Hello, ". $job_owner['name'] .". This is an automated email from the DSC. </p>
       <p> Your 3D print job; " . $job['job_name'] . " has been evaluated at a cost of $" . (number_format((float)$_POST["price"], 2, '.','')) . " </p>
       <p> Please make your payment <a href=". $direct_link .">here</a> for it to be placed in our printing queue.</p>
-      <p>If you have any questions please review our FAQ or email us at dscommons@uvic.ca.</p>
+      <p>If you have any questions please review our ". $direct_link2 .">FAQ</a> or email us at dscommons@uvic.ca.</p>
       </body>
       </html>";
       $headers = "MIME-Version: 1.0" . "\r\n";

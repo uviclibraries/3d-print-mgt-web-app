@@ -93,15 +93,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $stmt->bindParam(':status', $status);
   $stmt->execute();
 
-
+  $direct_link = "https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/";
   $msg = "
   <html>
   <head>
   <title>HTML email</title>
   </head>
   <body>
-  <p>Hello, ".$user_name.". This is an automated resposne from the DSC.</p>
-  <p>Thank you for submiting your print request to the DSC at MacPherson Library. We will evalute the cost of the print and you'll be notified by email when it is ready for payment. If you have any questions about the process or the status of your print, please review our FAQ or email us at DSCommons@uvic.ca.</p>
+  <p>Hello, ".$user_name.". This is an automated message from the DSC.</p>
+  <p>Thank you for submiting your print request to the DSC at MacPherson Library. We will evalute the cost of the print and you'll be notified by email when it is ready for payment. If you have any questions about the process or the status of your print, please review our ". $direct_link .">FAQ</a> or email us at DSCommons@uvic.ca.</p>
   </body>
   </html>";
   $headers = "MIME-Version: 1.0" . "\r\n";
@@ -211,7 +211,7 @@ header("location: customer-dashboard.php");
       </script>
 
     <div class="col-md-12 order-md-1">
-      <h3 class="mb-3">Specifications <a href="3dfaq.html#specs" target="_blank" data-toggle="tooltip" data-placement="right" title="FAQ Specifications section">?</a></h3>
+      <h3 class="mb-3">Specifications <a href="https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/#specs" target="_blank" data-toggle="tooltip" data-placement="right" title="FAQ Specifications section">?</a></h3>
         <div class="row">
             <div class="col-md-3 mb-3" data-toggle="tooltip" data-placement="right" data-trigger="click" title="The percentage of the interior that is made up of material. More infill increases strength and the cost.">
                 <label for="infill">Infill</label>
@@ -293,7 +293,7 @@ header("location: customer-dashboard.php");
         </div>
 
         <hr class="mb-4">
-        <h3 class="mb-2">Material Type <a href="3dfaq.html#mats" target="_blank" data-toggle="tooltip" data-placement="right" title="FAQ Material section">?</a></h3>
+        <h3 class="mb-2">Material Type <a href="https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/#mats" target="_blank" data-toggle="tooltip" data-placement="right" title="FAQ Material section">?</a></h3>
         <div class="d-block my-3">
           <div class="custom-control custom-radio">
             <input id="pla" name="material_type" value="PLA" type="radio" class="custom-control-input" checked required>
