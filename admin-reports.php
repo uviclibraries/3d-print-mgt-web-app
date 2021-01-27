@@ -27,14 +27,14 @@ if (isset($_GET['searchdate_start']) && ($_GET['searchdate_start'] != "" && $_GE
 $dateline = ""; //Used for table description
 //Check if parameters are empty
 if ($getcheck[0]==FALSE && $getcheck[1]==FALSE && $getcheck[2]==FALSE && $getcheck[3]==FALSE) {
-  $stm = $conn->query("SELECT * FROM moneris_fields ORDER BY id");
+  $stm = $conn->query("SELECT response_order_id, netlink_id, full_name, date_stamp, time_stamp, message, txn_num, cardholder, charge_total, card, bank_approval_code, bank_transaction_id, INVOICE, ISSCONF, ISSNAME, iso_code, avs_response_code, cavv_result_code, response_code, result, trans_name, f4l4  FROM moneris_fields ORDER BY id");
   $dateline .= " Until " . date("Y-m-d");
 }
 //find out what parameters are being searched for
 else{
 
   //build sql query line based on search parameters
-  $searchline = "SELECT * FROM moneris_fields WHERE " . implode(" AND ", $sql_line);
+  $searchline = "SELECT response_order_id, netlink_id, full_name, date_stamp, time_stamp, message, txn_num, cardholder, charge_total, card, bank_approval_code, bank_transaction_id, INVOICE, ISSCONF, ISSNAME, iso_code, avs_response_code, cavv_result_code, response_code, result, trans_name, f4l4  FROM moneris_fields WHERE " . implode(" AND ", $sql_line);
   $stm = $conn->prepare($searchline);
   //echo $searchline . "\n";
 
@@ -61,7 +61,7 @@ else{
   $stm->execute();
 
 }
-$all_users = $stm->fetchAll();
+$all_users = $stm->fetchAll(PDO::FETCH_ASSOC);
 
 $sum = 0;
 foreach ($all_users as $row) {
@@ -90,12 +90,16 @@ if (isset($_POST["getCSV"])) {
   header("Content-Type: text/csv;");
   header("Content-Disposition: attachment; filename=".$filename);
 
-  $fp = fopen("php://output", "a");
-  fputcsv($fp, array('Order ID','netlink ID', 'Full Name', 'Date', 'Time', 'Message', 'TRXN Num', 'Cardholder', 'Charge', 'Card', 'Bank Approval Code', 'Bank Transaction ID', 'INVOICE', 'ISSCONF', 'ISSNAME', 'ISO Code', 'AVS Response Code', 'CAVV Result Code', 'Response Code', 'Result', 'Trans Name', 'f4l4' ));
+  $fp = fopen("php://output", "w");
+  $column = array("Order ID", "Netlink ID", "Full Name", "Date", "Time", "Message", "Transaction Num", "Cardholder", "Charge", "Card", "Bank Approval Code", "Bank Transaction ID", "INVOICE", "ISSCONF", "ISSNAME", "ISO Code", "AVS Response Code", "CAVV Result Code",);
+  $fix = array("Response Code", "Result", "Trans Name", "f4l4");
+  $column = array_merge($column, $fix);
+  fputcsv($fp, $column);
   foreach ($all_users as $row) {
     fputcsv($fp, $row);
   }
   fclose($fp);
+  exit();
 }
  ?>
 
@@ -190,8 +194,8 @@ if (isset($_POST["getCSV"])) {
             <?php if ($getcheck[3]){ ?> checked <?php } ?> >
           </div>
           <input type="submit" name="Search" value="Search">
-          <input type="submit" name="getCSV" value="getCSV">
-        </form>
+          <!--<input type="submit" name="getCSV" value="getCSV" class="btn btn-md btn-danger btn-">-->
+
       </div>
       <div class="col-md-4 offset-md-4">
         <a class="btn btn-md btn-primary btn-" href="admin-dashboard.php" role="button">Back to Dashboard</a>
@@ -205,9 +209,10 @@ if (isset($_POST["getCSV"])) {
     <p><?php echo $dateline . " Sum: "?><b><?php echo "$" . number_format((float)$sum, 2, '.',''); ?></b></p>
     </div>
     <div class="col-md-4 align-self-end">
-      <a class="btn btn-md btn-danger btn-" href="admin-dashboard.php" role="button">Download CSV</a>
+      <input type="submit" name="getCSV" value="Download CSV" class="btn btn-md btn-danger btn-">
     </div>
   </div>
+  </form>
   <br>
   <div class="table-responsive">
     <table class="table table-striped table-md">
