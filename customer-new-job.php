@@ -211,7 +211,7 @@ header("location: customer-dashboard.php");
       </script>
 
     <div class="col-md-12 order-md-1">
-      <h3 class="mb-3">Specifications <a href="https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/#specs" target="_blank" data-toggle="tooltip" data-placement="right" title="FAQ Specifications section">?</a></h3>
+      <h3 class="mb-3">Specifications <a href="https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/#settings" target="_blank" data-toggle="tooltip" data-placement="right" title="FAQ Specifications section">?</a></h3>
         <div class="row">
             <div class="col-md-3 mb-3" data-toggle="tooltip" data-placement="right" data-trigger="click" title="The percentage of the interior that is made up of material. More infill increases strength and the cost.">
                 <label for="infill">Infill</label>
@@ -293,7 +293,7 @@ header("location: customer-dashboard.php");
         </div>
 
         <hr class="mb-4">
-        <h3 class="mb-2">Material Type <a href="https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/#mats" target="_blank" data-toggle="tooltip" data-placement="right" title="FAQ Material section">?</a></h3>
+        <h3 class="mb-2">Material Type <a href="https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/#filaments" target="_blank" data-toggle="tooltip" data-placement="right" title="FAQ Material section">?</a></h3>
         <div class="d-block my-3">
           <div class="custom-control custom-radio">
             <input id="pla" name="material_type" value="PLA" type="radio" class="custom-control-input" checked required>
