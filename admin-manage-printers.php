@@ -100,8 +100,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <form method="POST" enctype="multipart/form-data">
   <h1 class="h3 mb-3 font-weight-normal">Manage Printers</h1>
-
-  <a class="btn btn-primary btn-lg" href="admin-dashboard.php" role="button">Back to Dashboard</a>
+  <div class="row justify-content-around">
+    <div class="col-4">
+      <a class="btn btn-primary btn-" href="https://docs.google.com/spreadsheets/d/1OvlppAHDwstLXp30JeZq_sMxkuIDV-6wHsdhILI0xNs/edit#gid=0" role="button">Filament Stock</a>
+    </div>
+    <div class="col-4">
+      <a class="btn btn-md btn-primary btn-" href="admin-dashboard.php" role="button">Back to Dashboard</a>
+    </div>
+  </div>
   <div class="container">
   <div class="py-3"></div>
   <div class="table-responsive">
