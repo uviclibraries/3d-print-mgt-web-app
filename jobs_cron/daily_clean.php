@@ -35,7 +35,7 @@ foreach ($job_pp as $job) {
     <body>
     <p> Hello, ". $job['user_name'] .". This is an automated email from the DSC. </p>
     <p> Your 3D print job; " . $job['job_name'] . " has not been paid for. If you still wish to have your job printed, please complete the payment <a href=". $direct_link .">here</a>. If you no longer wish to print your job, ignore this email and your print job will automatically be cancelled.</p>
-    <p>If you have any questions please review our ". $direct_link2 .">FAQ</a> or email us at DSCommons@uvic.ca.</p>
+    <p>If you have any questions please review our <a href=". $direct_link2 .">FAQ</a> or email us at DSCommons@uvic.ca.</p>
     </body>
     </html>";
     $headers = "MIME-Version: 1.0" . "\r\n";
