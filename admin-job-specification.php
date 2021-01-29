@@ -96,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <p> Hello, ". $job_owner['name'] .". This is an automated email from the DSC. </p>
       <p> Your 3D print job; " . $job['job_name'] . " has been evaluated at a cost of $" . (number_format((float)$_POST["price"], 2, '.','')) . " </p>
       <p> Please make your payment <a href=". $direct_link .">here</a> for it to be placed in our printing queue.</p>
-      <p>If you have any questions please review our ". $direct_link2 .">FAQ</a> or email us at dscommons@uvic.ca.</p>
+      <p>If you have any questions please review our <a href=". $direct_link2 .">FAQ</a> or email us at dscommons@uvic.ca.</p>
       </body>
       </html>";
       $headers = "MIME-Version: 1.0" . "\r\n";
@@ -221,11 +221,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <div class="row">
             <div class="col-md-3 mb-3">
                 <select class="custom-select d-block w-100" name="status" id="layer-height">
-                  <option value="submitted" <?php if ($job["status"]== "submitted"){echo "selected";} ?>>Not Priced</option>
-                  <option value="pending payment" <?php if ($job["status"]== "pending payment"){echo "selected";} ?>>Pending Payment</option>
-                  <option value="paid" <?php if ($job["status"]== "paid"){echo "selected";} ?>>Paid</option>
-                  <option value="printing" <?php if ($job["status"]== "printing"){echo "selected";} ?>>Printing</option>
-                  <option value="completed" <?php if ($job["status"]== "completed"){echo "selected";} ?>>Completed</option>
+                  <?php if ($job["status"] == "cancelled") {
+                    ?> <option value="cancelled" echo "selected" readonly>cancelled</option>
+                  <?php } else { ?>
+                    <option value="submitted" <?php if ($job["status"]== "submitted"){echo "selected";} ?>>Not Priced</option>
+                    <option value="pending payment" <?php if ($job["status"]== "pending payment"){echo "selected";} ?>>Pending Payment</option>
+                    <option value="paid" <?php if ($job["status"]== "paid"){echo "selected";} ?>>Paid</option>
+                    <option value="printing" <?php if ($job["status"]== "printing"){echo "selected";} ?>>Printing</option>
+                    <option value="completed" <?php if ($job["status"]== "completed"){echo "selected";} ?>>Completed</option>
+                    <?php if($job["status"]== "archived") {?>
+                      <option value="archived" selected>Archived</option>
+                  <?php }
+                 } ?>
                 </select>
               </div>
               </div>
