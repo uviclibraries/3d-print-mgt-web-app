@@ -1,8 +1,8 @@
 <?php
-require ('db.php');
+require ('../db.php');
 
 //daily
-//Today's approved tranasactions
+//yesterday's approved transactions
 $stm = $conn->prepare("SELECT response_order_id, netlink_id, full_name, date_stamp, time_stamp, message, txn_num, cardholder, charge_total, card, bank_approval_code, bank_transaction_id, INVOICE, ISSCONF, ISSNAME, iso_code, avs_response_code, cavv_result_code, response_code, result, trans_name, f4l4 FROM moneris_fields WHERE date_stamp = :yesterday_date AND response_code >= 0 AND response_code <= 27");
 $yesterday = date("Y-m-d", strtotime("-1 days"));
 $stm->bindParam(':yesterday_date', $yesterday, PDO::PARAM_STR);
@@ -81,15 +81,15 @@ $msg .= "
 </body>
 </html>";
 
-
 $headers = "MIME-Version: 1.0" . "\r\n";
 $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
 $headers .= "From: dscommons@uvic.ca" . "\r\n";
 $subject = $yesterday . " 3D print Moneris Report";
+
+//Get mailing list
 $stm = $conn->query("SELECT email FROM users WHERE cron_report = 1 && user_type = 0");
 $cron_report_email = $stm->fetchAll();
 foreach ($cron_report_email as $admin) {
   mail($admin["email"],$subject,$msg,$headers);
 }
-
- ?>
+?>
