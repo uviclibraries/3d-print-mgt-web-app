@@ -114,12 +114,25 @@ if ($user != $job["netlink_id"] && $user_type == 1) {
           <hr class="mb-6">
 
     <h3 class="mb-3">Upload 3D Model</h3>
-    <a href="<?php echo "uploads/" . $job['model_name']; ?>" > Download 3D file </a>
+    <?php
+    if (is_file(("uploads/" . $job['model_name']))) {
+        ?>
+        <!--Grabs file and renames it to the job name when downloaded-->
+        <a href="<?php echo "uploads/" . $job['model_name']; ?>" download="<?php
+            $filetype = explode(".", $job['model_name']);
+            echo $job['job_name'] . "." . $filetype[1]; ?>">
+            Download 3D file
+        </a>
+    <?php
+    }
+    else{ ?>
+      <p>File Deleted</p>
+    <?php } ?>
       <br>
 
     <!-- if its priced/payed-->
     <?php if($job["status"] != "submitted"){?>
-
+      <hr class="mb-6">
 
         <div class="col-md-3 mb-3">
                 <label for="username">Price</label>
