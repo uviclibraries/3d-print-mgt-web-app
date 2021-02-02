@@ -1,7 +1,8 @@
 <?php
+//daily
+chdir("/usr/local/apache2/htdocs-webapp/3dprint/jobs_cron");
 require ('../db.php');
 
-//daily
 //yesterday's approved transactions
 $stm = $conn->prepare("SELECT response_order_id, netlink_id, full_name, date_stamp, time_stamp, message, txn_num, cardholder, charge_total, card, bank_approval_code, bank_transaction_id, INVOICE, ISSCONF, ISSNAME, iso_code, avs_response_code, cavv_result_code, response_code, result, trans_name, f4l4 FROM moneris_fields WHERE date_stamp = :yesterday_date AND response_code >= 0 AND response_code <= 27");
 $yesterday = date("Y-m-d", strtotime("-1 days"));
@@ -31,7 +32,6 @@ $msg = "
 </head>
 <body>
   <p>This is an automated email from the DSC.</p>
-   CSV file is now available to be downloaded from the reports page on the website.</p>
   <p>Paid transactions for ". $yesterday .". </p>
   <table>
     <thead>

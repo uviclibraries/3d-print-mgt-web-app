@@ -1,5 +1,6 @@
 <?php
 //Daily
+chdir("/usr/local/apache2/htdocs-webapp/3dprint/jobs_cron");
 require ('../db.php');
 
 
@@ -27,17 +28,15 @@ foreach ($job_pp as $job) {
     $stm1->execute();
 
     //deleting 3d file
-    $delete = "uploads/" . $job['model_name'];
+    $delete = "../uploads/" . $job['model_name'];
     if(is_file($delete)){
       unlink($delete);
     }
     //check if secondary file exists. If so delete
     if ($job["model_name_2"] != NULL) {
-      $delete2 = "uploads/" . $job['model_name_2'];
+      $delete2 = "../uploads/" . $job['model_name_2'];
       if (is_file($delete2)) {
         unlink($delete2);
       }
     }
   }
-
-}

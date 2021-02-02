@@ -1,5 +1,6 @@
 <?php
 //Daily
+chdir("/usr/local/apache2/htdocs-webapp/3dprint/jobs_cron");
 require ('../db.php');
 
 

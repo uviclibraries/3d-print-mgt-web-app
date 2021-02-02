@@ -1,6 +1,7 @@
 <?php
 
 //Weekly
+chdir("/usr/local/apache2/htdocs-webapp/3dprint/jobs_cron");
 require ('../db.php');
 
 //One semester ago & one semester + 2 weeks ago.
@@ -13,12 +14,12 @@ $job_arh = $stm->fetchAll();
 
 //Deleting files
 foreach ($job_arh as $job) {
-  $delete = "uploads/" . $job['model_name'];
+  $delete = "../uploads/" . $job['model_name'];
   if (is_file($delete)) {
     unlink($delete);
   }
   if ($job["model_name_2"] != NULL) {
-    $delete2 = "uploads/" . $job['model_name_2'];
+    $delete2 = "../uploads/" . $job['model_name_2'];
     if (is_file($delete2)) {
       unlink($delete2);
     }
