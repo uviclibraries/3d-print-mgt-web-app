@@ -131,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </head>
       <body>
       <p>Hello, ". $job_owner['name'] .". This is an automated email from the DSC. </p>
-      <p> Your 3D print job; " . $job['job_name'] . " has been printed. You can pick it up from the front desk at the MacPherson Library.</p>
+      <p> Your 3D print job; " . $job['job_name'] . " has been printed. You can pick it up from the front desk at the McPherson Library.</p>
       <p>Please check up to date library hours and safety guidelines by checking the library website <a href=". $direct_link .">here</a></p>
       </body>
       </html>";

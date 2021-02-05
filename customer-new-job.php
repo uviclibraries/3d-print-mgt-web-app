@@ -101,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </head>
   <body>
   <p>Hello, ".$user_name.". This is an automated message from the DSC.</p>
-  <p>Thank you for submiting your print request to the DSC at MacPherson Library. We will evalute the cost of the print and you'll be notified by email when it is ready for payment. If you have any questions about the process or the status of your print, please review our <a href=". $direct_link .">FAQ</a> or email us at DSCommons@uvic.ca.</p>
+  <p>Thank you for submiting your print request to the DSC at McPherson Library. We will evalute the cost of the print and you'll be notified by email when it is ready for payment. If you have any questions about the process or the status of your print, please review our <a href=". $direct_link .">FAQ</a> or email us at DSCommons@uvic.ca.</p>
   </body>
   </html>";
   $headers = "MIME-Version: 1.0" . "\r\n";
