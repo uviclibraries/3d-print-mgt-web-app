@@ -108,13 +108,18 @@ foreach ($data as $job) {
           <button class="btn btn-danger btn-lg" type="submit">FAQ</button>
         </a>
       </div>
-      <?php if ($user_type == 0){ ?>
+
         <div class="btn-auto mr-auto">
-          <a href="admin-dashboard.php">
-            <button class="btn btn-primary btn-lg" type="submit">Admin Dashboard</button>
-          </a>
+          <?php if ($user_type == 0){ ?>
+            <a href="admin-dashboard.php">
+              <button class="btn btn-primary btn-lg" type="submit">Admin Dashboard</button>
+            </a>
+          <?php } else{ ?>
+            <a href=" mailto:dscommons@uvic.ca?subject=3DAppFeedback">
+              <button class="btn btn-primary btn-lg" type="submit">Feedback</button>
+            </a>
+          <?php }  ?>
         </div>
-    <?php } ?>
     </div>
 
         <hr class="mb-12">
