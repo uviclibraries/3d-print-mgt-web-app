@@ -8,19 +8,19 @@ if ($user_type == 1) {
   die();
 }
 
-$stm = $conn->query("SELECT id, job_name, netlink_id, status, submission_date FROM print_job WHERE status = 'submitted' ORDER BY submission_date ASC");
+$stm = $conn->query("SELECT print_job.job_name AS job_name, print_job.status AS status, print_job.submission_date AS submission_date, users.name AS name FROM print_job INNER JOIN users ON print_job.netlink_id = users.netlink_id WHERE print_job.status = 'submitted' ORDER BY print_job.submission_date ASC");
 $job1 = $stm->fetchAll();
 
-$stm = $conn->query("SELECT id, job_name, netlink_id, status, priced_date FROM print_job WHERE status = 'pending payment' ORDER BY priced_date ASC");
+$stm = $conn->query("SELECT print_job.job_name as job_name, print_job.status AS status, print_job.priced_date AS priced_date, users.name AS name FROM print_job INNER JOIN users ON print_job.netlink_id = users.netlink_id WHERE print_job.status = 'pending payment' ORDER BY print_job.priced_date ASC");
 $job2 = $stm->fetchAll();
 
-$stm = $conn->query("SELECT id, job_name, netlink_id, status, paid_date FROM print_job WHERE status = 'paid' ORDER BY paid_date ASC");
+$stm = $conn->query("SELECT print_job.job_name AS job_name, print_job.status AS status, print_job.paid_date AS paid_date, users.name AS name FROM print_job INNER JOIN users ON print_job.netlink_id = users.netlink_id WHERE print_job.status = 'paid' ORDER BY print_job.paid_date ASC");
 $job3 = $stm->fetchAll();
 
-$stm = $conn->query("SELECT id, job_name, netlink_id, status, printing_date FROM print_job WHERE status = 'printing' ORDER BY printing_date ASC");
+$stm = $conn->query("SELECT print_job.job_name AS job_name, print_job.status AS status, print_job.printing_date AS printing_date, users.name as name FROM print_job INNER JOIN users ON print_job.netlink_id = users.netlink_id WHERE print_job.status = 'printing' ORDER BY print_job.printing_date ASC");
 $job4 = $stm->fetchAll();
 
-$stm = $conn->query("SELECT id, job_name, netlink_id, status, completed_date FROM print_job WHERE status = 'completed' ORDER BY completed_date ASC");
+$stm = $conn->query("SELECT print_job.job_name AS job_name, print_job.status AS status, print_job.completed_date AS completed_date, users.name as name FROM print_job INNER JOIN users ON print_job.netlink_id = users.netlink_id WHERE print_job.status = 'completed' ORDER BY print_job.completed_date ASC");
 $job5 = $stm->fetchAll();
 
 $not_priced = [];
@@ -115,7 +115,7 @@ foreach ($job5 as $job) {
 
             <div class="row">
                 <div class="col-md-4 mb-3">
-                    <a href="admin-reports.php?searchdate_start=<?php echo date("Y-m-d") ?>&approved=on">
+                    <a href="admin-reports.php?searchdate_start=<?php echo date("Y-m-01") ?>&searchdate_end=<?php echo date("Y-m-d") ?>&approved=on">
                         <button class="btn btn-primary btn-lg btn-block" class="form-control" type="submit" data-inline="true">Reports</button>
                     </a>
                 </div>
@@ -139,9 +139,7 @@ foreach ($job5 as $job) {
                 </div>
 
                 <div class="col-md-4 mb-3">
-                  <form action="deletejob.php">
-                    <input type="submit" value="delete, cancel, and archive">
-                  </form>
+
                 </div>
 
                 <div class="col-md-4 mb-3">
@@ -173,7 +171,7 @@ foreach ($job5 as $job) {
             foreach($not_priced as $row){
             ?>
             <tr>
-              <td><?php echo $row["netlink_id"]; ?></td>
+              <td><?php echo $row["name"]; ?></td>
               <td><a href="admin-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
               <td> <?php echo $row["submission_date"]; ?></td>
               <td><?php echo $row["status"]; ?></td>
@@ -198,7 +196,7 @@ foreach ($job5 as $job) {
             <?php foreach ($pending_payment as $row) {
             ?>
             <tr>
-              <td><?php echo $row["netlink_id"]; ?></td>
+              <td><?php echo $row["name"]; ?></td>
                 <td><a href="admin-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
               <td><?php echo $row["priced_date"]; ?></td>
               <td><?php echo $row["status"]; ?></td>
@@ -224,7 +222,7 @@ foreach ($job5 as $job) {
             <?php foreach ($paid as $row) {
             ?>
             <tr>
-              <td><?php echo $row["netlink_id"]; ?></td>
+              <td><?php echo $row["name"]; ?></td>
                 <td><a href="admin-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
               <td><?php echo $row["paid_date"]; ?></td>
               <td><?php echo $row["status"]; ?></td>
@@ -250,7 +248,7 @@ foreach ($job5 as $job) {
             <?php foreach ($printing as $row) {
             ?>
             <tr>
-              <td><?php echo $row["netlink_id"]; ?></td>
+              <td><?php echo $row["name"]; ?></td>
                 <td><a href="admin-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
               <td><?php echo $row["printing_date"]; ?></td>
               <td><?php echo $row["status"]; ?></td>
@@ -276,7 +274,7 @@ foreach ($job5 as $job) {
             <?php foreach ($complete as $row) {
             ?>
             <tr>
-              <td><?php echo $row["netlink_id"]; ?></td>
+              <td><?php echo $row["name"]; ?></td>
                 <td><a href="admin-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
               <td><?php echo $row["completed_date"]; ?></td>
               <td><?php echo $row["status"]; ?></td>
