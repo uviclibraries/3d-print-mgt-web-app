@@ -101,11 +101,14 @@ if ($user != $job["netlink_id"] && $user_type == 1) {
                 <div class="input-group">
                   <div class="input-group mb-3">
                     <input type="text" class="form-control" placeholder="100" value="<?php echo $job["status"]; ?>" aria-label="100" aria-describedby="basic-addon2" readonly>
-                </div>
+                  </div>
                 <div class="invalid-feedback" style="width: 100%;">
                 Status is required.
                 </div>
             </div>
+            <?php if ($job["status"] =="archived" && is_file(("uploads/" . $job['model_name']))){ ?>
+              <a class="btn btn-md btn-primary btn-" href="customer-revive-job.php?job_id=<?php echo $job['id']?>" role="button">Revive</a>
+            <?php } ?>
             </div>
             </div>
             <!------------------->
