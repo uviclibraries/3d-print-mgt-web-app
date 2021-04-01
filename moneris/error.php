@@ -34,7 +34,9 @@
 <b>An error with Moneris Occured. Please save the error message below and contact the dscommons@uvic.ca</b>
 </p>
 <p>
-<b>Error:</b> <?php echo "$message" ?>
+<b>Error:</b> <?php if (isset($message)) {
+  echo "$message"
+} ?>
 </p>
 </body>
 </html>

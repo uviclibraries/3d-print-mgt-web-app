@@ -8,19 +8,19 @@ if ($user_type == 1) {
   die();
 }
 
-$stm = $conn->query("SELECT print_job.job_name AS job_name, print_job.status AS status, print_job.submission_date AS submission_date, users.name AS name FROM print_job INNER JOIN users ON print_job.netlink_id = users.netlink_id WHERE print_job.status = 'submitted' ORDER BY print_job.submission_date ASC");
+$stm = $conn->query("SELECT print_job.id as id, print_job.job_name AS job_name, print_job.status AS status, print_job.submission_date AS submission_date, users.name AS name FROM print_job INNER JOIN users ON print_job.netlink_id = users.netlink_id WHERE print_job.status = 'submitted' ORDER BY print_job.submission_date ASC");
 $job1 = $stm->fetchAll();
 
-$stm = $conn->query("SELECT print_job.job_name as job_name, print_job.status AS status, print_job.priced_date AS priced_date, users.name AS name FROM print_job INNER JOIN users ON print_job.netlink_id = users.netlink_id WHERE print_job.status = 'pending payment' ORDER BY print_job.priced_date ASC");
+$stm = $conn->query("SELECT print_job.id as id, print_job.job_name as job_name, print_job.status AS status, print_job.priced_date AS priced_date, users.name AS name FROM print_job INNER JOIN users ON print_job.netlink_id = users.netlink_id WHERE print_job.status = 'pending payment' ORDER BY print_job.priced_date ASC");
 $job2 = $stm->fetchAll();
 
-$stm = $conn->query("SELECT print_job.job_name AS job_name, print_job.status AS status, print_job.paid_date AS paid_date, users.name AS name FROM print_job INNER JOIN users ON print_job.netlink_id = users.netlink_id WHERE print_job.status = 'paid' ORDER BY print_job.paid_date ASC");
+$stm = $conn->query("SELECT print_job.id as id, print_job.job_name AS job_name, print_job.status AS status, print_job.paid_date AS paid_date, users.name AS name FROM print_job INNER JOIN users ON print_job.netlink_id = users.netlink_id WHERE print_job.status = 'paid' ORDER BY print_job.paid_date ASC");
 $job3 = $stm->fetchAll();
 
-$stm = $conn->query("SELECT print_job.job_name AS job_name, print_job.status AS status, print_job.printing_date AS printing_date, users.name as name FROM print_job INNER JOIN users ON print_job.netlink_id = users.netlink_id WHERE print_job.status = 'printing' ORDER BY print_job.printing_date ASC");
+$stm = $conn->query("SELECT print_job.id as id, print_job.job_name AS job_name, print_job.status AS status, print_job.printing_date AS printing_date, users.name as name FROM print_job INNER JOIN users ON print_job.netlink_id = users.netlink_id WHERE print_job.status = 'printing' ORDER BY print_job.printing_date ASC");
 $job4 = $stm->fetchAll();
 
-$stm = $conn->query("SELECT print_job.job_name AS job_name, print_job.status AS status, print_job.completed_date AS completed_date, users.name as name FROM print_job INNER JOIN users ON print_job.netlink_id = users.netlink_id WHERE print_job.status = 'completed' ORDER BY print_job.completed_date ASC");
+$stm = $conn->query("SELECT print_job.id as id, print_job.job_name AS job_name, print_job.status AS status, print_job.completed_date AS completed_date, users.name as name FROM print_job INNER JOIN users ON print_job.netlink_id = users.netlink_id WHERE print_job.status = 'completed' ORDER BY print_job.completed_date ASC");
 $job5 = $stm->fetchAll();
 
 $not_priced = [];
@@ -158,8 +158,8 @@ foreach ($job5 as $job) {
           <thead>
             <tr>
               <!-- table header-->
-              <th>Username</th>
               <th>Name</th>
+              <th>Job</th>
               <th>Submission Date</th>
               <th>Status</th>
             </tr>
@@ -187,8 +187,8 @@ foreach ($job5 as $job) {
             </tr>
             <tr>
               <thread>
-                <th>Username</th>
                 <th>Name</th>
+                <th>Job</th>
                 <th>Priced Date</th>
                 <th>Status</th>
               </thread>
@@ -213,8 +213,8 @@ foreach ($job5 as $job) {
             <tr>
             <tr>
               <thread>
-                <th>Username</th>
                 <th>Name</th>
+                <th>Job</th>
                 <th>Payment Date</th>
                 <th>Status</th>
               </thread>
@@ -239,8 +239,8 @@ foreach ($job5 as $job) {
             <tr>
             <tr>
               <thread>
-                <th>Username</th>
                 <th>Name</th>
+                <th>Job</th>
                 <th>Print Start Date</th>
                 <th>Status</th>
               </thread>
@@ -265,8 +265,8 @@ foreach ($job5 as $job) {
             <tr>
             <tr>
               <thread>
-                <th>Username</th>
                 <th>Name</th>
+                <th>Job</th>
                 <th>Completion Date</th>
                 <th>Status</th>
               </thread>

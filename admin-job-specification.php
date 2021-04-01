@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $stmt = $conn->prepare("UPDATE print_job SET price = :price, infill = :infill, scale = :scale, layer_height = :layer_height, supports = :supports, copies = :copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, model_name_2 =:model_name_2 WHERE id = :job_id;
   ");
   $current_date = date("Y-m-d");
-  //temp is to prevent php notice: only variables should be passed by reference.
+
   $stmt->bindParam(':job_id', $job['id']);
   $price = floatval(number_format((float)$_POST["price"], 2, '.',''));
   $stmt->bindParam(':price', $price);
@@ -140,6 +140,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $headers .= "From: dscommons@uvic.ca" . "\r\n";
       mail($job_owner['email'], "Your 3D Print is ready for collection",$msg,$headers);
     }
+  } elseif($_POST['status'] == "archived"){
+    $d4 = $current_date;
+
   }
   $stmt->execute();
 
@@ -229,10 +232,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <option value="paid" <?php if ($job["status"]== "paid"){echo "selected";} ?>>Paid</option>
                     <option value="printing" <?php if ($job["status"]== "printing"){echo "selected";} ?>>Printing</option>
                     <option value="completed" <?php if ($job["status"]== "completed"){echo "selected";} ?>>Completed</option>
-                    <?php if($job["status"]== "archived") {?>
-                      <option value="archived" selected>Archived</option>
-                  <?php }
-                 } ?>
+                    <option value="archived" <?php if ($job["status"]== "archived"){echo "selected";} ?>>Archived</option>
+                  <?php } ?>
                 </select>
               </div>
               </div>

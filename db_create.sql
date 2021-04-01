@@ -80,7 +80,8 @@ CREATE TABLE `users` (
   `netlink_id` varchar(100) NOT NULL UNIQUE,
   `name` varchar(100) NOT NULL,
   `user_type` int(11) NOT NULL DEFAULT 1,
-  `email` varchar(100) NOT NULL
+  `email` varchar(100) NOT NULL,
+  `cron_report` int(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 

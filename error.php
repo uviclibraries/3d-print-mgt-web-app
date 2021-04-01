@@ -24,7 +24,12 @@
 
     <h1>You've run into an error</h1>
       <p>sorry, but the ldap was unsuccessful</p>
-      <p>please contact the webdeveloper with your Netlink ID at kenziewong@gmail.com</p>
+      <p>
+        <?php if (isset($_GET['mesg'])) {
+          echo "Error message: \n " . $_GET['mesg'];
+        } ?>
+      </p>
+      <p>please contact the webdeveloper with the error message at kenziewong@gmail.com</p>
       <p>Thank you.</p>
   </body>
 </html>
