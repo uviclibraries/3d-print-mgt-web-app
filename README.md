@@ -6,6 +6,9 @@ Redirect to UVic Login page. Checks to see if user exists in current database el
 admin-dashboard.php
 Home screen of the admin side. Displays active jobs by status. Has links to all other admin pages and the personal dashboard.  Only accessible to admin level users.
 
+admin-edit-group.php
+Allows admin to add & remove jobs to a group and to price and change the status of a group.
+
 admin-job-specification.php
 Individual job page. Displays data from the database on the specified job by job id. Allows downloading 3d files if they exist. Editable data: status, price(when status is submitted/pending_payment), secondary 3d file (max 200MB), all specifications, copies, material type, staff comments. Sends email when status is pending payment or completed if enable email is checked. Only accessible to admin level users.
 
@@ -23,6 +26,9 @@ Shows Moneris response fields. Can search by transaction date, order id  (which 
 
 admin-user-specification.php
 Displays and offers editable data from specific user in user database. Editable data is user type, email, email reports (automated daily Moneris report emailed). Only accessible to admin level users.
+
+create-group.php
+Creates a group from a list of users who have a job with a "submitted" status.
 
 customer-dashboard.php
 Displays all jobs linked to logged in netlink user. Has links to all linked specific job pages, new-job creation, and FAQ page. If user is admin, displays link to admin page.
