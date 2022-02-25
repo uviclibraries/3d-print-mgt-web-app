@@ -73,7 +73,7 @@ Contains cron job files
   Searches for jobs that have been pending payment for a specified number of days and emails a reminder to the job owner. Intended to be done daily.
 
 moneris(folder)
-Moneris landing and setup files.
+Moneris (a payment processing system) landing and setup files.
 
   moneris/approved.php
   Saves moneris fields to database. Changes job status to paid.
