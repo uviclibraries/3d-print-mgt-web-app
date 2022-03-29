@@ -354,8 +354,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <div class="col-md-3 mb-3">
             <label for="layer-height">Layer Height</label>
             <select class="custom-select d-block w-100" name="layer_height" id="layer-height">
-              <option <?php if ($job["layer_height"]== 0.4){echo "selected";} ?>>0.4</option>
-              <option <?php if ($job["layer_height"]== 0.3){echo "selected";} ?>>0.3</option>
               <option <?php if ($job["layer_height"]== 0.2){echo "selected";} ?>>0.2</option>
               <option <?php if ($job["layer_height"]== 0.15){echo "selected";} ?>>0.15</option>
               <option <?php if ($job["layer_height"]== 0.1){echo "selected";} ?>>0.1</option>

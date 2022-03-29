@@ -247,8 +247,6 @@ header("location: customer-dashboard.php");
           <div class="col-md-3 mb-3" data-toggle="tooltip" data-placement="right" title="Thickness of each layer. Smaller heights increases detail and print times.">
             <label for="layer-height">Layer Height</label>
             <select class="custom-select d-block w-100" name="layer_height" id="layer-height" required>
-              <option>0.4</option>
-              <option>0.3</option>
               <option selected="selected">0.2</option>
               <option>0.15</option>
               <option>0.1</option>
