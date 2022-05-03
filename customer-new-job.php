@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $file_array = explode(".",$file_name);
       $ext = end($file_array);
       $explode_len = count($file_array);
-      if (!in_array($ext, ["stl", "obj", "3mf", "gcode"])|| $explode_len > 2) {
+      if (!in_array($ext, ["stl", "obj", "3mf", "gcode","svg"])|| $explode_len > 2) {
           throw new RuntimeException('Invalid file format.');
       }
 
