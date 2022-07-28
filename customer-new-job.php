@@ -45,11 +45,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $file_name = $_FILES["3d_model"]['name'];
       $file_array = explode(".",$file_name);
       $ext = end($file_array);
-      $explode_len = count($file_array);
-      if (!in_array($ext, ["stl", "obj", "3mf", "gcode","svg"])|| $explode_len > 2) {
+	  if (!in_array($ext, ["stl", "STL", "obj", "3mf", "gcode","svg"])) {
           throw new RuntimeException('Invalid file format.');
       }
-
+	  
+	  
       // You should name it uniquely.
       // DO NOT USE $_FILES["3d_model"]['name'] WITHOUT ANY VALIDATION !!
       // On this example, obtain safe unique name from its binary data.
