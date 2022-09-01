@@ -181,11 +181,11 @@ header("location: customer-dashboard.php");
         <form method="POST" enctype="multipart/form-data">
   <div class="py-5 text-center">
 
-    <h1>New Print Job</h1>
+    <h1>New 3D Print or Laser Cut Job</h1>
     </div>
 
     <div class="col-md-12 order-md-1">
-        <h3 class="mb-3">Print Job Name</h3>
+        <h3 class="mb-3">Job Name</h3>
           <div class="row">
             <div class="col-md-12 mb-3">
               <input type="text" class="form-control" name="job_name" id="printJobName" placeholder="" autocomplete="off" value="" required>
@@ -197,11 +197,25 @@ header("location: customer-dashboard.php");
           <hr class="mb-6">
 
 
-    <h3 class="mb-3">Upload 3D Model</h3>
+    <h3 class="mb-3">Upload Model or Graphic</h3>
     <small class="text-muted">(Max 200MB)</small>
         <input type="file" id="myFile" name="3d_model" required>
       <br>
       <hr class="mb-6">
+
+    <h3 class="mb-2">Job Type</h3>
+      <div class="d-block my-3">
+        <div class="custom-control custom-radio">
+          <input id="3d_print" name="job_type" value="3D Print" type="radio" class="custom-control-input" checked required>
+          <label class="custom-control-label" for="3d_print">3D Print</label>
+        </div>
+        <div class="custom-control custom-radio">
+          <input id="laser_cut" name="job_type" value="laser_cut" type="radio" class="custom-control-input" required>
+          <label class="custom-control-label" for="laser_cut">Laser Cut</label>
+        </div>
+    <br>
+    <hr class="mb-6">
+      
 
       <!--allows popup for Specifications-->
       <script>
@@ -211,7 +225,7 @@ header("location: customer-dashboard.php");
       </script>
 
     <div class="col-md-12 order-md-1">
-      <h3 class="mb-3">Specifications <a href="https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/#settings" target="_blank" data-toggle="tooltip" data-placement="right" title="FAQ Specifications section">?</a></h3>
+      <h3 class="mb-3">3D Print Specifications <a href="https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/#settings" target="_blank" data-toggle="tooltip" data-placement="right" title="FAQ Specifications section">?</a></h3>
         <div class="row">
             <div class="col-md-3 mb-3" data-toggle="tooltip" data-placement="right" data-trigger="click" title="The percentage of the interior that is made up of material. More infill increases strength and the cost.">
                 <label for="infill">Infill</label>
@@ -291,44 +305,106 @@ header("location: customer-dashboard.php");
         </div>
 
         <hr class="mb-4">
-        <h3 class="mb-2">Material Type <a href="https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/#filaments" target="_blank" data-toggle="tooltip" data-placement="right" title="FAQ Material section">?</a></h3>
+        <h3 class="mb-2">3D Print Material Type <a href="https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/#filaments" target="_blank" data-toggle="tooltip" data-placement="right" title="FAQ Material section">?</a></h3>
         <div class="d-block my-3">
           <div class="custom-control custom-radio">
-            <input id="pla" name="material_type" value="PLA" type="radio" class="custom-control-input" checked required>
+            <input id="pla" name="print_material_type" value="PLA" type="radio" class="custom-control-input" checked required>
             <label class="custom-control-label" for="pla">PLA</label>
           </div>
           <div class="custom-control custom-radio">
-            <input id="pla-pva" name="material_type" value="PLA + PVA" type="radio" class="custom-control-input" required>
+            <input id="pla-pva" name="print_material_type" value="PLA + PVA" type="radio" class="custom-control-input" required>
             <label class="custom-control-label" for="pla-pva">PLA + PVA</label>
           </div>
           <div class="custom-control custom-radio">
-            <input id="tpu95" name="material_type" value="TPU95" type="radio" class="custom-control-input" required>
+            <input id="tpu95" name="print_material_type" value="TPU95" type="radio" class="custom-control-input" required>
             <label class="custom-control-label" for="tpu95">TPU95</label>
           </div>
           <div class="custom-control custom-radio">
-            <input id="other" name="material_type" value="Other" type="radio" class="custom-control-input" required>
+            <input id="other" name="print_material_type" value="Other" type="radio" class="custom-control-input" required>
             <label class="custom-control-label" for="other">Other</label>
             <small class="text-muted"> - Elaborate in Additional Comments section</small>
           </div>
         </div>
-
+    </div>
+    <!-- new block start-->
+    <div class="col-md-12 order-md-1">
+      <!--change link to a future laser cut FAQ page-->
+      <h3 class="mb-3"> Laser Cut Specifications <a href="https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/#settings" target="_blank" data-toggle="tooltip" data-placement="right" title="FAQ Specifications section">?</a></h3>
         <hr class="mb-4">
-        <h3 class="mb-2">Additional Comments</h3>
+        <label class="mb-2"> Indicate either cut or engrave properties for each color in laser cut graphic (temporary) </label>
             <div class="input-group">
                 <textarea class="form-control" name="comments" aria-label="additional-comments"></textarea>
             </div>
             <div class="invalid-feedback">
-            Please enter additional comments.
+            Please provide laser cutting specifications
             </div>
         </div>
 
+        <div>
         <hr class="mb-4">
-        <center>
-            <form action="customer-dashboard.php">
-                <button class="btn btn-primary btn-lg" type="submit">Submit Print Job</button>
-            </form>
-        </center>
+          <div class="col-md-3 mb-3">
+            <label for="supports">Copies</label>
+            <select class="custom-select d-block w-100" name="copies" id="supports" required>
+              <option>1</option>
+              <option>2</option>
+              <option>3</option>
+              <option>4</option>
+              <option>5</option>
+              <option>6</option>
+              <option>7</option>
+              <option>8</option>
+              <option>9</option>
+              <option>10</option>
+            </select>
+            <div class="invalid-feedback">
+              Please provide a valid response.
+            </div>
+          </div>
+        </div>
+
+        <hr class="mb-4">
+        <!--change link to a future laser cut FAQ page-->
+        <h3 class="mb-2">Laser Cut Material Type <a href="https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/#filaments" target="_blank" data-toggle="tooltip" data-placement="right" title="FAQ Material section">?</a></h3>
+        <div class="d-block my-3">
+          <div class="custom-control custom-radio">
+            <input id="mdf_6mm" name="laser_material_type" value="MDF 6mm" type="radio" class="custom-control-input" checked required>
+            <label class="custom-control-label" for="mdf_6mm">MDF 6mm</label>
+          </div>
+          <div class="custom-control custom-radio">
+            <input id="mdf_3mm" name="laser_material_type" value="MDF 3mm" type="radio" class="custom-control-input" required>
+            <label class="custom-control-label" for="mdf_3mmm">MDF 3mm</label>
+          </div>
+          <div class="custom-control custom-radio">
+            <input id="plywood_3mm" name="laser_material_type" value="Plywood_3mm" type="radio" class="custom-control-input" required>
+            <label class="custom-control-label" for="plywood_3mm">Plywood 3mm</label>
+          </div>
+          <div class="custom-control custom-radio">
+            <input id="laser_cut_other" name="laser_material_type" value="Other" type="radio" class="custom-control-input" required>
+            <label class="custom-control-label" for="laser_cut_other">Other</label>
+            <small class="text-muted"> - Elaborate in Additional Comments section</small>
+          </div>
+        </div>
     </div>
+
+    <div class="col-md-12 order-md-1">
+      <hr class="mb-4">
+          <h3 class="mb-2">Additional Comments</h3>
+              <div class="input-group">
+                  <textarea class="form-control" name="comments" aria-label="additional-comments"></textarea>
+              </div>
+              <div class="invalid-feedback">
+              Please enter additional comments.
+              </div>
+          </div>
+
+          <hr class="mb-4">
+          <center>
+              <form action="customer-dashboard.php">
+                  <button class="btn btn-primary btn-lg" type="submit">Submit Print Job</button>
+              </form>
+          </center>
+    <div>
+    <!-- new block end-->
     </form>
   </div>
 
