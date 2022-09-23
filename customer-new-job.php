@@ -125,6 +125,9 @@ header("location: customer-dashboard.php");
     <meta name="generator" content="Jekyll v4.0.1">
     <title>New 3D print request</title>
 
+    <!--javascript-->
+    <!-- <script src="customer-new-job.js" async></script> -->
+
     <!--header link-->
     <link rel="stylesheet" href="css/uvic_banner.css">
     <link rel="icon" href="https://www.uvic.ca/assets/core-4-0/img/favicon-32.png">
@@ -198,19 +201,62 @@ header("location: customer-dashboard.php");
 
 
     <h3 class="mb-3">Upload Model or Graphic</h3>
-    <small class="text-muted">(Max 200MB)</small>
+    <small class="text-muted">Accepted file types: .stl, .svg, .obj, .pdf (Max 200M)</small>
+    <br>    
         <input type="file" id="myFile" name="3d_model" required>
       <br>
       <hr class="mb-6">
 
+    <script type ="text/JavaScript">
+      function setPageInfo() {
+        var print_div = document.getElementById("3d_specs");
+        var laser_div = document.getElementById("laser_specs");
+        var submit = document.getElementById("submit_section");
+        print_div.style.display = "none";
+        laser_div.style.display = "none";
+        submit.style.display = "none";
+        //alert("Print info set");
+      }
+      window.onload = setPageInfo;
+    </script>
+
+    <script type="text/JavaScript">
+      function showPrintInfo() {
+        var print_div = document.getElementById("3d_specs");
+        var laser_div = document.getElementById("laser_specs");
+        var submit = document.getElementById("submit_section");
+        //alert("Print info displayed");
+        if (print_div.style.display == "none") {
+          print_div.style.display = "block";
+          laser_div.style.display = "none";
+          submit.style.display = "block";
+        }
+        
+      }
+    </script>
+
+    <script type="text/JavaScript">
+      function showLaserInfo() {
+        var print_div = document.getElementById("3d_specs");
+        var laser_div = document.getElementById("laser_specs");
+        var submit = document.getElementById("submit_section");
+        //alert("Laser info displayed");
+        if (laser_div.style.display == "none") {
+          print_div.style.display = "none";        
+          laser_div.style.display = "block";
+          submit.style.display = "block";
+        }
+      }
+    </script>
+
     <h3 class="mb-2">Job Type</h3>
       <div class="d-block my-3">
         <div class="custom-control custom-radio">
-          <input id="3d_print" name="job_type" value="3D Print" type="radio" class="custom-control-input" checked required>
+          <input id="3d_print" name="job_type" value="3D Print" type="radio" class="custom-control-input" onclick="showPrintInfo()" required>
           <label class="custom-control-label" for="3d_print">3D Print</label>
         </div>
         <div class="custom-control custom-radio">
-          <input id="laser_cut" name="job_type" value="laser_cut" type="radio" class="custom-control-input" required>
+          <input id="laser_cut" name="job_type" value="laser_cut" type="radio" class="custom-control-input" onclick="showLaserInfo()" required>
           <label class="custom-control-label" for="laser_cut">Laser Cut</label>
         </div>
     <br>
@@ -224,7 +270,7 @@ header("location: customer-dashboard.php");
       })
       </script>
 
-    <div class="col-md-12 order-md-1">
+    <div id="3d_specs" class="col-md-12 order-md-1">
       <h3 class="mb-3">3D Print Specifications <a href="https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/#settings" target="_blank" data-toggle="tooltip" data-placement="right" title="FAQ Specifications section">?</a></h3>
         <div class="row">
             <div class="col-md-3 mb-3" data-toggle="tooltip" data-placement="right" data-trigger="click" title="The percentage of the interior that is made up of material. More infill increases strength and the cost.">
@@ -326,11 +372,14 @@ header("location: customer-dashboard.php");
           </div>
         </div>
     </div>
+
+    <!-- script for first block -->
+
     <!-- new block start-->
-    <div class="col-md-12 order-md-1">
+    <div id="laser_specs" class="col-md-12 order-md-1">
       <!--change link to a future laser cut FAQ page-->
+      <div>
       <h3 class="mb-3"> Laser Cut Specifications <a href="https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/#settings" target="_blank" data-toggle="tooltip" data-placement="right" title="FAQ Specifications section">?</a></h3>
-        <hr class="mb-4">
         <label class="mb-2"> Indicate either cut or engrave properties for each color in laser cut graphic (temporary) </label>
             <div class="input-group">
                 <textarea class="form-control" name="comments" aria-label="additional-comments"></textarea>
@@ -338,7 +387,7 @@ header("location: customer-dashboard.php");
             <div class="invalid-feedback">
             Please provide laser cutting specifications
             </div>
-        </div>
+      </div>
 
         <div>
         <hr class="mb-4">
@@ -386,16 +435,16 @@ header("location: customer-dashboard.php");
         </div>
     </div>
 
-    <div class="col-md-12 order-md-1">
+    <div id="submit_section" class="col-md-12 order-md-1"> 
       <hr class="mb-4">
           <h3 class="mb-2">Additional Comments</h3>
               <div class="input-group">
                   <textarea class="form-control" name="comments" aria-label="additional-comments"></textarea>
               </div>
               <div class="invalid-feedback">
-              Please enter additional comments.
+                Please enter additional comments.
               </div>
-          </div>
+          
 
           <hr class="mb-4">
           <center>
@@ -403,7 +452,7 @@ header("location: customer-dashboard.php");
                   <button class="btn btn-primary btn-lg" type="submit">Submit Print Job</button>
               </form>
           </center>
-    <div>
+      </div>
     <!-- new block end-->
     </form>
   </div>
