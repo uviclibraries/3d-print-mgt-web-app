@@ -73,25 +73,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   }
 /*  Check inputs here */
-
   $infill_bind = intval($_POST["infill"]);
   $scale_bind = intval($_POST["scale"]);
   $layer_bind = floatval(number_format((float)$_POST["layer_height"], 2, '.',''));
   $support_bind = intval($_POST["supports"]);
   $copies_bind = intval($_POST["copies"]);
-  $stmt = $conn->prepare("INSERT INTO print_job (netlink_id, job_name, model_name, infill, scale, layer_height, supports, copies, material_type, comments, status) VALUES (:netlink_id, :job_name, :model_name, :infill, :scale, :layer_height, :supports, :copies, :material_type, :comments, :status)");
+/* added new table insertion here */  
+  //$stmt = $conn->prepare("INSERT INTO print_job (netlink_id, job_name, model_name, infill, scale, layer_height, supports, copies, material_type, comments, status) VALUES (:netlink_id, :job_name, :model_name, :infill, :scale, :layer_height, :supports, :copies, :material_type, :comments, :status)");
+  $stmt = $conn->prepare("INSERT INTO web_job (netlink_id, job_name, status) VALUES (:netlink_id, :job_name, :status)");
   $stmt->bindParam(':netlink_id', $user);
   $stmt->bindParam(':job_name', $_POST["job_name"]);
+  $stmt->bindParam(':status', $status);
+  $stmt->execute();
+
+  if($_POST["job_type"] == "3D Print"){
+    $stmt = $conn->prepare("INSERT INTO web_job (netlink_id, job_name, status) VALUES (:netlink_id, :job_name, :status)");
+    $stmt = $conn->prepare("INSERT INTO 3d_print_job (3d_print_id, model_name, infill, scale, layer_height, supports, copies, material_type, comments) VALUES (:job_id, :model_name, :infill, scale, :layer_height, :supports, :copies, :material_type, :comments)");
+    $stmt->bindParam(':model_name', $hash_name);
+    $stmt->bindParam(':infill', $infill_bind, PDO::PARAM_INT);
+    $stmt->bindParam(':scale', $scale_bind , PDO::PARAM_INT);
+    $stmt->bindParam(':layer_height', $layer_bind);
+    $stmt->bindParam(':supports', $support_bind, PDO::PARAM_INT);
+    $stmt->bindParam(':copies', $copies_bind, PDO::PARAM_INT);
+    $stmt->bindParam(':material_type', $_POST["print_material_type"]);
+    $stmt->bindParam(':comments', $_POST["comments"]);
+  }
+
+
+  /*
   $stmt->bindParam(':model_name', $hash_name);
   $stmt->bindParam(':infill', $infill_bind, PDO::PARAM_INT);
   $stmt->bindParam(':scale', $scale_bind , PDO::PARAM_INT);
   $stmt->bindParam(':layer_height', $layer_bind);
   $stmt->bindParam(':supports', $support_bind, PDO::PARAM_INT);
   $stmt->bindParam(':copies', $copies_bind, PDO::PARAM_INT);
-  $stmt->bindParam(':material_type', $_POST["material_type"]);
+  $stmt->bindParam(':material_type', $_POST["print_material_type"]);
   $stmt->bindParam(':comments', $_POST["comments"]);
-  $stmt->bindParam(':status', $status);
   $stmt->execute();
+  */
 
   $direct_link = "https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/";
   $msg = "
@@ -273,7 +292,7 @@ header("location: customer-dashboard.php");
     <div id="3d_specs" class="col-md-12 order-md-1">
       <h3 class="mb-3">3D Print Specifications <a href="https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/#settings" target="_blank" data-toggle="tooltip" data-placement="right" title="FAQ Specifications section">?</a></h3>
         <div class="row">
-            <div class="col-md-3 mb-3" data-toggle="tooltip" data-placement="right" data-trigger="click" title="The percentage of the interior that is made up of material. More infill increases strength and the cost.">
+            <div class="col-md-3 mb-3" data-toggle="tooltip" data-placement="right" data-trigger="click" title="The percentage of the interior that is made up of material. More infill increases strength, print time, and cost.">
                 <label for="infill">Infill</label>
                 <div class="input-group">
                   <div class="input-group mb-3">
@@ -304,7 +323,7 @@ header("location: customer-dashboard.php");
         </div>
 
         <div class="row">
-          <div class="col-md-3 mb-3" data-toggle="tooltip" data-placement="right" title="Thickness of each layer. Smaller heights increases detail and print times.">
+          <div class="col-md-3 mb-3" data-toggle="tooltip" data-placement="right" title="Thickness of each layer. Smaller heights increases detail and print time.">
             <label for="layer-height">Layer Height</label>
             <select class="custom-select d-block w-100" name="layer_height" id="layer-height" required>
               <option selected="selected">0.2</option>
@@ -316,7 +335,7 @@ header("location: customer-dashboard.php");
               Please select a valid layer height.
             </div>
           </div>
-          <div class="col-md-3 mb-3" data-toggle="tooltip" data-placement="right" title="3D printers cannot print in the air and supports allow builing portions that hang or are suspended. Supports use material and increase cost.">
+          <div class="col-md-3 mb-3" data-toggle="tooltip" data-placement="right" title="3D printers cannot print large overhangs and supports allow builing sections. Supports use material and increase cost.">
             <label for="supports">Supports</label>
             <select class="custom-select d-block w-100" name="supports" id="supports" required>
               <option value="1">Yes</option>
@@ -449,7 +468,7 @@ header("location: customer-dashboard.php");
           <hr class="mb-4">
           <center>
               <form action="customer-dashboard.php">
-                  <button class="btn btn-primary btn-lg" type="submit">Submit Print Job</button>
+                  <button class="btn btn-primary btn-lg" type="submit">Submit</button>
               </form>
           </center>
       </div>
