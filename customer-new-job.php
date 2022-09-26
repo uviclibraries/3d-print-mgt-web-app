@@ -78,17 +78,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $layer_bind = floatval(number_format((float)$_POST["layer_height"], 2, '.',''));
   $support_bind = intval($_POST["supports"]);
   $copies_bind = intval($_POST["copies"]);
-/* added new table insertion here */  
+/* added new table insertion here */
   //$stmt = $conn->prepare("INSERT INTO print_job (netlink_id, job_name, model_name, infill, scale, layer_height, supports, copies, material_type, comments, status) VALUES (:netlink_id, :job_name, :model_name, :infill, :scale, :layer_height, :supports, :copies, :material_type, :comments, :status)");
+  $good_statement = True;
   $stmt = $conn->prepare("INSERT INTO web_job (netlink_id, job_name, status) VALUES (:netlink_id, :job_name, :status)");
   $stmt->bindParam(':netlink_id', $user);
   $stmt->bindParam(':job_name', $_POST["job_name"]);
   $stmt->bindParam(':status', $status);
-  $stmt->execute();
+  $good_statement &= $stmt->execute();
+
+  if(!$good_statement){
+    die("Error during sql execution");
+  }
 
   if($_POST["job_type"] == "3D Print"){
-    $stmt = $conn->prepare("INSERT INTO web_job (netlink_id, job_name, status) VALUES (:netlink_id, :job_name, :status)");
-    $stmt = $conn->prepare("INSERT INTO 3d_print_job (3d_print_id, model_name, infill, scale, layer_height, supports, copies, material_type, comments) VALUES (:job_id, :model_name, :infill, scale, :layer_height, :supports, :copies, :material_type, :comments)");
+    /* insert 3d print job into 3d_print_job table with corrisponding id number */
+    //$get_id_sql = "SELECT MAX(id) FROM web_job WHERE netlink_id=$user";
+    //$curr_id = $conn->query($get_id_sql);
+    
+    $stmt = $conn->prepare("SELECT MAX(id) FROM web_job WHERE netlink_id=:user_netlink");
+    $stmt->bindParam(':user_netlink', $user);
+    $good_statement &= $stmt->execute();
+    //$curr_id = $stmt->fetch(PDO::FETCH_BOTH);
+    $curr_id = $stmt->fetch(PDO::FETCH_NUM)[0];
+
+    if(!$good_statement){
+      die("Error during sql execution");
+    }
+
+    if(!$curr_id){
+      die('No web job entry for username {$user}');
+    }
+
+    $comment_string="id retrieved from web_job: $curr_id";
+
+    $stmt = $conn->prepare("INSERT INTO 3d_print_job (3d_print_id, model_name, infill, scale, layer_height, supports, copies, material_type, comments) VALUES (:3d_print_id, :model_name, :infill, :scale, :layer_height, :supports, :copies, :material_type, :comments)");
+    /* (:3d_print_id, :model_name, :infill, :scale, :layer_height, :supports, :copies, :material_type, :comments) */
+    $stmt->bindParam(':3d_print_id', $curr_id);
     $stmt->bindParam(':model_name', $hash_name);
     $stmt->bindParam(':infill', $infill_bind, PDO::PARAM_INT);
     $stmt->bindParam(':scale', $scale_bind , PDO::PARAM_INT);
@@ -97,20 +123,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bindParam(':copies', $copies_bind, PDO::PARAM_INT);
     $stmt->bindParam(':material_type', $_POST["print_material_type"]);
     $stmt->bindParam(':comments', $_POST["comments"]);
+    //$stmt->bindParam(':comments', $comment_string);
+    $stmt->execute();
   }
-
-
-  /*
-  $stmt->bindParam(':model_name', $hash_name);
-  $stmt->bindParam(':infill', $infill_bind, PDO::PARAM_INT);
-  $stmt->bindParam(':scale', $scale_bind , PDO::PARAM_INT);
-  $stmt->bindParam(':layer_height', $layer_bind);
-  $stmt->bindParam(':supports', $support_bind, PDO::PARAM_INT);
-  $stmt->bindParam(':copies', $copies_bind, PDO::PARAM_INT);
-  $stmt->bindParam(':material_type', $_POST["print_material_type"]);
-  $stmt->bindParam(':comments', $_POST["comments"]);
-  $stmt->execute();
-  */
 
   $direct_link = "https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/";
   $msg = "
