@@ -22,7 +22,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
  #         throw new RuntimeException('Invalid parameters.');
       }
 
-      // Check $_FILES["3d_model"]['error'] value.
       switch ($_FILES["3d_model"]['error']) {
           case UPLOAD_ERR_OK:
               break;
@@ -93,10 +92,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     die("Error during SQL execution");
   }
 
+  // Extract most recent use id from the web job table based on user netlink id
+
   $stmt = $conn->prepare("SELECT MAX(id) FROM web_job WHERE netlink_id=:user_netlink");
   $stmt->bindParam(':user_netlink', $user);
   $good_statement &= $stmt->execute();
-  //$curr_id = $stmt->fetch(PDO::FETCH_BOTH);
   $curr_id = $stmt->fetch(PDO::FETCH_NUM)[0];
 
   if(!$good_statement){
@@ -108,25 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   if($_POST["job_type"] == "3D Print"){
-    /* insert 3d print job into 3d_print_job table with corrisponding id number */
-    //$get_id_sql = "SELECT MAX(id) FROM web_job WHERE netlink_id=$user";
-    //$curr_id = $conn->query($get_id_sql);
-    
-    /*
-    $stmt = $conn->prepare("SELECT MAX(id) FROM web_job WHERE netlink_id=:user_netlink");
-    $stmt->bindParam(':user_netlink', $user);
-    $good_statement &= $stmt->execute();
-    //$curr_id = $stmt->fetch(PDO::FETCH_BOTH);
-    $curr_id = $stmt->fetch(PDO::FETCH_NUM)[0];
-
-    if(!$good_statement){
-      die("Error during SQL execution");
-    }
-
-    if(!$curr_id){
-      die('No web job entry for username {$user}');
-    }
-    */
+    // Use the extracted id to insert job information to the 3d print table
 
     $comment_string="id retrieved from web_job: $curr_id";
 
@@ -142,44 +124,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bindParam(':comments', $_POST["comments"]);
     $stmt->execute();
   }
-  /*else{
-    $stmt -> $conn->prepare("SELECT MAX(id) FROM web_job WHERE netlink_id=:user_netlink");
-    $stmt->bindParam(':user_netlink', $user);
-    $good_statement &= $stmt->execute();
-    $curr_id = $stmt->fetch(PDO::FETCH_NUM)[0];
-
-    if(!$good_statement){
-      die("Error during SQL execution");
-    }
-
-    if(!$curr_id){
-      die('No web job entry for username {$user}');
-    }
-
-    $stmt = $conn->prepare("INSERT INTO laser_cut_job (laser_cut_id, model_name, copies, material_type, comments) VALUES (:laser_cut_id, :model_name, :copies, :material_type, :comments)");
-    $stmt->bindParam('laser_cut_id', $curr_id);
-    $stmt->bindParam(':model_name', $hash_name);
-    $stmt->bindParam(':copies', $laser_copies);
-    $stmt->bindParam(':material_type', $_POST["laser_material_type"]);
-    $stmt->bindParam(':comments', $_POST["comments"]);
-    $stmt->execute();
-  }*/
 
   elseif($_POST["job_type"] == "laser_cut"){
-    /*
-    $stmt -> $conn->prepare("SELECT MAX(id) FROM web_job WHERE netlink_id=:user_netlink");
-    $stmt->bindParam(':user_netlink', $user);
-    $good_statement &= $stmt->execute();
-    $curr_id = $stmt->fetch(PDO::FETCH_NUM)[0];
-
-    if(!$good_statement){
-      die("Error during SQL execution");
-    }
-
-    if(!$curr_id){
-      die('No web job entry for username {$user}');
-    }
-    */
+    // Use extracted id to insert job information to the
 
     $stmt = $conn->prepare("INSERT INTO laser_cut_job (laser_cut_id, model_name, copies, material_type, comments) VALUES (:laser_cut_id, :model_name, :copies, :material_type, :comments)");
     $stmt->bindParam('laser_cut_id', $curr_id);
@@ -192,6 +139,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   }
   else{
+    // Invalid job type
     $job_type = $_POST["job_type"];
     die("$job_type invalid job type");
   }
