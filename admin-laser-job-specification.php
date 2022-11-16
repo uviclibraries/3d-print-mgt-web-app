@@ -1,7 +1,4 @@
 <?php
-
-// DEPRICATED FILE
-
 session_start();
 require ('auth-sec.php'); //Gets CAS & db
 //auth-sec includes: $user, $user_email, $user_type, $user_name
@@ -11,18 +8,9 @@ if ($user_type == 1) {
   die();
 }
 
-$laser_v_print = false;
-
-$stm = $conn->prepare("SELECT * FROM web_job INNER JOIN 3d_print_job ON id=3d_print_id WHERE id=?");
-$stm->execute([$_GET["job_id"]]);
-$print_job=$stm->fetch();
-
 $stm = $conn->prepare("SELECT * FROM web_job INNER JOIN laser_cut_job ON id=laser_cut_id WHERE id=?");
 $stm->execute([$_GET["job_id"]]);
-$print_job=$stm->fetch();
-
-/*add if statement*/
-
+$job=$stm->fetch();
 
 /*
 $stm = $conn->prepare("SELECT * FROM print_job WHERE id=?");
@@ -60,20 +48,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   // change to source from web job and 3d_print_job
-  $stmt = $conn->prepare("UPDATE print_job SET price = :price, infill = :infill, scale = :scale, layer_height = :layer_height, supports = :supports, copies = :copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, model_name_2 =:model_name_2 WHERE id = :job_id;
-  ");
+  $stmt = $conn->prepare("UPDATE web_job INNER JOIN laser_cut_job ON id=laser_cut_id SET price = :price, copies=:copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, model_name_2 =:model_name_2 WHERE id = :job_id;");
+  //$stmt = $conn->prepare("UPDATE print_job SET price = :price, infill = :infill, scale = :scale, layer_height = :layer_height, supports = :supports, copies = :copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, model_name_2 =:model_name_2 WHERE id = :job_id;
+  //");
   $current_date = date("Y-m-d");
 
   $stmt->bindParam(':job_id', $job['id']);
   $price = floatval(number_format((float)$_POST["price"], 2, '.',''));
   $stmt->bindParam(':price', $price);
-  $infill = intval($_POST["infill"]);
-  $stmt->bindParam(':infill', $infill, PDO::PARAM_INT);
-  $scale = intval($_POST["scale"]);
-  $stmt->bindParam(':scale', $scale, PDO::PARAM_INT);
-  $stmt->bindParam(':layer_height', $_POST["layer_height"], PDO::PARAM_STR);
-  $supports = intval($_POST["supports"]) ;
-  $stmt->bindParam(':supports', $supports , PDO::PARAM_INT);
   $copies = intval($_POST["copies"]);
   $stmt->bindParam(':copies', $copies , PDO::PARAM_INT);
   $stmt->bindParam(':material_type', $_POST["material_type"]);
@@ -300,7 +282,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <hr class="mb-6">
 
-    <h3 class="mb-3">3D Model</h3>
+    <h3 class="mb-3">Drawing</h3>
         <?php
         if (is_file(("uploads/" . $job['model_name']))) {
             ?>
@@ -308,7 +290,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <a href="<?php echo "uploads/" . $job['model_name']; ?>" download="<?php
                 $filetype = explode(".", $job['model_name']);
                 echo $job['job_name'] . "." . $filetype[1]; ?>">
-                Download 3D file
+                Download file
             </a>
         <?php
         }
@@ -318,11 +300,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <br>
       <hr class="mb-6">
 
-      <h3 class="mb-3">Modified 3D Model</h3>
+      <h3 class="mb-3">Modified Drawing</h3>
 
     <?php //checks if there is a modify file
     if ($job['model_name_2'] != NULL && is_file(("uploads/" . $job['model_name_2']))) { ?>
-      <a href="<?php echo "uploads/" . $job['model_name_2']; ?>" download>Download Modify 3D file</a>
+      <a href="<?php echo "uploads/" . $job['model_name_2']; ?>" download>Download Drawing file</a>
     <?php } ?>
     <br/>
 
@@ -336,99 +318,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <br>
       <hr class="mb-6">
 
-    <div class="col-md-12 order-md-1">
-      <h4 class="mb-3">Specifications</h4>
-        <div class="row">
-            <div class="col-md-3 mb-3">
-                <label for="username">Infill</label>
-                <div class="input-group">
-                  <div class="input-group mb-3">
-                    <input type="text" name="infill" class="form-control" value="<?php echo $job["infill"]; ?>" placeholder="100" aria-label="100" aria-describedby="basic-addon2">
-                    <div class="input-group-append">
-                    <span class="input-group-text" id="basic-addon2">%</span>
-                    </div>
-                </div>
-                <div class="invalid-feedback" style="width: 100%;">
-                Infill is required.
-                </div>
-            </div>
-            </div>
-            <div class="col-md-3 mb-3">
-                <label for="username">Scale</label>
-                <div class="input-group">
-                <div class="input-group mb-3">
-                    <input type="text" class="form-control" name="scale" value="<?php echo $job["scale"]; ?>" placeholder="100" aria-label="100" aria-describedby="basic-addon2">
-                    <div class="input-group-append">
-                        <span class="input-group-text" id="basic-addon2">%</span>
-                    </div>
-                    </div>
-                <div class="invalid-feedback" style="width: 100%;">
-                    Scale is required.
-                </div>
-                </div>
-            </div>
+      <h5 class="mb-2">Drawing Description</h5>
+        <div class="input-group">
+            <textarea class="form-control" aria-label="additional-comments" readonly><?php echo $job["specifications"]; ?></textarea>
         </div>
-
-        <div class="row">
-          <div class="col-md-3 mb-3">
-            <label for="layer-height">Layer Height</label>
-            <select class="custom-select d-block w-100" name="layer_height" id="layer-height">
-              <option <?php if ($job["layer_height"]== 0.2){echo "selected";} ?>>0.2</option>
-              <option <?php if ($job["layer_height"]== 0.15){echo "selected";} ?>>0.15</option>
-              <option <?php if ($job["layer_height"]== 0.1){echo "selected";} ?>>0.1</option>
-              <option <?php if ($job["layer_height"]== 0.06){echo "selected";} ?>>0.06</option>
-            </select>
-          </div>
-          <div class="col-md-3 mb-3">
-            <label for="supports">Supports</label>
-            <select class="custom-select d-block w-100" name="supports" id="supports">
-              <option value = 1  <?php if ($job["supports"]== 1){echo "selected";} ?>>Yes</option>
-              <option value = 0 <?php if ($job["supports"]== 0){echo "selected";} ?>>No</option>
-            </select>
-          </div>
-        </div>
-
-        <div>
         <hr class="mb-4">
-          <div class="col-md-3 mb-3">
-            <label for="copies">Copies</label>
-            <select class="custom-select d-block w-100" name="copies" id="copies">
-              <option <?php if ($job["copies"]== 1){echo "selected";} ?>>1</option>
-              <option <?php if ($job["copies"]== 2){echo "selected";} ?>>2</option>
-              <option <?php if ($job["copies"]== 3){echo "selected";} ?>>3</option>
-              <option <?php if ($job["copies"]== 4){echo "selected";} ?>>4</option>
-              <option <?php if ($job["copies"]== 5){echo "selected";} ?>>5</option>
-              <option <?php if ($job["copies"]== 6){echo "selected";} ?>>6</option>
-              <option <?php if ($job["copies"]== 7){echo "selected";} ?>>7</option>
-              <option <?php if ($job["copies"]== 8){echo "selected";} ?>>8</option>
-              <option <?php if ($job["copies"]== 9){echo "selected";} ?>>9</option>
-              <option <?php if ($job["copies"]== 10){echo "selected";} ?>>10</option>
-            </select>
-          </div>
+        <h5 class="mb-2">Copies</h5>
+        <div class="col-md-3 mb-3">
+
+          <select class="custom-select d-block w-100" name="copies" id="copies">
+            <option <?php if ($job["copies"]== 1){echo "selected";} ?>>1</option>
+            <option <?php if ($job["copies"]== 2){echo "selected";} ?>>2</option>
+            <option <?php if ($job["copies"]== 3){echo "selected";} ?>>3</option>
+            <option <?php if ($job["copies"]== 4){echo "selected";} ?>>4</option>
+            <option <?php if ($job["copies"]== 5){echo "selected";} ?>>5</option>
+            <option <?php if ($job["copies"]== 6){echo "selected";} ?>>6</option>
+            <option <?php if ($job["copies"]== 7){echo "selected";} ?>>7</option>
+            <option <?php if ($job["copies"]== 8){echo "selected";} ?>>8</option>
+            <option <?php if ($job["copies"]== 9){echo "selected";} ?>>9</option>
+            <option <?php if ($job["copies"]== 10){echo "selected";} ?>>10</option>
+          </select>
         </div>
 
+        
         <hr class="mb-4">
         <h5 class="mb-2">Material Type</h5>
         <div class="d-block my-3">
           <div class="custom-control custom-radio">
-            <input id="pla" name="material_type" value="PLA" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "PLA"){echo "checked";} ?>>
-            <label class="custom-control-label" for="pla">PLA</label>
+            <input id="mdf_6mm" name="material_type" value="MDF 6mm" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "MDF 6mm"){echo "checked";} ?>>
+            <label class="custom-control-label" for="mdf_6mm">MDF 6mm</label>
           </div>
           <div class="custom-control custom-radio">
-            <input id="pla-pva" name="material_type" value="PLA + PVA" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "PLA + PVA"){echo "checked";} ?>>
-            <label class="custom-control-label" for="pla-pva">PLA + PVA</label>
+            <input id="mdf_3mm" name="material_type" value="MDF 3mm" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "MDF 3mm"){echo "checked";} ?>>
+            <label class="custom-control-label" for="mdf_3mmm">MDF 3mm</label>
           </div>
           <div class="custom-control custom-radio">
-            <input id="tpu95" name="material_type" value="TPU95" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "TPU95"){echo "checked";} ?>>
-            <label class="custom-control-label" for="tpu95">TPU95</label>
+            <input id="plywood_3mm" name="material_type" value="Plywood_3mm" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "Plywood 3mm"){echo "checked";} ?>>
+            <label class="custom-control-label" for="plywood_3mm">Plywood 3mm</label>
           </div>
           <div class="custom-control custom-radio">
-            <input id="other" name="material_type" value="Other" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "Other"){echo "checked";} ?>>
+            <input id="laser_cut_other" name="material_type" value="Other" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "Other"){echo "checked";} ?>>
             <label class="custom-control-label" for="other">Other</label>
-            <small class="text-muted"> - Elaborate in Additional Comments section</small>
+            <!-- <small class="text-muted"> - Elaborate in Additional Comments section</small> -->
           </div>
         </div>
-
+      
         <hr class="mb-4">
         <h5 class="mb-2">Additional Comments</h5>
             <div class="input-group">

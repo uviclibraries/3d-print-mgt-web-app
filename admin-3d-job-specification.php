@@ -1,7 +1,4 @@
 <?php
-
-// DEPRICATED FILE
-
 session_start();
 require ('auth-sec.php'); //Gets CAS & db
 //auth-sec includes: $user, $user_email, $user_type, $user_name
@@ -11,17 +8,9 @@ if ($user_type == 1) {
   die();
 }
 
-$laser_v_print = false;
-
 $stm = $conn->prepare("SELECT * FROM web_job INNER JOIN 3d_print_job ON id=3d_print_id WHERE id=?");
 $stm->execute([$_GET["job_id"]]);
-$print_job=$stm->fetch();
-
-$stm = $conn->prepare("SELECT * FROM web_job INNER JOIN laser_cut_job ON id=laser_cut_id WHERE id=?");
-$stm->execute([$_GET["job_id"]]);
-$print_job=$stm->fetch();
-
-/*add if statement*/
+$job=$stm->fetch();
 
 
 /*

@@ -52,6 +52,7 @@ CREATE TABLE laser_cut_job (
   `model_name` varchar(250) NOT NULL,
   `model_name_2` varchar(250) NOT NULL,
   `copies` int(11) NOT NULL,
+  `specifications` text,
   `material_type` varchar(100) NOT NULL,
   `comments` text
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
