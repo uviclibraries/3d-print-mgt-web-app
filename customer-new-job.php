@@ -82,10 +82,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $laser_copies = intval($_POST["laser_copies"]);
 
   $good_statement = True;
-  $stmt = $conn->prepare("INSERT INTO web_job (netlink_id, job_name, status) VALUES (:netlink_id, :job_name, :status)");
+  $stmt = $conn->prepare("INSERT INTO web_job (netlink_id, job_name, status) VALUES (:netlink_id, :job_name, :job_status)");
   $stmt->bindParam(':netlink_id', $user);
   $stmt->bindParam(':job_name', $_POST["job_name"]);
-  $stmt->bindParam(':status', $status);
+  $stmt->bindParam(':job_status', $status);
   $good_statement &= $stmt->execute();
 
   if(!$good_statement){
@@ -475,7 +475,7 @@ header("location: customer-dashboard.php");
             <label class="custom-control-label" for="mdf_3mmm">MDF 3mm</label>
           </div>
           <div class="custom-control custom-radio">
-            <input id="plywood_3mm" name="laser_material_type" value="Plywood_3mm" type="radio" class="custom-control-input" required>
+            <input id="plywood_3mm" name="laser_material_type" value="Plywood 3mm" type="radio" class="custom-control-input" required>
             <label class="custom-control-label" for="plywood_3mm">Plywood 3mm</label>
           </div>
           <div class="custom-control custom-radio">

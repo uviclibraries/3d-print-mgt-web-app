@@ -2,21 +2,15 @@
 session_start();
 require ('auth-sec.php'); //Gets CAS & db
 
-/* DEPRECATED FILE */
-
 /*
 $stm = $conn->prepare("SELECT * FROM print_job WHERE id=?");
 $stm->execute([$_GET["job_id"]]);
 $job=$stm->fetch();
 */
 
-$stm = $conn->prepare("SELECT * FROM web_job INNER JOIN 3d_print_job ON id=3d_print_id WHERE id=?");
-$stm->execute([$_GET["job_id"]]);
-$print_job=$stm->fetch();
-
 $stm = $conn->prepare("SELECT * FROM web_job INNER JOIN laser_cut_job ON id=laser_cut_id WHERE id=?");
 $stm->execute([$_GET["job_id"]]);
-$print_job=$stm->fetch();
+$job=$stm->fetch();
 
 //Only owner and admin can see.
 if ($user != $job["netlink_id"] && $user_type == 1) {
@@ -92,17 +86,17 @@ if ($user != $job["netlink_id"] && $user_type == 1) {
     <div class="container">
   <div class="py-5 text-center">
 
-    <h1>Submitted Print Job</h1>
+    <h1>Submitted Laser Cut Job</h1>
     </div>
 
     <div class="col-md-12 order-md-1">
-        <h3 class="mb-3">Print Job Name</h3>
+        <h3 class="mb-3">Laser Cut Job Name</h3>
         <form class="needs-validation" novalidate>
           <div class="row">
             <div class="col-md-12 mb-3">
               <input type="text" class="form-control" id="printJobName" placeholder="Velociraptor" value="<?php echo $job["job_name"]; ?>" required readonly>
               <div class="invalid-feedback">
-                Valid print job name is required.
+                Valid lsaer cut job name is required.
               </div>
             </div>
           </div>
@@ -128,7 +122,7 @@ if ($user != $job["netlink_id"] && $user_type == 1) {
 
           <hr class="mb-6">
 
-    <h3 class="mb-3">Upload 3D Model</h3>
+    <h3 class="mb-3">Upload Laser Cut Drawing</h3>
     <?php
     if (is_file(("uploads/" . $job['model_name']))) {
         ?>
@@ -136,7 +130,7 @@ if ($user != $job["netlink_id"] && $user_type == 1) {
         <a href="<?php echo "uploads/" . $job['model_name']; ?>" download="<?php
             $filetype = explode(".", $job['model_name']);
             echo $job['job_name'] . "." . $filetype[1]; ?>">
-            Download 3D file
+            Download Drawing file
         </a>
     <?php
     }
@@ -182,59 +176,8 @@ if ($user != $job["netlink_id"] && $user_type == 1) {
     <div class="col-md-12 order-md-1">
       <h4 class="mb-3">Specifications</h4>
       <form class="needs-validation" novalidate>
-        <div class="row">
-            <div class="col-md-3 mb-3">
-                <label for="username">Infill</label>
-                <div class="input-group">
-                  <div class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="100" value="<?php echo $job["infill"]; ?>" aria-label="100" aria-describedby="basic-addon2" readonly>
-                    <div class="input-group-append">
-                    <span class="input-group-text" id="basic-addon2">%</span>
-                    </div>
-                </div>
-                <div class="invalid-feedback" style="width: 100%;">
-                Infill is required.
-                </div>
-            </div>
-            </div>
-            <div class="col-md-3 mb-3">
-                <label for="username">Scale</label>
-                <div class="input-group">
-                <div class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="100" value="<?php echo $job["scale"]; ?>" aria-label="100" aria-describedby="basic-addon2" readonly>
-                    <div class="input-group-append">
-                        <span class="input-group-text" id="basic-addon2">%</span>
-                    </div>
-                    </div>
-                <div class="invalid-feedback" style="width: 100%;">
-                    Scale is required.
-                </div>
-                </div>
-            </div>
-        </div>
 
-        <div class="row">
-
-        <div class="col-md-3 mb-3">
-                <label for="username">Layer Height</label>
-                <div class="input-group">
-                <div class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="100" value="<?php echo $job["layer_height"]; ?>" aria-label="100" aria-describedby="basic-addon2" readonly>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-3 mb-3">
-                <label for="username">Supports</label>
-                <div class="input-group">
-                <div class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="100" value="<?php if ($job["supports"]==1) {echo "Yes";} else {echo "No";} ?>" aria-label="100" aria-describedby="basic-addon2" readonly>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3 mb-3">
+          <div class="col-md-3 mb-3">
                 <label for="username">Copies</label>
                 <div class="input-group">
                 <div class="input-group mb-3">
@@ -243,24 +186,29 @@ if ($user != $job["netlink_id"] && $user_type == 1) {
                 </div>
             </div>
 
-            <hr class="mb-4">
-            <div class="col-md-3 mb-3">
-                <label for="username">Material Type</label>
-                <div class="input-group">
-                <div class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="100" value="<?php echo $job["material_type"]; ?>" aria-label="100" aria-describedby="basic-addon2" readonly>
-                    </div>
-                </div>
+          <div class="col-md-3 mb-3">
+            <label for="username">Drawing Description</label>
+            <div class="input-group">
+              <textarea class="form-control" aria-label="additional-comments" readonly><?php echo $job["specifications"]; ?></textarea>
             </div>
+          </div>
+
+
+          <hr class="mb-4">
+          <div class="col-md-3 mb-3">
+              <label for="username">Material Type</label>
+              <div class="input-group">
+              <div class="input-group mb-3">
+                  <input type="text" class="form-control" placeholder="100" value="<?php echo $job["material_type"]; ?>" aria-label="100" aria-describedby="basic-addon2" readonly>
+                  </div>
+              </div>
+          </div>
 
         <hr class="mb-4">
         <h5 class="mb-2">Additional Comments</h5>
             <div class="input-group">
                 <textarea class="form-control" aria-label="additional-comments"readonly ><?php echo $job["comments"]; ?>
                 </textarea>
-            </div>
-            <div class="invalid-feedback">
-            Please enter additional comments.
             </div>
         </div>
 
