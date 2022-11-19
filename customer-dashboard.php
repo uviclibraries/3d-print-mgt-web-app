@@ -110,7 +110,7 @@ foreach ($data as $job) {
     <div class="container">
   <div class="py-5 text-center">
 
-    <h1><b> DSC 3D printing dashboard</b></h1>
+    <h1><b> DSC 3D Printing and Laser Cutting Dashboard</b></h1>
   </div>
 
   <div class="row">
@@ -119,18 +119,19 @@ foreach ($data as $job) {
     </div>
 
     <div class="col-md-12 order-md-1">
+      <div class="py-5 text-center">
 
-      <div class="row">
-        <div class="btn-auto mr-auto">
-        <a href="customer-new-job.php">
-          <button class="btn btn-primary btn-lg" type="submit">Create New Print Job</button>
-        </a>
+        <div class="row">
+          <div class="btn-auto mr-auto">
+          <a href="customer-new-job.php">
+            <button class="btn btn-primary btn-lg" type="submit">Create New Print Job</button>
+          </a>
+          </div>
+          <div class="btn-auto mr-auto">
+          <a href="https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/">
+            <button class="btn btn-danger btn-lg" type="submit">FAQ</button>
+          </a>
         </div>
-        <div class="btn-auto mr-auto">
-        <a href="https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/">
-          <button class="btn btn-danger btn-lg" type="submit">FAQ</button>
-        </a>
-      </div>
 
         <div class="btn-auto mr-auto">
           <?php if ($user_type == 0){ ?>
@@ -143,6 +144,9 @@ foreach ($data as $job) {
             </a>
           <?php }  ?>
         </div>
+        
+      </div>
+
     </div>
 
         <hr class="mb-12">

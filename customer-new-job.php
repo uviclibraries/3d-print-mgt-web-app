@@ -73,6 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   }
 /*  Check inputs here */
+  $current_date = date("Y-m-d");
   $infill_bind = intval($_POST["infill"]);
   $scale_bind = intval($_POST["scale"]);
   $layer_bind = floatval(number_format((float)$_POST["layer_height"], 2, '.',''));
@@ -82,11 +83,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $laser_copies = intval($_POST["laser_copies"]);
 
   $good_statement = True;
-  $stmt = $conn->prepare("INSERT INTO web_job (netlink_id, job_name, status) VALUES (:netlink_id, :job_name, :job_status)");
+  $stmt = $conn->prepare("INSERT INTO web_job (netlink_id, job_name, submission_date, status) VALUES (:netlink_id, :job_name, :submission_date, :job_status)");
   $stmt->bindParam(':netlink_id', $user);
   $stmt->bindParam(':job_name', $_POST["job_name"]);
   $stmt->bindParam(':job_status', $status);
+  $stmt->bindParam(':submission_date', $current_date);
   $good_statement &= $stmt->execute();
+
+  /*TODO also validate laser cutting variables*/
 
   if(!$good_statement){
     die("Error during SQL execution");
@@ -110,8 +114,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if($_POST["job_type"] == "3D Print"){
     // Use the extracted id to insert job information to the 3d print table
 
-    $comment_string="id retrieved from web_job: $curr_id";
-
     $stmt = $conn->prepare("INSERT INTO 3d_print_job (3d_print_id, model_name, infill, scale, layer_height, supports, copies, material_type, comments) VALUES (:3d_print_id, :model_name, :infill, :scale, :layer_height, :supports, :copies, :material_type, :comments)");
     $stmt->bindParam(':3d_print_id', $curr_id);
     $stmt->bindParam(':model_name', $hash_name);
@@ -128,11 +130,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   elseif($_POST["job_type"] == "laser_cut"){
     // Use extracted id to insert job information to the
 
-    $stmt = $conn->prepare("INSERT INTO laser_cut_job (laser_cut_id, model_name, copies, material_type, comments) VALUES (:laser_cut_id, :model_name, :copies, :material_type, :comments)");
+    $stmt = $conn->prepare("INSERT INTO laser_cut_job (laser_cut_id, model_name, copies, material_type, specifications, comments) VALUES (:laser_cut_id, :model_name, :copies, :material_type, :specifications, :comments)");
     $stmt->bindParam('laser_cut_id', $curr_id);
     $stmt->bindParam(':model_name', $hash_name);
     $stmt->bindParam(':copies', $laser_copies);
     $stmt->bindParam(':material_type', $_POST["laser_material_type"]);
+    $stmt->bindParam(':specifications', $_POST["user_specs"]);
     $stmt->bindParam(':comments', $_POST["comments"]);
     $stmt->execute();
 
@@ -433,7 +436,7 @@ header("location: customer-dashboard.php");
       <h3 class="mb-3"> Laser Cut Specifications <a href="https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/#settings" target="_blank" data-toggle="tooltip" data-placement="right" title="FAQ Specifications section">?</a></h3>
         <label class="mb-2"> Indicate either cut or engrave properties for each color in laser cut graphic (temporary) </label>
             <div class="input-group">
-                <textarea class="form-control" name="comments" aria-label="additional-comments"></textarea>
+                <textarea class="form-control" name="user_specs" aria-label="user-specs"></textarea>
             </div>
             <div class="invalid-feedback">
             Please provide laser cutting specifications
