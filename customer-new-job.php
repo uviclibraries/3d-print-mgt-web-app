@@ -475,7 +475,7 @@ header("location: customer-dashboard.php");
           </div>
           <div class="custom-control custom-radio">
             <input id="mdf_3mm" name="laser_material_type" value="MDF 3mm" type="radio" class="custom-control-input" required>
-            <label class="custom-control-label" for="mdf_3mmm">MDF 3mm</label>
+            <label class="custom-control-label" for="mdf_3mm">MDF 3mm</label>
           </div>
           <div class="custom-control custom-radio">
             <input id="plywood_3mm" name="laser_material_type" value="Plywood 3mm" type="radio" class="custom-control-input" required>
