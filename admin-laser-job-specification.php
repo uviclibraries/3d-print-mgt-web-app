@@ -85,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $userSQL->execute();
       $job_owner = $userSQL->fetch();
 
-      $direct_link = "https://webapp.library.uvic.ca/3dprint/customer-job-information.php?job_id=". $job['id'];
+      $direct_link = "https://webapp.library.uvic.ca/3dprint/customer-laser-job-information.php?job_id=". $job['id'];
       $direct_link2 = "https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/";
       $msg = "
       <html>

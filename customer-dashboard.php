@@ -111,7 +111,7 @@ foreach ($data as $job) {
   <div class="py-5 text-center">
 
     <h1><b> DSC 3D Printing and Laser Cutting Dashboard</b></h1>
-    <p>This is a new version of our web app that includes a laser cutting service. If you encounter a problem or have questions about laser cutting, contact dscommons@uvic.ca<p>
+    <p><b>This is a new version of our web app that includes a laser cutting service.</b></p> <p><b>If you encounter a problem or have questions about laser cutting, contact: <a href=“mailto:dscommons@uvic.ca”>dscommons@uvic.ca</a></b></p>
   </div>
 
   <div class="row">
