@@ -3,9 +3,9 @@
 // moneris.inc.php  -  moneris HPP parameters
 //
 
-$moneris_url = 'https://esqa.moneris.com/HPPDP/index.php';
-$moneris_store_id = 'N3JUP00754';
-$moneris_hpp_key = 'hpBKH4NVMGC8';
+$moneris_url = 'https://www3.moneris.com/HPPDP/index.php';
+$moneris_store_id = 'UFRCT79462';
+$moneris_hpp_key = 'hpIKCP6P9SUJ';
 $moneris_note = 'UVic Libraries 3D Print Job Payment';
 
 // If $moneris_log is enabled, then $moneris_log_file must be writable

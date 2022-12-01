@@ -12,7 +12,7 @@
   <!--header link-->
   <link rel="stylesheet" href="../css/uvic_banner.css">
   <link rel="icon" href="https://www.uvic.ca/assets/core-4-0/img/favicon-32.png">
-  <title>Moneris Transaction Cancelled</title>
+  <title>Moneris Transaction Declined</title>
 </head>
 <body>
 
@@ -34,9 +34,5 @@
 <p>
 Your payment attempt was cancelled.
 </p>
-<br>
-<a href="../customer-dashboard.php">
-<button type="button" type="submit">Return</button>
-</a>
 </body>
 </html>
