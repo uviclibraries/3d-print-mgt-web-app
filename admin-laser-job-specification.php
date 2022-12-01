@@ -349,7 +349,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           </div>
           <div class="custom-control custom-radio">
             <input id="mdf_3mm" name="material_type" value="MDF 3mm" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "MDF 3mm"){echo "checked";} ?>>
-            <label class="custom-control-label" for="mdf_3mmm">MDF 3mm</label>
+            <label class="custom-control-label" for="mdf_3mm">MDF 3mm</label>
           </div>
           <div class="custom-control custom-radio">
             <input id="plywood_3mm" name="material_type" value="Plywood_3mm" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "Plywood 3mm"){echo "checked";} ?>>

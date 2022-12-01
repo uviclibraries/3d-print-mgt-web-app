@@ -113,7 +113,7 @@ if ($user != $job["netlink_id"] && $user_type == 1) {
                 </div>
             </div>
             <?php if ($job["status"] =="archived" && is_file(("uploads/" . $job['model_name']))){ ?>
-              <a class="btn btn-md btn-primary btn-" href="customer-revive-job.php?job_id=<?php echo $job['id']?>" role="button">Revive</a>
+              <!-- <a class="btn btn-md btn-primary btn-" href="customer-revive-job.php?job_id=<?php echo $job['id']?>" role="button">Revive</a> -->
             <?php } ?>
             </div>
             </div>

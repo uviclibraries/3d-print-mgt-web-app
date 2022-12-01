@@ -24,13 +24,13 @@ if (isset($_GET['searchdate_start']) && ($_GET['searchdate_start'] != "" && $_GE
 
 //Check if parameters are empty
 if ($getcheck[0]==FALSE && $getcheck[1]==FALSE && $getcheck[2]==FALSE) {
-  $stm = $conn->query("SELECT id, job_name, netlink_id, status, completed_date FROM print_job WHERE status = 'completed' OR status = 'archived' OR status = 'cancelled' ORDER BY completed_date DESC");
+  $stm = $conn->query("SELECT id, job_name, netlink_id, status, completed_date FROM web_job WHERE status = 'completed' OR status = 'archived' OR status = 'cancelled' ORDER BY completed_date DESC");
 }
 //find out what parameters are being searched for
 else{
 
   //build sql query line based on search parameters
-  $searchline = "SELECT id, job_name, netlink_id, status, completed_date FROM print_job WHERE (status = 'completed' OR status = 'archived' OR status = 'cancelled') AND " . implode(" AND ", $sql_line) . " ORDER BY completed_date DESC";
+  $searchline = "SELECT id, job_name, netlink_id, status, completed_date FROM web_job WHERE (status = 'completed' OR status = 'archived' OR status = 'cancelled') AND " . implode(" AND ", $sql_line) . " ORDER BY completed_date DESC";
   $stm = $conn->prepare($searchline);
   //echo $searchline . "\n";
 
