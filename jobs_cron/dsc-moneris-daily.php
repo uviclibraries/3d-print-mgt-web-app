@@ -14,10 +14,6 @@ $header = array("Order ID", "Netlink ID", "Full Name", "Date", "Time", "Message"
 $fix = array("Result", "Trans Name", "f4l4");
 $header = array_merge($header, $fix);
 
-foreach ($daily_results as $row) {
-  fputcsv($output, $row);
-}
-
 $sum = 0;
 $direct_link = "https://webapp.library.uvic.ca/3dprint/admin-reports.php?approved=on&searchdate_start=". $yesterday ."&searchdate_end=". $yesterday;
 $msg = "
