@@ -86,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $job_owner = $userSQL->fetch();
 
       $direct_link = "https://webapp.library.uvic.ca/3dprint/customer-laser-job-information.php?job_id=". $job['id'];
-      $direct_link2 = "https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/";
+      $direct_link2 = "https://onlineacademiccommunity.uvic.ca/dsc/how-to-laser-cut/";
       $msg = "
       <html>
       <head>
@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </head>
       <body>
       <p> Hello, ". $job_owner['name'] .". This is an automated email from the DSC. </p>
-      <p> Your 3D print job; " . $job['job_name'] . " has been evaluated at a cost of $" . (number_format((float)$_POST["price"], 2, '.','')) . " </p>
+      <p> Your laser cutting job; " . $job['job_name'] . " has been evaluated at a cost of $" . (number_format((float)$_POST["price"], 2, '.','')) . " </p>
       <p> Please make your payment <a href=". $direct_link .">here</a> for it to be placed in our printing queue.</p>
       <p>If you have any questions please review our <a href=". $direct_link2 .">FAQ</a> or email us at dscommons@uvic.ca.</p>
       </body>
@@ -102,7 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $headers = "MIME-Version: 1.0" . "\r\n";
       $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
       $headers .= "From: dscommons@uvic.ca" . "\r\n";
-      mail($job_owner['email'],"Your 3D Print is ready for payment",$msg,$headers);
+      mail($job_owner['email'],"Your laser cut is ready for payment",$msg,$headers);
     }
   } elseif($_POST['status'] == "paid"){
     //this is done automatically when payment is received.
@@ -131,14 +131,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </head>
       <body>
       <p>Hello, ". $job_owner['name'] .". This is an automated email from the DSC. </p>
-      <p> Your 3D print job; " . $job['job_name'] . " has been printed. You can pick it up from the front desk at the McPherson Library.</p>
+      <p> Your laser cutting job; " . $job['job_name'] . " has been completed. You can pick it up from the front desk at the McPherson Library.</p>
       <p>Please check up to date library hours and safety guidelines by checking the library website <a href=". $direct_link .">here</a></p>
       </body>
       </html>";
       $headers = "MIME-Version: 1.0" . "\r\n";
       $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
       $headers .= "From: dscommons@uvic.ca" . "\r\n";
-      mail($job_owner['email'], "Your 3D Print is ready for collection",$msg,$headers);
+      mail($job_owner['email'], "Your laser cut is ready for collection",$msg,$headers);
     }
   } elseif($_POST['status'] == "archived"){
     $d4 = $current_date;
@@ -354,6 +354,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <div class="custom-control custom-radio">
             <input id="plywood_3mm" name="material_type" value="Plywood_3mm" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "Plywood 3mm"){echo "checked";} ?>>
             <label class="custom-control-label" for="plywood_3mm">Plywood 3mm</label>
+          </div>
+          <div class="custom-control custom-radio">
+            <input id="plywood_6mm" name="material_type" value="Plywood_6mm" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "Plywood 6mm"){echo "checked";} ?>>
+            <label class="custom-control-label" for="plywood_6mm">Plywood 6mm</label>
           </div>
           <div class="custom-control custom-radio">
             <input id="laser_cut_other" name="material_type" value="Other" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "Other"){echo "checked";} ?>>

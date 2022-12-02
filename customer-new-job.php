@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $file_array = explode(".",$file_name);
       $ext = end($file_array);
       $explode_len = count($file_array);
-      if (!in_array($ext, ["stl", "STL", "obj", "3mf", "gcode","svg", "pdf"])|| $explode_len > 2) {
+      if (!in_array($ext, ["stl", "STL", "obj", "3mf", "gcode","svg", "pdf", "PDF"])|| $explode_len > 2) {
           throw new RuntimeException('Invalid file format.');
       }
 
@@ -161,7 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $headers = "MIME-Version: 1.0" . "\r\n";
   $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
   $headers .= "From: dscommons@uvic.ca" . "\r\n";
-  mail($user_email,"3D Print - New Job",$msg,$headers);
+  mail($user_email,"DSC - New Job",$msg,$headers);
 
 header("location: customer-dashboard.php");
 }
@@ -476,6 +476,10 @@ header("location: customer-dashboard.php");
           <div class="custom-control custom-radio">
             <input id="mdf_3mm" name="laser_material_type" value="MDF 3mm" type="radio" class="custom-control-input" required>
             <label class="custom-control-label" for="mdf_3mm">MDF 3mm</label>
+          </div>
+          <div class="custom-control custom-radio">
+            <input id="plywood_6mm" name="laser_material_type" value="Plywood 6mm" type="radio" class="custom-control-input" required>
+            <label class="custom-control-label" for="plywood_6mm">Plywood 6mm</label>
           </div>
           <div class="custom-control custom-radio">
             <input id="plywood_3mm" name="laser_material_type" value="Plywood 3mm" type="radio" class="custom-control-input" required>
