@@ -1,7 +1,4 @@
 <?php
-
-// DEPRICATED FILE
-
 session_start();
 require ('auth-sec.php'); //Gets CAS & db
 //auth-sec includes: $user, $user_email, $user_type, $user_name
@@ -11,17 +8,9 @@ if ($user_type == 1) {
   die();
 }
 
-$laser_v_print = false;
-
 $stm = $conn->prepare("SELECT * FROM web_job INNER JOIN 3d_print_job ON id=3d_print_id WHERE id=?");
 $stm->execute([$_GET["job_id"]]);
-$print_job=$stm->fetch();
-
-$stm = $conn->prepare("SELECT * FROM web_job INNER JOIN laser_cut_job ON id=laser_cut_id WHERE id=?");
-$stm->execute([$_GET["job_id"]]);
-$print_job=$stm->fetch();
-
-/*add if statement*/
+$job=$stm->fetch();
 
 
 /*
@@ -60,8 +49,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   // change to source from web job and 3d_print_job
-  $stmt = $conn->prepare("UPDATE print_job SET price = :price, infill = :infill, scale = :scale, layer_height = :layer_height, supports = :supports, copies = :copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, model_name_2 =:model_name_2 WHERE id = :job_id;
-  ");
+  $stmt = $conn->prepare("UPDATE web_job INNER JOIN 3d_print_job ON id=3d_print_id SET price = :price, infill = :infill, scale = :scale, layer_height = :layer_height, supports = :supports, copies = :copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, model_name_2 =:model_name_2 WHERE id = :job_id;");
+  //$stmt = $conn->prepare("UPDATE print_job SET price = :price, infill = :infill, scale = :scale, layer_height = :layer_height, supports = :supports, copies = :copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, model_name_2 =:model_name_2 WHERE id = :job_id;
+  //");
   $current_date = date("Y-m-d");
 
   $stmt->bindParam(':job_id', $job['id']);
@@ -104,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $userSQL->execute();
       $job_owner = $userSQL->fetch();
 
-      $direct_link = "https://webapp.library.uvic.ca/3dprint/customer-job-information.php?job_id=". $job['id'];
+      $direct_link = "https://webapp.library.uvic.ca/3dprint/customer-3d-job-information.php?job_id=". $job['id'];
       $direct_link2 = "https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/";
       $msg = "
       <html>

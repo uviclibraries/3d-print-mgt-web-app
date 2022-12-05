@@ -8,42 +8,86 @@ if ($user_type == 1) {
   die();
 }
 
-$stm = $conn->query("SELECT print_job.id as id, print_job.job_name AS job_name, print_job.status AS status, print_job.submission_date AS submission_date, users.name AS name FROM print_job INNER JOIN users ON print_job.netlink_id = users.netlink_id WHERE print_job.status = 'submitted' ORDER BY print_job.submission_date ASC");
-$job1 = $stm->fetchAll();
+//pull only 3d print strings from web_job
 
-$stm = $conn->query("SELECT print_job.id as id, print_job.job_name as job_name, print_job.status AS status, print_job.priced_date AS priced_date, users.name AS name FROM print_job INNER JOIN users ON print_job.netlink_id = users.netlink_id WHERE print_job.status = 'pending payment' ORDER BY print_job.priced_date ASC");
-$job2 = $stm->fetchAll();
+$stm = $conn->query("SELECT web_job.id AS id, web_job.job_name AS job_name, web_job.status AS status, web_job.submission_date AS submission_date, users.name AS name FROM web_job INNER JOIN users ON web_job.netlink_id=users.netlink_id INNER JOIN 3d_print_job ON web_job.id=3d_print_job.3d_print_id WHERE web_job.status = 'submitted' ORDER BY web_job.submission_date ASC;");
+$print_job1 = $stm->fetchAll();
 
-$stm = $conn->query("SELECT print_job.id as id, print_job.job_name AS job_name, print_job.status AS status, print_job.paid_date AS paid_date, users.name AS name FROM print_job INNER JOIN users ON print_job.netlink_id = users.netlink_id WHERE print_job.status = 'paid' ORDER BY print_job.paid_date ASC");
-$job3 = $stm->fetchAll();
+$stm = $conn->query("SELECT web_job.id AS id, web_job.job_name AS job_name, web_job.status AS status, web_job.priced_date AS priced_date, users.name AS name FROM web_job INNER JOIN users ON web_job.netlink_id = users.netlink_id INNER JOIN 3d_print_job ON web_job.id=3d_print_job.3d_print_id WHERE web_job.status = 'pending payment' ORDER BY web_job.priced_date ASC");
+$print_job2 = $stm->fetchAll();
 
-$stm = $conn->query("SELECT print_job.id as id, print_job.job_name AS job_name, print_job.status AS status, print_job.printing_date AS printing_date, users.name as name FROM print_job INNER JOIN users ON print_job.netlink_id = users.netlink_id WHERE print_job.status = 'printing' ORDER BY print_job.printing_date ASC");
-$job4 = $stm->fetchAll();
+$stm = $conn->query("SELECT web_job.id AS id, web_job.job_name AS job_name, web_job.status AS status, web_job.paid_date AS paid_date, users.name AS name FROM web_job INNER JOIN users ON web_job.netlink_id = users.netlink_id INNER JOIN 3d_print_job ON web_job.id=3d_print_job.3d_print_id WHERE web_job.status = 'paid' ORDER BY web_job.paid_date ASC");
+$print_job3 = $stm->fetchAll();
 
-$stm = $conn->query("SELECT print_job.id as id, print_job.job_name AS job_name, print_job.status AS status, print_job.completed_date AS completed_date, users.name as name FROM print_job INNER JOIN users ON print_job.netlink_id = users.netlink_id WHERE print_job.status = 'completed' ORDER BY print_job.completed_date ASC");
-$job5 = $stm->fetchAll();
+$stm = $conn->query("SELECT web_job.id AS id, web_job.job_name AS job_name, web_job.status AS status, web_job.printing_date AS printing_date, users.name as name FROM web_job INNER JOIN users ON web_job.netlink_id = users.netlink_id INNER JOIN 3d_print_job ON web_job.id=3d_print_job.3d_print_id WHERE web_job.status = 'printing' ORDER BY web_job.printing_date ASC");
+$print_job4 = $stm->fetchAll();
 
-$not_priced = [];
-$pending_payment = [];
-$paid = [];
-$printing = [];
-$complete = [];
+$stm = $conn->query("SELECT web_job.id AS id, web_job.job_name AS job_name, web_job.status AS status, web_job.completed_date AS completed_date, users.name as name FROM web_job INNER JOIN users ON web_job.netlink_id = users.netlink_id INNER JOIN 3d_print_job ON web_job.id=3d_print_job.3d_print_id WHERE web_job.status = 'completed' ORDER BY web_job.completed_date ASC");
+$print_job5 = $stm->fetchAll();
 
-foreach ($job1 as $job) {
-  $not_priced[] = $job;
+//pull only laser cutting strings from web_job
+
+$stm = $conn->query("SELECT web_job.id AS id, web_job.job_name AS job_name, web_job.status AS status, web_job.submission_date AS submission_date, users.name AS name FROM web_job INNER JOIN users ON web_job.netlink_id=users.netlink_id INNER JOIN laser_cut_job ON web_job.id=laser_cut_job.laser_cut_id WHERE web_job.status = 'submitted' ORDER BY web_job.submission_date ASC;");
+$laser_job1 = $stm->fetchAll();
+
+$stm = $conn->query("SELECT web_job.id AS id, web_job.job_name AS job_name, web_job.status AS status, web_job.priced_date AS priced_date, users.name AS name FROM web_job INNER JOIN users ON web_job.netlink_id = users.netlink_id INNER JOIN laser_cut_job ON web_job.id=laser_cut_job.laser_cut_id WHERE web_job.status = 'pending payment' ORDER BY web_job.priced_date ASC");
+$laser_job2 = $stm->fetchAll();
+
+$stm = $conn->query("SELECT web_job.id AS id, web_job.job_name AS job_name, web_job.status AS status, web_job.paid_date AS paid_date, users.name AS name FROM web_job INNER JOIN users ON web_job.netlink_id = users.netlink_id INNER JOIN laser_cut_job ON web_job.id=laser_cut_job.laser_cut_id WHERE web_job.status = 'paid' ORDER BY web_job.paid_date ASC");
+$laser_job3 = $stm->fetchAll();
+
+$stm = $conn->query("SELECT web_job.id AS id, web_job.job_name AS job_name, web_job.status AS status, web_job.printing_date AS printing_date, users.name AS name FROM web_job INNER JOIN users ON web_job.netlink_id = users.netlink_id INNER JOIN laser_cut_job ON web_job.id=laser_cut_job.laser_cut_id WHERE web_job.status = 'printing' ORDER BY web_job.printing_date ASC");
+$laser_job4 = $stm->fetchAll();
+
+$stm = $conn->query("SELECT web_job.id AS id, web_job.job_name AS job_name, web_job.status AS status, web_job.completed_date AS completed_date, users.name AS name FROM web_job INNER JOIN users ON web_job.netlink_id = users.netlink_id INNER JOIN laser_cut_job ON web_job.id=laser_cut_job.laser_cut_id WHERE web_job.status = 'completed' ORDER BY web_job.completed_date ASC");
+$laser_job5 = $stm->fetchAll();
+
+//3d_printing jobs
+
+$d_not_priced = [];
+$d_pending_payment = [];
+$d_paid = [];
+$d_printing = [];
+$d_complete = [];
+
+foreach ($print_job1 as $job) {
+  $d_not_priced[] = $job;
 }
-foreach ($job2 as $job) {
-  $pending_payment[] = $job;
+foreach ($print_job2 as $job) {
+  $d_pending_payment[] = $job;
 }
-foreach ($job3 as $job) {
-  $paid[] = $job;
+foreach ($print_job3 as $job) {
+  $d_paid[] = $job;
 }
-foreach ($job4 as $job) {
-  $printing[] = $job;
+foreach ($print_job4 as $job) {
+  $d_printing[] = $job;
 }
-foreach ($job5 as $job) {
-  $complete[] = $job;
+foreach ($print_job5 as $job) {
+  $d_complete[] = $job;
 }
+
+$l_not_priced = [];
+$l_pending_payment = [];
+$l_paid = [];
+$l_printing = [];
+$l_complete = [];
+
+foreach ($laser_job1 as $job) {
+  $l_not_priced[] = $job;
+}
+foreach ($laser_job2 as $job) {
+  $l_pending_payment[] = $job;
+}
+foreach ($laser_job3 as $job) {
+  $l_paid[] = $job;
+}
+foreach ($laser_job4 as $job) {
+  $l_printing[] = $job;
+}
+foreach ($laser_job5 as $job) {
+  $l_complete[] = $job;
+}
+
 ?>
 
 <!doctype html>
@@ -151,7 +195,7 @@ foreach ($job5 as $job) {
             <div class="container">
           <div class="py-5 text-left">
 
-            <h3>Active Jobs</h3>
+            <h3>3D Print Jobs</h3>
             <div class="py-3"></div>
       <div class="table-responsive">
         <table class="table table-striped table-md">
@@ -168,11 +212,11 @@ foreach ($job5 as $job) {
 
           <?php
             //Grab each item from each array
-            foreach($not_priced as $row){
+            foreach($d_not_priced as $row){
             ?>
             <tr>
               <td><?php echo $row["name"]; ?></td>
-              <td><a href="admin-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+              <td><a href="admin-3d-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
               <td> <?php echo $row["submission_date"]; ?></td>
               <td><?php echo $row["status"]; ?></td>
             </tr>
@@ -193,11 +237,11 @@ foreach ($job5 as $job) {
                 <th>Status</th>
               </thread>
             </tr>
-            <?php foreach ($pending_payment as $row) {
+            <?php foreach ($d_pending_payment as $row) {
             ?>
             <tr>
               <td><?php echo $row["name"]; ?></td>
-                <td><a href="admin-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+                <td><a href="admin-3d-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
               <td><?php echo $row["priced_date"]; ?></td>
               <td><?php echo $row["status"]; ?></td>
             </tr>
@@ -219,11 +263,11 @@ foreach ($job5 as $job) {
                 <th>Status</th>
               </thread>
             </tr>
-            <?php foreach ($paid as $row) {
+            <?php foreach ($d_paid as $row) {
             ?>
             <tr>
               <td><?php echo $row["name"]; ?></td>
-                <td><a href="admin-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+                <td><a href="admin-3d-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
               <td><?php echo $row["paid_date"]; ?></td>
               <td><?php echo $row["status"]; ?></td>
             </tr>
@@ -245,11 +289,11 @@ foreach ($job5 as $job) {
                 <th>Status</th>
               </thread>
             </tr>
-            <?php foreach ($printing as $row) {
+            <?php foreach ($d_printing as $row) {
             ?>
             <tr>
               <td><?php echo $row["name"]; ?></td>
-                <td><a href="admin-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+                <td><a href="admin-3d-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
               <td><?php echo $row["printing_date"]; ?></td>
               <td><?php echo $row["status"]; ?></td>
             </tr>
@@ -271,11 +315,147 @@ foreach ($job5 as $job) {
                 <th>Status</th>
               </thread>
             </tr>
-            <?php foreach ($complete as $row) {
+            <?php foreach ($d_complete as $row) {
             ?>
             <tr>
               <td><?php echo $row["name"]; ?></td>
-                <td><a href="admin-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+                <td><a href="admin-3d-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+              <td><?php echo $row["completed_date"]; ?></td>
+              <td><?php echo $row["status"]; ?></td>
+            </tr>
+            <?php
+            }
+            ?>
+
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Laser Cut Jobs</h3>
+            <div class="py-3"></div>
+      <div class="table-responsive">
+        <table class="table table-striped table-md">
+          <thead>
+            <tr>
+              <!-- table header-->
+              <th>Name</th>
+              <th>Job</th>
+              <th>Submission Date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+
+          <?php
+            //Grab each item from each array
+            foreach($l_not_priced as $row){
+            ?>
+            <tr>
+              <td><?php echo $row["name"]; ?></td>
+              <td><a href="admin-laser-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+              <td> <?php echo $row["submission_date"]; ?></td>
+              <td><?php echo $row["status"]; ?></td>
+            </tr>
+            <?php
+            } ?>
+            <tr>
+              <!-- empty row-->
+              <td> </td>
+              <td> </td>
+              <td> </td>
+              <td> </td>
+            </tr>
+            <tr>
+              <thread>
+                <th>Name</th>
+                <th>Job</th>
+                <th>Priced Date</th>
+                <th>Status</th>
+              </thread>
+            </tr>
+            <?php foreach ($l_pending_payment as $row) {
+            ?>
+            <tr>
+              <td><?php echo $row["name"]; ?></td>
+                <td><a href="admin-laser-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+              <td><?php echo $row["priced_date"]; ?></td>
+              <td><?php echo $row["status"]; ?></td>
+            </tr>
+            <?php
+            }
+            ?>
+            <tr>
+              <td> </td>
+              <td> </td>
+              <td> </td>
+              <td> </td>
+            </tr>
+            <tr>
+            <tr>
+              <thread>
+                <th>Name</th>
+                <th>Job</th>
+                <th>Payment Date</th>
+                <th>Status</th>
+              </thread>
+            </tr>
+            <?php foreach ($l_paid as $row) {
+            ?>
+            <tr>
+              <td><?php echo $row["name"]; ?></td>
+                <td><a href="admin-laser-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+              <td><?php echo $row["paid_date"]; ?></td>
+              <td><?php echo $row["status"]; ?></td>
+            </tr>
+            <?php
+            }
+            ?>
+            <tr>
+              <td> </td>
+              <td> </td>
+              <td> </td>
+              <td> </td>
+            </tr>
+            <tr>
+            <tr>
+              <thread>
+                <th>Name</th>
+                <th>Job</th>
+                <th>Cut Start Date</th>
+                <th>Status</th>
+              </thread>
+            </tr>
+            <?php foreach ($l_printing as $row) {
+            ?>
+            <tr>
+              <td><?php echo $row["name"]; ?></td>
+                <td><a href="admin-laser-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+              <td><?php echo $row["printing_date"]; ?></td>
+              <td><?php echo $row["status"]; ?></td>
+            </tr>
+            <?php
+            }
+            ?>
+            <tr>
+              <td> </td>
+              <td> </td>
+              <td> </td>
+              <td> </td>
+            </tr>
+            <tr>
+            <tr>
+              <thread>
+                <th>Name</th>
+                <th>Job</th>
+                <th>Completion Date</th>
+                <th>Status</th>
+              </thread>
+            </tr>
+            <?php foreach ($l_complete as $row) {
+            ?>
+            <tr>
+              <td><?php echo $row["name"]; ?></td>
+                <td><a href="admin-laser-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
               <td><?php echo $row["completed_date"]; ?></td>
               <td><?php echo $row["status"]; ?></td>
             </tr>

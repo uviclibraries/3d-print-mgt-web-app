@@ -2,22 +2,45 @@
 session_start();
 require ('auth-sec.php'); //Gets CAS & db
 //auth-sec includes: $user, $user_email, $user_type, $user_name
-$stm = $conn->query("SELECT id, job_name, status, submission_date, priced_date, paid_date, printing_date, completed_date FROM print_job WHERE netlink_id = '$user' ORDER BY id DESC");
+
+$stm = $conn->query("SELECT id, job_name, status, submission_date, priced_date, paid_date, printing_date, completed_date FROM web_job INNER JOIN 3d_print_job ON id=3d_print_id WHERE netlink_id = '$user' ORDER BY id DESC");
 $data = $stm->fetchAll();
 //split results by Status
-$pending_payment = [];
-$complete = [];
-$paid_print_subm = [];
-$other_jobs = [];
+$d_pending_payment = [];
+$d_complete = [];
+$d_paid_print_subm = [];
+$d_other_jobs = [];
+
 foreach ($data as $job) {
   if ($job['status'] == "pending payment") {
-    $pending_payment[] = $job;
+    $d_pending_payment[] = $job;
   }elseif ($job['status'] == "completed") {
-    $complete[] = $job;
+    $d_complete[] = $job;
   }elseif ($job['status'] == "paid" || $job['status'] == "printing" || $job['status'] == "submitted") {
-    $paid_print_subm[] = $job;
+    $d_paid_print_subm[] = $job;
   }else{
-    $other_jobs[] = $job;
+    $d_other_jobs[] = $job;
+  }
+
+}
+
+$stm = $conn->query("SELECT id, job_name, status, submission_date, priced_date, paid_date, printing_date, completed_date FROM web_job INNER JOIN laser_cut_job ON id=laser_cut_id WHERE netlink_id = '$user' ORDER BY id DESC");
+$data = $stm->fetchAll();
+//split results by Status
+$l_pending_payment = [];
+$l_complete = [];
+$l_paid_print_subm = [];
+$l_other_jobs = [];
+
+foreach ($data as $job) {
+  if ($job['status'] == "pending payment") {
+    $l_pending_payment[] = $job;
+  }elseif ($job['status'] == "completed") {
+    $l_complete[] = $job;
+  }elseif ($job['status'] == "paid" || $job['status'] == "printing" || $job['status'] == "submitted") {
+    $l_paid_print_subm[] = $job;
+  }else{
+    $l_other_jobs[] = $job;
   }
 
 }
@@ -87,7 +110,8 @@ foreach ($data as $job) {
     <div class="container">
   <div class="py-5 text-center">
 
-    <h1><b> DSC 3D printing dashboard</b></h1>
+    <h1><b> DSC 3D Printing and Laser Cutting Dashboard</b></h1>
+    <p><b>This is a new version of our web app that includes a laser cutting service.</b></p> <p><b>If you encounter a problem or have questions about laser cutting, contact: <a href=“mailto:dscommons@uvic.ca”>dscommons@uvic.ca</a></b></p>
   </div>
 
   <div class="row">
@@ -96,18 +120,19 @@ foreach ($data as $job) {
     </div>
 
     <div class="col-md-12 order-md-1">
+      <div class="py-5 text-center">
 
-      <div class="row">
-        <div class="btn-auto mr-auto">
-        <a href="customer-new-job.php">
-          <button class="btn btn-primary btn-lg" type="submit">Create New Print Job</button>
-        </a>
+        <div class="row">
+          <div class="btn-auto mr-auto">
+          <a href="customer-new-job.php">
+            <button class="btn btn-primary btn-lg" type="submit">Create New Print Job</button>
+          </a>
+          </div>
+          <div class="btn-auto mr-auto">
+          <a href="https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/">
+            <button class="btn btn-danger btn-lg" type="submit">FAQ</button>
+          </a>
         </div>
-        <div class="btn-auto mr-auto">
-        <a href="https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/">
-          <button class="btn btn-danger btn-lg" type="submit">FAQ</button>
-        </a>
-      </div>
 
         <div class="btn-auto mr-auto">
           <?php if ($user_type == 0){ ?>
@@ -120,17 +145,22 @@ foreach ($data as $job) {
             </a>
           <?php }  ?>
         </div>
+        
+      </div>
+
     </div>
 
         <hr class="mb-12">
 
-        <h2>Your Print Job</h2>
+      <!-- 3d print table -->
+
+        <h2>3D Print Jobs</h2>
       <div class="table-responsive">
         <table class="table table-striped table-md">
         <tbody>
           <?php
           //pending payment jobs
-          if (!empty($pending_payment)) {
+          if (!empty($d_pending_payment)) {
             ?>
             <thead>
               <tr>
@@ -139,18 +169,18 @@ foreach ($data as $job) {
                 <th>Status</th>
               </tr>
             </thead>
-            <?php foreach ($pending_payment as $row) {
+            <?php foreach ($d_pending_payment as $row) {
             ?>
             <tr>
               <td><?php echo $row["priced_date"]; ?></td>
-              <td><a href="customer-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+              <td><a href="customer-3d-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
               <td><?php echo $row["status"]; ?></td>
             </tr>
             <?php
             }
           }
           //Completed jobs
-          if (!empty($complete)) {
+          if (!empty($d_complete)) {
             ?>
             <thead>
               <tr>
@@ -159,18 +189,18 @@ foreach ($data as $job) {
                 <th>Status</th>
               </tr>
             </thead>
-            <?php foreach ($complete as $row) {
+            <?php foreach ($d_complete as $row) {
             ?>
             <tr>
               <td><?php echo $row["completed_date"]; ?></td>
-              <td><a href="customer-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+              <td><a href="customer-3d-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
               <td><?php echo $row["status"]; ?></td>
             </tr>
             <?php
             }
           }
           //Paid & printing jobs
-          if (!empty($paid_print_subm)) {
+          if (!empty($d_paid_print_subm)) {
             ?>
             <thead>
               <tr>
@@ -179,7 +209,7 @@ foreach ($data as $job) {
                 <th>Status</th>
               </tr>
             </thead>
-            <?php foreach ($paid_print_subm as $row) {
+            <?php foreach ($d_paid_print_subm as $row) {
             ?>
             <tr>
               <?php if ($row["status"] == "paid") { ?>
@@ -189,14 +219,14 @@ foreach ($data as $job) {
               <?php } else { ?>
                 <td><?php echo $row["submission_date"]; ?></td>
               <?php } ?>
-              <td><a href="customer-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+              <td><a href="customer-3d-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
               <td><?php echo $row["status"]; ?></td>
             </tr>
             <?php
             }
           }
           //Other jobs
-          if (!empty($other_jobs)) {
+          if (!empty($d_other_jobs)) {
             ?>
             <thead>
               <tr>
@@ -205,11 +235,110 @@ foreach ($data as $job) {
                 <th>Status</th>
               </tr>
             </thead>
-            <?php foreach ($other_jobs as $row) {
+            <?php foreach ($d_other_jobs as $row) {
             ?>
             <tr>
               <td><?php echo $row["completed_date"]; ?></td>
-              <td><a href="customer-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+              <td><a href="customer-3d-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+              <td><?php echo $row["status"]; ?></td>
+            </tr>
+            <?php
+            }
+          }
+          ?>
+
+           </tbody>
+        </table>
+      </div>
+
+      <!-- laser cut table -->
+
+      <h2>Laser Cut Jobs</h2>
+      <div class="table-responsive">
+        <table class="table table-striped table-md">
+        <tbody>
+          <?php
+          //pending payment jobs
+          if (!empty($l_pending_payment)) {
+            ?>
+            <thead>
+              <tr>
+                <th>Priced Date</th>
+                <th>Name</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <?php foreach ($l_pending_payment as $row) {
+            ?>
+            <tr>
+              <td><?php echo $row["priced_date"]; ?></td>
+              <td><a href="customer-laser-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+              <td><?php echo $row["status"]; ?></td>
+            </tr>
+            <?php
+            }
+          }
+          //Completed jobs
+          if (!empty($l_complete)) {
+            ?>
+            <thead>
+              <tr>
+                <th>Completed Date</th>
+                <th>Name</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <?php foreach ($l_complete as $row) {
+            ?>
+            <tr>
+              <td><?php echo $row["completed_date"]; ?></td>
+              <td><a href="customer-laser-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+              <td><?php echo $row["status"]; ?></td>
+            </tr>
+            <?php
+            }
+          }
+          //Paid & printing jobs
+          if (!empty($l_paid_print_subm)) {
+            ?>
+            <thead>
+              <tr>
+                <th>Last Updated</th>
+                <th>Name</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <?php foreach ($l_paid_print_subm as $row) {
+            ?>
+            <tr>
+              <?php if ($row["status"] == "paid") { ?>
+                <td><?php echo $row["paid_date"]; ?></td>
+              <?php }elseif ($row["status"] == "printing") { ?>
+                <td><?php echo $row["printing_date"]; ?></td>
+              <?php } else { ?>
+                <td><?php echo $row["submission_date"]; ?></td>
+              <?php } ?>
+              <td><a href="customer-laser-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+              <td><?php echo $row["status"]; ?></td>
+            </tr>
+            <?php
+            }
+          }
+          //Other jobs
+          if (!empty($l_other_jobs)) {
+            ?>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Name</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <?php foreach ($l_other_jobs as $row) {
+            ?>
+            <tr>
+              <td><?php echo $row["completed_date"]; ?></td>
+              <td><a href="customer-laser-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
               <td><?php echo $row["status"]; ?></td>
             </tr>
             <?php

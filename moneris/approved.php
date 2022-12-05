@@ -34,7 +34,9 @@
   //Change Status
   $current_date = date("Y-m-d");
   $current_status = "paid";
-  $stmt = $conn->prepare("UPDATE print_job SET status = :status, paid_date = :paid_date WHERE id = :job_id");
+  $stmt = $conn->prepare("UPDATE web_job SET status = :status, paid_date = :paid_date WHERE id = :job_id");
+  /*hot fix*/
+  //$stmt = $conn->prepare("UPDATE print_job SET status = :status, paid_date = :paid_date WHERE id = :job_id");
   $stmt->bindParam(':status', $current_status);
   $stmt->bindParam(':paid_date', $current_date);
   $stmt->bindParam(':job_id', $job_id[2]);
