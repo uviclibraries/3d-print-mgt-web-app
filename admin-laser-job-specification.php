@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $userSQL->bindParam(':netlink_id', $job['netlink_id']);
       $userSQL->execute();
       $job_owner = $userSQL->fetch();
-      $direct_link = "https://webapp.library.uvic.ca/3dprint/customer-laser-job-information.php?job_id=?". $job['id'];
+      $direct_link = "https://webapp.library.uvic.ca/3dprint/customer-laser-job-information.php?job_id=". $job['id'];
       $direct_link2 = "https://onlineacademiccommunity.uvic.ca/dsc/how-to-laser-cut/";
       $msg = "
       <html>
