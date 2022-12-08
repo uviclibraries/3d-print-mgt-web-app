@@ -1,7 +1,7 @@
 3D Print Job Management Web Application
 
 This is a web appliction to manage the submission of 3D print job requests, 
-3D print job settings, online payment through a 3rd party credit card
+3D print job settings, Lasercut jobs online payment through a 3rd party credit card
 payment processor, and management of the administrative work flow from
 start to finish.
 
