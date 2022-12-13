@@ -15,8 +15,8 @@ $ldap_bindpw = "jeaHuf2g";
 // - returns ($name, $email, $errormesg) for $netlink_id
 // - if $errormesg is NULL the other two are set
 //
-function get_personal_info($netlink_id)
-{
+function get_personal_info($netlink_id) {
+  
   global $ldap_url, $ldap_binddn, $ldap_bindpw;
 
   $conn = ldap_connect($ldap_url);
@@ -37,8 +37,10 @@ function get_personal_info($netlink_id)
 
   $name = $info[0]['cn'][0];
   if (!$name) {
-	return array('', '', "No cn for $netlink_id in LDAP");
+	  #return array('', '', "No cn for $netlink_id in LDAP");
+    $name = $netlink_id;
   }
+
   $email = $info[0]['mail'][0];
   if (!$email) {
 	return array('', '', "No mail for $netlink_id in LDAP");
