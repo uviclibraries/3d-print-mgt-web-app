@@ -29,7 +29,7 @@
           echo "Error message: \n " . $_GET['mesg'];
         } ?>
       </p>
-      <p>please contact the webdeveloper with the error message at kenziewong@gmail.com</p>
+      <p>please contact the webdeveloper with the error message at <a href="mailto:dscommons@uvic.ca">dscommons@uvic.ca</a></p>
       <p>Thank you.</p>
   </body>
 </html>
