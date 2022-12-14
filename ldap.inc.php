@@ -6,7 +6,7 @@
 //$ldap_url = 'ldaps://ldap1p.uvic.ca';  // production server
 $ldap_url = "ldaps://ldap1r.uvic.ca";  // test server
 $ldap_binddn = "cn=Auth Manager,ou=LIBR,ou=administrators,dc=uvic,dc=ca";
-$ldap_bindpw = "jeaHuf2g";
+$ldap_bindpw = "PASSWORD HERE";
 
 
 //
