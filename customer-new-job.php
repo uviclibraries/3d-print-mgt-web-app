@@ -433,7 +433,7 @@ header("location: customer-dashboard.php");
     <div id="laser_specs" class="col-md-12 order-md-1">
       <!--change link to a future laser cut FAQ page-->
       <div>
-      <h3 class="mb-3"> Laser Cut Specifications <a href="https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/#settings" target="_blank" data-toggle="tooltip" data-placement="right" title="FAQ Specifications section">?</a></h3>
+      <h3 class="mb-3"> Laser Cut Specifications <a href="https://lib.uvic.ca/laser" target="_blank" data-toggle="tooltip" data-placement="right" title="FAQ Specifications section">?</a></h3>
         <label class="mb-2"> Indicate either cut or engrave properties for each color in laser cut graphic (temporary) </label>
             <div class="input-group">
                 <textarea class="form-control" name="user_specs" aria-label="user-specs"></textarea>
@@ -467,7 +467,7 @@ header("location: customer-dashboard.php");
 
         <hr class="mb-4">
         <!--change link to a future laser cut FAQ page-->
-        <h3 class="mb-2">Laser Cut Material Type <a href="https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/#filaments" target="_blank" data-toggle="tooltip" data-placement="right" title="FAQ Material section">?</a></h3>
+        <h3 class="mb-2">Laser Cut Material Type <a href="https://onlineacademiccommunity.uvic.ca/dsc/how-to-laser-cut/#colours" target="_blank" data-toggle="tooltip" data-placement="right" title="FAQ Material section">?</a></h3>
         <div class="d-block my-3">
           <div class="custom-control custom-radio">
             <input id="mdf_6mm" name="laser_material_type" value="MDF 6mm" type="radio" class="custom-control-input" checked required>
