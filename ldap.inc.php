@@ -16,7 +16,7 @@ $ldap_bindpw = "jeaHuf2g";
 // - if $errormesg is NULL the other two are set
 //
 function get_personal_info($netlink_id) {
-  
+
   global $ldap_url, $ldap_binddn, $ldap_bindpw;
 
   $conn = ldap_connect($ldap_url);
@@ -37,7 +37,8 @@ function get_personal_info($netlink_id) {
 
   $name = $info[0]['cn'][0];
   if (!$name) {
-	  #return array('', '', "No cn for $netlink_id in LDAP");
+	  // Removed because the user's cn or canonical name is no longer available to external apps
+    // return array('', '', "No cn for $netlink_id in LDAP"); 
     $name = $netlink_id;
   }
 
