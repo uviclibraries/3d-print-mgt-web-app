@@ -3,11 +3,13 @@
 // ldap.inc.php  -  LDAP lookup subroutine
 //
 
-//$ldap_url = 'ldaps://ldap1p.uvic.ca';  // production server
-$ldap_url = "ldaps://ldap1r.uvic.ca";  // test server
-$ldap_binddn = "cn=Auth Manager,ou=LIBR,ou=administrators,dc=uvic,dc=ca";
-$ldap_bindpw = "jeaHuf2g";
+#$ldap_url = "ldaps://ldap1r.uvic.ca";  // test server
+#$ldap_binddn = "cn=Auth Manager,ou=3D Print Manager,ou=LIBR,ou=administrators,dc=uvic,dc=ca";
+#$ldap_bindpw = "PASSWORD_HERE";
 
+$ldap_url = 'ldaps://ldap1p.uvic.ca';  // production server
+$ldap_binddn = "cn=Auth Manager,ou=3D Print Manager,ou=LIBR,ou=administrators,dc=uvic,dc=ca";
+$ldap_bindpw = "PASSWORD_HERE";
 
 //
 // get_personal_info($netlink_id)
@@ -37,9 +39,10 @@ function get_personal_info($netlink_id) {
 
   $name = $info[0]['cn'][0];
   if (!$name) {
-	  // Removed because the user's cn or canonical name is no longer available to external apps
-    // return array('', '', "No cn for $netlink_id in LDAP"); 
-    $name = $netlink_id;
+    return array('', '', "No cn for $netlink_id in LDAP"); 
+    // Temporatily removed the line below because the user's cn or 
+    // canonical name was no longer available to external apps
+    // $name = $netlink_id;
   }
 
   $email = $info[0]['mail'][0];
