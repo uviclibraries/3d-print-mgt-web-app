@@ -1,3 +1,9 @@
 db.php
 ldap.inc.php
 ldap.inc.php
+moneris/
+uploads/
+moneris_checkout/
+log/
+db_test.sql
+db_update.sql
