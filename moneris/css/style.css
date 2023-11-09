@@ -1,8 +1,0 @@
-body { font-family: "Arial Unicode MS",Verdana,Arial,sans-serif; }
-table { border-collapse: collapse; }
-tr { background-color: #ffffff; }
-tr.header { background-color: #cccccc; }
-tr.total { background-color: #eeeeee; }
-td { border: 1px solid #000000; padding-left: 10px; padding-right: 20px; }
-td.right { text-align: right; }
-td.center{ text-align: center; }
