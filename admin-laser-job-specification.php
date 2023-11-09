@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
   }
 
-  $stmt = $conn->prepare("UPDATE web_job INNER JOIN laser_cut_job ON id=laser_cut_id SET price = :price, copies=:copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, model_name_2 =:model_name_2 WHERE id = :job_id;");
+  $stmt = $conn->prepare("UPDATE web_job INNER JOIN laser_cut_job ON id=laser_cut_id SET price = :price, copies=:copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, hold_date = :hold_date, model_name_2 =:model_name_2 WHERE id = :job_id;");
   //$stmt = $conn->prepare("UPDATE print_job SET price = :price, infill = :infill, scale = :scale, layer_height = :layer_height, supports = :supports, copies = :copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, model_name_2 =:model_name_2 WHERE id = :job_id;
   //");
   $current_date = date("Y-m-d");
@@ -68,10 +68,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $d2 = $job['paid_date'];
   $d3 = $job['printing_date'];
   $d4 = $job['completed_date'];
+  $d5 = $job['hold_date'];
   $stmt->bindParam(':priced_date', $d1);
   $stmt->bindParam(':paid_date', $d2);
   $stmt->bindParam(':printing_date', $d3);
   $stmt->bindParam(':completed_date', $d4);
+  $stmt->bindParam(':hold_date', $d5);
 
   //need variable to check if admin wants to send email. case: updating notes but dont send email
   if ($_POST['status'] == "pending payment") {
@@ -107,9 +109,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     //this is done automatically when payment is received.
     $d2 = $current_date;
 
-
   } elseif($_POST['status'] == "printing"){
     $d3 = $current_date;
+
+  } elseif($_POST['status'] == "on_hold"){
+    echo "d5";
+    $d5 = $current_date;
 
   } elseif ($_POST['status'] == "completed") {
     $d4 = $current_date;
@@ -141,7 +146,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
   } elseif($_POST['status'] == "archived"){
     $d4 = $current_date;
-
   }
   $stmt->execute();
 
@@ -228,8 +232,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                   <?php } else { ?>
                     <option value="submitted" <?php if ($job["status"]== "submitted"){echo "selected";} ?>>Not Priced</option>
                     <option value="pending payment" <?php if ($job["status"]== "pending payment"){echo "selected";} ?>>Pending Payment</option>
+                    <option value="on hold" <?php if ($job["status"]== "on hold"){echo "selected";} ?>>On Hold</option>
                     <option value="paid" <?php if ($job["status"]== "paid"){echo "selected";} ?>>Paid</option>
                     <option value="printing" <?php if ($job["status"]== "printing"){echo "selected";} ?>>Printing</option>
+                    <option value="printed" <?php if ($job["status"]== "printed"){echo "selected";} ?>>Printed</option>
                     <option value="completed" <?php if ($job["status"]== "completed"){echo "selected";} ?>>Completed</option>
                     <option value="archived" <?php if ($job["status"]== "archived"){echo "selected";} ?>>Archived</option>
                   <?php } ?>
@@ -263,12 +269,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <div class="input-group-prepend">
                               <!-- ** catch non floatable input-->
                                 <span class="input-group-text">$</span>
-                          <input type="text" name="price" autocomplete="off" class="form-control" value="<?php echo number_format((float)$job["price"], 2, '.',''); ?>"
-                          <?php if ($job["status"] != "submitted" && $job["status"] != "pending payment"): ?>
-                            readonly
-                          <?php endif; ?>
-                          >
-                          </div>
+                                <input type="text" name="price" autocomplete="off" class="form-control" value="<?php echo number_format((float)$job["price"], 2, '.','');?>"
+                                <?php if ($job["status"] != "submitted" && $job["status"] != "pending payment" && $job["status"] != "on hold"): ?>
+                                  readonly
+                                <?php endif; ?>
+                                >
+                            </div>
                       </div>
                       <small class="text-muted">Reminder: Minimum payment is $2.00.</small>
                       <div class="invalid-feedback" style="width: 100%;">
@@ -307,7 +313,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <br/>
 
     <?php //Allow file upload if status is pp or submitted
-    if ($job["status"] == "pending payment" || $job["status"] == "submitted"): ?>
+    if ($job["status"] == "pending payment" || $job["status"] == "submitted" || $job["status"] == "on_hold"): ?>
 
       <small class="text-muted">(Max 200MB)</small>
       <input type="file" id="myFile" name="modify">
@@ -318,24 +324,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       <h5 class="mb-2">Drawing Description</h5>
         <div class="input-group">
-            <textarea class="form-control" aria-label="additional-comments" readonly><?php echo $job["specifications"]; ?></textarea>
+            <textarea rows="5" cols="50" class="form-control" aria-label="additional-comments" readonly><?php echo $job["specifications"]; ?></textarea>
         </div>
         <hr class="mb-4">
         <h5 class="mb-2">Copies</h5>
         <div class="col-md-3 mb-3">
-
-          <select class="custom-select d-block w-100" name="copies" id="copies">
-            <option <?php if ($job["copies"]== 1){echo "selected";} ?>>1</option>
-            <option <?php if ($job["copies"]== 2){echo "selected";} ?>>2</option>
-            <option <?php if ($job["copies"]== 3){echo "selected";} ?>>3</option>
-            <option <?php if ($job["copies"]== 4){echo "selected";} ?>>4</option>
-            <option <?php if ($job["copies"]== 5){echo "selected";} ?>>5</option>
-            <option <?php if ($job["copies"]== 6){echo "selected";} ?>>6</option>
-            <option <?php if ($job["copies"]== 7){echo "selected";} ?>>7</option>
-            <option <?php if ($job["copies"]== 8){echo "selected";} ?>>8</option>
-            <option <?php if ($job["copies"]== 9){echo "selected";} ?>>9</option>
-            <option <?php if ($job["copies"]== 10){echo "selected";} ?>>10</option>
-          </select>
+            <label for="copies">Copies</label>
+            <input type="number" class="form-control" name="copies" min="1" max="100" step="1" value="1" id="supports" placeholder="<?php if ($job["copies"]!= ""){echo "{$job["copies"]}";} else{"Enter # of copies";}?>" required />
+            <div class="invalid-feedback">
+              Please provide a valid response.
+            </div>
+          </div>
         </div>
 
         
@@ -368,13 +367,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <hr class="mb-4">
         <h5 class="mb-2">Additional Comments</h5>
             <div class="input-group">
-                <textarea class="form-control" aria-label="additional-comments" readonly><?php echo $job["comments"]; ?></textarea>
+                <textarea rows="5" cols="50" class="form-control" aria-label="additional-comments" readonly><?php echo $job["comments"]; ?></textarea>
             </div>
 
         <hr class="mb-4">
         <h5 class="mb-2">Staff Notes</h5>
             <div class="input-group">
-                <textarea class="form-control" name="staff_notes" aria-label="additional-comments"><?php echo $job["staff_notes"]; ?></textarea>
+                <textarea rows="5" cols="50" class="form-control" name="staff_notes" aria-label="additional-comments"><?php echo $job["staff_notes"]; ?></textarea>
             </div>
             <div class="invalid-feedback">
             Please enter additional comments.
