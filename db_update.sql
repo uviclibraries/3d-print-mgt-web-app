@@ -21,7 +21,7 @@ CREATE TABLE web_job (
   `staff_notes` text,
   `status` varchar(100) NOT NULL,
   `submission_date` date DEFAULT NULL,
-  `price` decimal(4,2) DEFAULT NULL,
+  `price` decimal(9,2) DEFAULT NULL,
   `priced_date` date DEFAULT NULL,
   `paid_date` date DEFAULT NULL,
   `printing_date` date DEFAULT NULL,
