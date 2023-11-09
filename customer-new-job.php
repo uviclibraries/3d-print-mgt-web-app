@@ -470,20 +470,20 @@ header("location: customer-dashboard.php");
         <h3 class="mb-2">Laser Cut Material Type <a href="https://onlineacademiccommunity.uvic.ca/dsc/how-to-laser-cut/#colours" target="_blank" data-toggle="tooltip" data-placement="right" title="FAQ Material section">?</a></h3>
         <div class="d-block my-3">
           <div class="custom-control custom-radio">
-            <input id="mdf_6mm" name="laser_material_type" value="MDF 6mm" type="radio" class="custom-control-input" checked required>
-            <label class="custom-control-label" for="mdf_6mm">MDF 6mm</label>
-          </div>
-          <div class="custom-control custom-radio">
-            <input id="mdf_3mm" name="laser_material_type" value="MDF 3mm" type="radio" class="custom-control-input" required>
-            <label class="custom-control-label" for="mdf_3mm">MDF 3mm</label>
+            <input id="plywood_3mm" name="laser_material_type" value="Plywood 3mm" type="radio" class="custom-control-input" checked required>
+            <label class="custom-control-label" for="plywood_3mm">Plywood 3mm</label>
           </div>
           <div class="custom-control custom-radio">
             <input id="plywood_6mm" name="laser_material_type" value="Plywood 6mm" type="radio" class="custom-control-input" required>
             <label class="custom-control-label" for="plywood_6mm">Plywood 6mm</label>
           </div>
           <div class="custom-control custom-radio">
-            <input id="plywood_3mm" name="laser_material_type" value="Plywood 3mm" type="radio" class="custom-control-input" required>
-            <label class="custom-control-label" for="plywood_3mm">Plywood 3mm</label>
+            <input id="mdf_3mm" name="laser_material_type" value="MDF 3mm" type="radio" class="custom-control-input" required>
+            <label class="custom-control-label" for="mdf_3mm">MDF 3mm</label>
+          </div>
+          <div class="custom-control custom-radio">
+            <input id="mdf_6mm" name="laser_material_type" value="MDF 6mm" type="radio" class="custom-control-input" required>
+            <label class="custom-control-label" for="mdf_6mm">MDF 6mm</label>
           </div>
           <div class="custom-control custom-radio">
             <input id="laser_cut_other" name="laser_material_type" value="Other" type="radio" class="custom-control-input" required>
