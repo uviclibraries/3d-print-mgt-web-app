@@ -5,9 +5,8 @@ $stm = $conn->query("SELECT VERSION()");
 #$version = $stm->fetch();
 #echo $version;
 
-//hey there
 
-$status = "submitted";
+$status = "submitted"; //declaring value that the job will take when the submission form is submitted
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
@@ -79,13 +78,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $layer_bind = floatval(number_format((float)$_POST["layer_height"], 2, '.',''));
   $support_bind = intval($_POST["supports"]);
   $copies_bind = intval($_POST["copies"]);
-
   $laser_copies = intval($_POST["laser_copies"]);
-
   $good_statement = True;
-  $stmt = $conn->prepare("INSERT INTO web_job (netlink_id, job_name, submission_date, status) VALUES (:netlink_id, :job_name, :submission_date, :job_status)");
+  $stmt = $conn->prepare("INSERT INTO web_job (netlink_id, job_name, job_purpose, academic_code, submission_date, status) VALUES (:netlink_id, :job_name, :job_purpose, :academic_code, :submission_date, :job_status)");
   $stmt->bindParam(':netlink_id', $user);
   $stmt->bindParam(':job_name', $_POST["job_name"]);
+  $stmt->bindParam(':job_purpose', $_POST["job_purpose"]);
+  $stmt->bindParam(':academic_code', $_POST["academic_code"]);
   $stmt->bindParam(':job_status', $status);
   $stmt->bindParam(':submission_date', $current_date);
   $good_statement &= $stmt->execute();
@@ -155,13 +154,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </head>
   <body>
   <p>Hello, ".$user_name.". This is an automated message from the DSC.</p>
-  <p>Thank you for submiting your print request to the DSC at McPherson Library. We will evalute the cost of the print and you'll be notified by email when it is ready for payment. If you have any questions about the process or the status of your print, please review our <a href=". $direct_link .">FAQ</a> or email us at DSCommons@uvic.ca.</p>
+  <p>Thank you for submitting your ".$job_type." request to the DSC at McPherson Library. We will evaluate the cost of the ".$job_type." and you'll be notified by email when it is ready for payment. If you have any questions about the process or the status of your ".$job_type.", please review our <a href=". $direct_link .">FAQ</a> or email us at DSCommons@uvic.ca.</p>
   </body>
   </html>";
   $headers = "MIME-Version: 1.0" . "\r\n";
   $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
   $headers .= "From: dscommons@uvic.ca" . "\r\n";
-  mail($user_email,"DSC - New Job",$msg,$headers);
+  mail($user_email,"DSC - New ".$job_type." Job",$msg,$headers);
 
 header("location: customer-dashboard.php");
 }
@@ -188,17 +187,17 @@ header("location: customer-dashboard.php");
     <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/checkout/">
 
     <!-- Bootstrap core CSS -->
-<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
 
-    <!-- Favicons -->
-<link rel="apple-touch-icon" href="/docs/4.5/assets/img/favicons/apple-touch-icon.png" sizes="180x180">
-<link rel="icon" href="/docs/4.5/assets/img/favicons/favicon-32x32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/docs/4.5/assets/img/favicons/favicon-16x16.png" sizes="16x16" type="image/png">
-<link rel="manifest" href="/docs/4.5/assets/img/favicons/manifest.json">
-<link rel="mask-icon" href="/docs/4.5/assets/img/favicons/safari-pinned-tab.svg" color="#563d7c">
-<link rel="icon" href="/docs/4.5/assets/img/favicons/favicon.ico">
-<meta name="msapplication-config" content="/docs/4.5/assets/img/favicons/browserconfig.xml">
-<meta name="theme-color" content="#563d7c">
+        <!-- Favicons -->
+    <link rel="apple-touch-icon" href="/docs/4.5/assets/img/favicons/apple-touch-icon.png" sizes="180x180">
+    <link rel="icon" href="/docs/4.5/assets/img/favicons/favicon-32x32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/docs/4.5/assets/img/favicons/favicon-16x16.png" sizes="16x16" type="image/png">
+    <link rel="manifest" href="/docs/4.5/assets/img/favicons/manifest.json">
+    <link rel="mask-icon" href="/docs/4.5/assets/img/favicons/safari-pinned-tab.svg" color="#563d7c">
+    <link rel="icon" href="/docs/4.5/assets/img/favicons/favicon.ico">
+    <meta name="msapplication-config" content="/docs/4.5/assets/img/favicons/browserconfig.xml">
+    <meta name="theme-color" content="#563d7c">
 
 
     <style>
@@ -220,62 +219,79 @@ header("location: customer-dashboard.php");
     <!-- Custom styles for this template -->
     <link href="form-validation.css" rel="stylesheet">
   </head>
+
   <body class="bg-light">
 
     <!--Header-->
     <div id="custom_header"><div class="wrapper" style="min-height: 6em;" id="banner">
-     <div style="position:absolute; left: 5px; top: 26px;">
+      <div style="position:absolute; left: 5px; top: 26px;">
       <a href="http://www.uvic.ca/" id="logo"><span>University of Victoria</span></a>
-     </div>
-     <div style="position:absolute; left: 176px; top: 26px;">
+      </div>
+      <div style="position:absolute; left: 176px; top: 26px;">
       <a href="http://www.uvic.ca/library/" id="unit"><span>Libraries</span></a>
-     </div>
-     <div class="edge" style="position:absolute; margin: 0px;right: 0px; top: 0px; height: 96px; width:200px;">&nbsp;</div>
+      </div>
+      <div class="edge" style="position:absolute; margin: 0px;right: 0px; top: 0px; height: 96px; width:200px;">&nbsp;</div>
     </div>
     <!--Header end-->
 
     <div class="container">
-        <form method="POST" enctype="multipart/form-data">
-  <div class="py-5 text-center">
-
-    <h1>New 3D Print or Laser Cut Job</h1>
-    </div>
+      <form method="POST" enctype="multipart/form-data">
+    
+      <div class="py-5 text-center">
+        <h1>New <span id="header-job-type">3D Print or Laser Cut</span> Job</h1>
+      </div>
 
     <div class="col-md-12 order-md-1">
-        <h3 class="mb-3">Job Name</h3>
-          <div class="row">
-            <div class="col-md-12 mb-3">
-              <input type="text" class="form-control" name="job_name" id="printJobName" placeholder="" autocomplete="off" value="" required>
-              <div class="invalid-feedback">
-                Valid print job name is required.
-              </div>
-            </div>
+
+      <h3 class="mb-2">Job Type</h3>
+      <div class="d-block my-3">
+        <div class="custom-control custom-radio">
+          <input id="3d_print" name="job_type" value="3D Print" type="radio" class="custom-control-input" onclick="showPrintInfo()" required>
+          <label class="custom-control-label" for="3d_print">3D Print</label>
+        </div>
+        <div class="custom-control custom-radio">
+          <input id="laser_cut" name="job_type" value="laser_cut" type="radio" class="custom-control-input" onclick="showLaserInfo()" required>
+          <label class="custom-control-label" for="laser_cut">Laser Cut</label>
+        </div>
+      <br>
+      <hr class="mb-6">
+
+      <h3 class="mb-3">Job Name</h3>
+      <div class="row">
+        <div class="col-md-12 mb-3">
+          <input type="text" class="form-control" name="job_name" id="printJobName" placeholder="" autocomplete="off" value="" required>
+          <div class="invalid-feedback">
+            Valid print job name is required.
           </div>
-          <hr class="mb-6">
+        </div>
+      </div>
+      <hr class="mb-6">
 
-
-    <h3 class="mb-3">Upload Model or Graphic</h3>
-    <small class="text-muted">Accepted file types: .stl, .svg, .obj, .pdf (Max 200M)</small>
-    <br>    
+      <h3 class="mb-3">Upload Model or Graphic</h3>
+      <small class="text-muted">Accepted file types: .stl, .svg, .obj, .pdf (Max 200M)</small>
+      <br>    
         <input type="file" id="myFile" name="3d_model" required>
       <br>
       <hr class="mb-6">
 
     <script type ="text/JavaScript">
       function setPageInfo() {
+      //At page load, hide submission details specific to 3D print and laser cut jobs, and submission button
         var print_div = document.getElementById("3d_specs");
         var laser_div = document.getElementById("laser_specs");
         var submit = document.getElementById("submit_section");
-        print_div.style.display = "none";
-        laser_div.style.display = "none";
-        submit.style.display = "none";
+        print_div.style.display = "none"; //hides 3D print specs
+        laser_div.style.display = "none"; //hides laser cut jobs
+        submit.style.display = "none"; //hides submit button
         //alert("Print info set");
       }
       window.onload = setPageInfo;
-    </script>
+    </script> <!--setPageInfo()-->
 
     <script type="text/JavaScript">
       function showPrintInfo() {
+      //When job_type "3d Print" radio button selected, show 3D print submission details and submit button
+        document.getElementById("header-job-type").innerText="3D Print";
         var print_div = document.getElementById("3d_specs");
         var laser_div = document.getElementById("laser_specs");
         var submit = document.getElementById("submit_section");
@@ -285,12 +301,13 @@ header("location: customer-dashboard.php");
           laser_div.style.display = "none";
           submit.style.display = "block";
         }
-        
       }
-    </script>
+    </script><!--setPrintInfo()-->
 
     <script type="text/JavaScript">
       function showLaserInfo() {
+      //When job_type "laser cut" radio button selected, show laser cut submission details and submit button
+        document.getElementById("header-job-type").innerText="Laser Cut";
         var print_div = document.getElementById("3d_specs");
         var laser_div = document.getElementById("laser_specs");
         var submit = document.getElementById("submit_section");
@@ -301,48 +318,141 @@ header("location: customer-dashboard.php");
           submit.style.display = "block";
         }
       }
-    </script>
+    </script><!--setLaserInfo()-->
 
-    <h3 class="mb-2">Job Type</h3>
+    <script type="text/JavaScript">
+      //Function will be triggered by the selection of job_purpose ("academic" and "personal") radio buttons. 
+      //Shows the academic_code text box if the "academic" rafio button is selected, hides otherwise.
+      function showAcademicCodeText() {
+        var academiccode_div = document.getElementById("academiccode_textbox");
+        if (academiccode_div.style.display == "none") {      
+          academiccode_div.style.display = "inline-block";
+          academiccode_div.style.width = "300px";
+        } else {
+          academiccode_div.style.display = "none";  // Hide if it's already visible
+        }
+      }
+    </script><!--showAcademicCodeText()-->
+
+    <h3 class="mb-2">Job Purpose</h3>
+    <!-- contains radio buttons and optional textbox to indicate if it's a personal or academic (and academic code) job-->
       <div class="d-block my-3">
         <div class="custom-control custom-radio">
-          <input id="3d_print" name="job_type" value="3D Print" type="radio" class="custom-control-input" onclick="showPrintInfo()" required>
-          <label class="custom-control-label" for="3d_print">3D Print</label>
-        </div>
+          <input id="academic-purpose" name="job_purpose" value="academic" type="radio" class="custom-control-input" onclick="showAcademicCodeText()" required>
+          <label class="custom-control-label" for="academic-purpose">Academic
+            <div class="col-md-12 mb-3" id="academiccode_textbox" style="display:none;">
+              <input type="text" id="academic-purpose" class="form-control" name="academic_code" placeholder="Academic code" autocomplete="off">
+            </div> <!-- to fill TABLE `web_job` column `academic_code` if `job_purpose` == "academic"-->
+          </label>
+          <span class="popup">
+            &#9432
+            <span class="popuptext" id="myPopup">
+              <p>Academic jobs will be prioritized during high-volume periods.</p>
+              <span class="close-btn">x</span>
+            </span>
+          </span> <!-- popup box for job_purpose =="academic"-->
+        </div><!--to fill TABLE `web_job` column `job_purpose`=="academic"; *selection will cause academiccode_textbox to appear-->
         <div class="custom-control custom-radio">
-          <input id="laser_cut" name="job_type" value="laser_cut" type="radio" class="custom-control-input" onclick="showLaserInfo()" required>
-          <label class="custom-control-label" for="laser_cut">Laser Cut</label>
-        </div>
-    <br>
+          <input type="text" id="personal-purpose" name="job_purpose" value="personal" type="radio" class="custom-control-input" onclick="showAcademicCodeText()" required>
+          <label class="custom-control-label" for="personal-purpose">Personal</label>
+        </div><!--to fill TABLE `web_job` column `job_purpose`=="personal"-->
+    
     <hr class="mb-6">
       
+    <style>
+      .popup {
+        position: relative;
+        display: inline;  /* Changed from inline-block for better alignment */
+        cursor: pointer;
+        padding-left: 5px;  /* Add some spacing between the header text and the trigger */
+      }
 
-      <!--allows popup for Specifications-->
-      <script>
-      $(function () {
-          $('[data-toggle="tooltip"]').tooltip()
-      })
-      </script>
+
+      .popup .popuptext {
+          visibility: hidden;
+          width: 500px;
+          background-color: #555;
+          color: #fff;
+          text-align: center;
+          border-radius: 6px;
+          padding: 8px 0;
+          position: absolute;
+          z-index: 1;
+          
+          /* Adjust the positioning */
+          top: 0;          /* Aligns the top of the popup with the trigger text */
+          left: 110%;     /* Places the popup to the right of the trigger text */
+          margin-left: 20px; /* Optional: Adds some spacing between the trigger and the popup */
+      }
+
+
+      /* Popup leftward arrow */
+      .popup .popuptext::after {
+        content: "";
+        position: absolute;
+        top: 50%;  /* Center vertically */
+        left: 0;  /* Place at the left edge */
+        margin-top: -5px;  /* Adjust vertical position for true centering */
+        border-width: 5px 0 5px 5px;  /* Create left-pointing arrow */
+        border-style: solid;
+        border-color: transparent transparent transparent #555;
+      }
+
+      /* Toggle this class - hide and show the popup */
+      .popup .show {
+        visibility: visible;
+        -webkit-animation: fadeIn 1s;
+        animation: fadeIn 1s;
+      }
+
+      .close-btn {
+        position: absolute;
+        top: 0;
+        right: 0;
+        padding: 5px 10px;
+        cursor: pointer;
+      }
+    </style>
+
+
 
     <div id="3d_specs" class="col-md-12 order-md-1">
-      <h3 class="mb-3">3D Print Specifications <a href="https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/#settings" target="_blank" data-toggle="tooltip" data-placement="right" title="FAQ Specifications section">?</a></h3>
+      <h3 class="mb-3">3D Print Specifications</h3>
         <div class="row">
-            <div class="col-md-3 mb-3" data-toggle="tooltip" data-placement="right" data-trigger="click" title="The percentage of the interior that is made up of material. More infill increases strength, print time, and cost.">
-                <label for="infill">Infill</label>
-                <div class="input-group">
-                  <div class="input-group mb-3">
-                    <input type="number" max="100" min="0" class="form-control" name="infill" value="10" aria-label="100" aria-describedby="basic-addon2" required>
-                    <div class="input-group-append">
-                    <span class="input-group-text" id="basic-addon2">%</span>
-                    </div>
-                </div>
-                <div class="invalid-feedback" style="width: 100%;">
-                Infill is required.
-                </div>
+          <div class="col-md-3 mb-3">
+            <label for="layer-height">Layer Height
+              <span class="popup">
+                &#9432
+                <span class="popuptext" id="myPopup">
+                  <p>3D printing is done by slicing the digital object horizontally into layers, then printing each layer one at a time. Layer height is the thickness of each slice.<br>
+                  The smaller the layer height, the finer the detail of the finished print. Small layer heights take significantly longer to print because more layers are needed.<br>
+                  Standard print jobs are printed at 0.2mm layer height and for most jobs, this is the best option. <br>
+                  The Makerbot printers will print to as fine as 0.1mm and the Ultimaker 3 will print down to a 0.06mm layer height.</p>
+                  <span class="close-btn">x</span>
+                </span>
+              </span>
+            </label>
+            <select class="custom-select d-block w-100" name="layer_height" id="layer-height" required>
+              <option selected="selected">0.2</option>
+              <option>0.15</option>
+              <option>0.1</option>
+              <option>0.06</option>
+            </select>
+            <div class="invalid-feedback">
+              Please select a valid layer height.
             </div>
-            </div>
-            <div class="col-md-3 mb-3" data-toggle="tooltip" data-placement="right" title="The size based on the design of the file.">
-                <label for="scale">Scale</label>
+          </div>
+            <div class="col-md-3 mb-3">
+                <label for="scale">Scale
+                  <span class="popup">
+                      &#9432
+                      <span class="popuptext" id="myPopup">
+                        <p>The scale is the size of the print by comparison to the size it was designed to be. Many models are printed at 100% scale, but it is also common to change the size.<br> 
+                        Keep in mind: when decreasing model size, you will also be decreasing wall thickness and the size of detail. This can result in a loss of quality when printing, if taken too far.</p>
+                        <span class="close-btn">x</span>
+                      </span>
+                    </span>
+                </label>
                 <div class="input-group">
                 <div class="input-group mb-3">
                     <input type="number" min="1" class="form-control" name="scale" value="100" aria-label="100" aria-describedby="basic-addon2" required>
@@ -356,22 +466,50 @@ header("location: customer-dashboard.php");
                 </div>
             </div>
         </div>
-
         <div class="row">
-          <div class="col-md-3 mb-3" data-toggle="tooltip" data-placement="right" title="Thickness of each layer. Smaller heights increases detail and print time.">
-            <label for="layer-height">Layer Height</label>
-            <select class="custom-select d-block w-100" name="layer_height" id="layer-height" required>
-              <option selected="selected">0.2</option>
-              <option>0.15</option>
-              <option>0.1</option>
-              <option>0.06</option>
-            </select>
-            <div class="invalid-feedback">
-              Please select a valid layer height.
+          <div class="col-md-3 mb-3">
+            <label for="infill">Infill
+              <span class="popup">
+                &#9432
+                <span class="popuptext" id="myPopup">
+                  <p>The infill is the percentage of the inside of the print that is filled with material.<br>
+                  A higher infill makes the object sturdy and able to bear more weight, but can significantly increase the cost.<br>
+                  Most decorative items can have 5-10% infill.<br>
+                  Having no infill is not advised, unless the object was specifically designed to be printed with zero infill.<br>
+                  Increasing the size will also increase the amount of material used, increasing the cost. <br>
+                  In the image above, you’ll see the number of shells each print has. The number of shells or shell thickness is how thick the outside layer is. A thicker shell increase strength but also increase cost. Thicker shells can also be useful for post processing, as sanding or refining a print can remove shells and extra shells prevent ruining the print.<br>
+                  For additional shells please note this in the additional comment section of your print or jobs will be printed with default shell thickness.</p>
+                  <span class="close-btn">x</span>
+                </span>
+              </span>
+            </label>
+
+                <div class="input-group">
+                  <div class="input-group mb-3">
+                    <input type="number" max="100" min="0" class="form-control" name="infill" value="10" aria-label="100" aria-describedby="basic-addon2" required>
+                    <div class="input-group-append">
+                    <span class="input-group-text" id="basic-addon2">%</span>
+                    </div>
+                </div>
+                <div class="invalid-feedback" style="width: 100%;">
+                Infill is required.
+                </div>
             </div>
-          </div>
-          <div class="col-md-3 mb-3" data-toggle="tooltip" data-placement="right" title="3D printers cannot print large overhangs and supports allow builing sections. Supports use material and increase cost.">
-            <label for="supports">Supports</label>
+            </div>
+            
+          <div class="col-md-3 mb-3">
+            <label for="supports">Supports
+              <span class="popup">
+              &#9432
+                <span class="popuptext" id="myPopup">
+                  <p>It’s generally best to have Supports turned on.<br>
+                  The printing software we use will only generate supports where needed. We offer two option for support materials; regular PLA supports, which break off after printing but can leave aesthetic marks and may require sanding to get rid off.<br>
+                  The alternative is water soluble PVA supports, which allow supports to be built in places that PLA supports would be difficult or impossible to remove.<br>
+                  PVA supports also dont leave aesthetic marks, creating a nicer initial finish. However, PVA costs more at 20 cents per gram and increases printing times.</p>
+                  <span class="close-btn">x</span>
+                </span>
+              </span>
+            </label>
             <select class="custom-select d-block w-100" name="supports" id="supports" required>
               <option value="1">Yes</option>
               <option value="0">No</option>
@@ -383,21 +521,11 @@ header("location: customer-dashboard.php");
         </div>
 
         <div>
-        <hr class="mb-4">
+          <hr class="mb-4">
           <div class="col-md-3 mb-3">
             <label for="supports">Copies</label>
-            <select class="custom-select d-block w-100" name="copies" id="supports" required>
-              <option>1</option>
-              <option>2</option>
-              <option>3</option>
-              <option>4</option>
-              <option>5</option>
-              <option>6</option>
-              <option>7</option>
-              <option>8</option>
-              <option>9</option>
-              <option>10</option>
-            </select>
+            <input type="number" class="form-control" name="copies" min="1" max="100" step="1" id="supports" value = "1" required />
+
             <div class="invalid-feedback">
               Please provide a valid response.
             </div>
@@ -405,24 +533,89 @@ header("location: customer-dashboard.php");
         </div>
 
         <hr class="mb-4">
-        <h3 class="mb-2">3D Print Material Type <a href="https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/#filaments" target="_blank" data-toggle="tooltip" data-placement="right" title="FAQ Material section">?</a></h3>
+        <h3 class="mb-2">3D Print Material Type</h3>
         <div class="d-block my-3">
           <div class="custom-control custom-radio">
             <input id="pla" name="print_material_type" value="PLA" type="radio" class="custom-control-input" checked required>
-            <label class="custom-control-label" for="pla">PLA</label>
+            <label class="custom-control-label" for="pla">PLA 
+            </label>
+              <span class="popup">
+                &#9432
+                <span class="popuptext" id="myPopup">
+                  <p>
+                  PLA (Polylactic Acid): 
+                  <ul>
+                    <li>A form of plastic made from natural starches like cornstarch that will biodegrade in some industrial composting facilities.</li>
+                    <li>We charge 10 cents per gram.</li>
+                  </ul>
+                  </p>
+                  <span class="close-btn">x</span>
+                </span>
+              </span>
           </div>
           <div class="custom-control custom-radio">
             <input id="pla-pva" name="print_material_type" value="PLA + PVA" type="radio" class="custom-control-input" required>
-            <label class="custom-control-label" for="pla-pva">PLA + PVA</label>
+            <label class="custom-control-label" for="pla-pva">PLA + PVA
+            </label>
+            <span class="popup">
+              &#9432
+              <span class="popuptext" id="myPopup">
+                <p>
+                PVA Dissolving Filament:
+                <ul>
+                  <li>Also made from starch.</li>
+                  <li>It dissolves when you put it in water.</li>
+                  <li>Used for supports.</li>
+                  <li>We charge 20 cents per gram.</li>
+                </ul>
+                </p>
+                <span class="close-btn">x</span>
+              </span>
+            </span>
           </div>
           <div class="custom-control custom-radio">
             <input id="tpu95" name="print_material_type" value="TPU95" type="radio" class="custom-control-input" required>
             <label class="custom-control-label" for="tpu95">TPU95</label>
+            <span class="popup">
+              &#9432
+              <span class="popuptext" id="myPopup">
+                <p>
+                TPU 95a:
+                <ul>
+                  <li>A material with medium flex</li>
+                  <li>We charge 20 cents per gram</li>
+                </ul>
+                </p>
+                <span class="close-btn">x</span>
+              </span>
+            </span>
           </div>
           <div class="custom-control custom-radio">
             <input id="other" name="print_material_type" value="Other" type="radio" class="custom-control-input" required>
             <label class="custom-control-label" for="other">Other</label>
-            <small class="text-muted"> - Elaborate in Additional Comments section</small>
+              <span class="popup">
+              &#9432
+              <span class="popuptext" id="myPopup">
+                <p>
+                Q) How durable is the material?<br>
+                  A) PLA is brittle so if you put any load on something printed with PLA plastic always use protective eyewear to protect against the piece shattering into tiny shards.<br>
+                  Higher infill density as well and number of shells will increase the strength of a piece, but it also increases cost since it makes a printed object weigh more.<br>
+                  <a href="https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/#printers">Click here to see</a> Printer Information and Filaments Used.<br><br>
+
+                  About Colors:<br>
+                  We have different coloured filament loaded into the printers at a given time. When you email your print job, you can ask what colours are currently loaded in the printer. If your job specifically requires a certain colour, email and ask if it is possible.<br>
+                  Two-colour printing is possible with the DSC’s Ultimaker 3. Here are some things to note while creating your object:<br>
+                  <ul>
+                    <li>To complete a print, projects need to be exported in either a .’obj’ file (TinkerCad and other software such as SolidWorks) or ‘.amf’ file (SolidWorks).</li>
+                    <li>Before exporting your complete .obj file, make sure to group objects of the same colour together and export each as a different file. These will fit together for printing to complete your two colour creation.</li>
+                    <li>Make sure to communicate your colour preferences when requesting a print job; to make sure that your colour choices are available at the DSC.</li>
+                    <li>Note: Dissolving PVA Supports are not available with two colour print jobs.</li>
+                  </ul>
+                </p>
+                <span class="close-btn">x</span>
+              </span>
+              </span>
+              <small class="text-muted"> - Elaborate in Additional Comments section</small>
           </div>
         </div>
     </div>
@@ -433,10 +626,23 @@ header("location: customer-dashboard.php");
     <div id="laser_specs" class="col-md-12 order-md-1">
       <!--change link to a future laser cut FAQ page-->
       <div>
-      <h3 class="mb-3"> Laser Cut Specifications <a href="https://lib.uvic.ca/laser" target="_blank" data-toggle="tooltip" data-placement="right" title="FAQ Specifications section">?</a></h3>
-        <label class="mb-2"> Indicate either cut or engrave properties for each color in laser cut graphic (temporary) </label>
+      <h3 class="mb-3"> Laser Cut Specifications</h3>
+        <label class="mb-2"> Indicate either cut or engrave properties for each color in laser cut graphic
+          <span class="popup">
+            &#9432
+            <span class="popuptext" id="myPopup">
+              <p>Specify if you want to <b>cut</b> or <b>engrave</b> your design.<br>
+                If the file has both cutting and engraving, specify which colour is which (e.g red lines are cut, black lines are engraved).<br><br>
+                <b>% Power:</b> higher power settings will result in a deeper or darker engraving.  Very high power will cut through the material instead of engraving.<br><br>
+                <b>Passes:</b> similar to power, increasing the number of passes will make an engraving darker.  For fragile thin materials like paper, it may be better to have multiple passes at low power instead of a single high powered pass.<br><br>
+                We use a Trotec Speedy 100 laser; any special settings can be requested in the comments box when submitting a request.
+              </p>
+              <span class="close-btn">x</span>
+            </span>
+          </span>
+        </label>
             <div class="input-group">
-                <textarea class="form-control" name="user_specs" aria-label="user-specs"></textarea>
+                <textarea cols="50" rows="5" class="form-control" name="user_specs" aria-label="user-specs"></textarea>
             </div>
             <div class="invalid-feedback">
             Please provide laser cutting specifications
@@ -447,18 +653,7 @@ header("location: customer-dashboard.php");
         <hr class="mb-4">
           <div class="col-md-3 mb-3">
             <label for="supports">Copies</label>
-            <select class="custom-select d-block w-100" name="laser_copies" id="supports" required>
-              <option>1</option>
-              <option>2</option>
-              <option>3</option>
-              <option>4</option>
-              <option>5</option>
-              <option>6</option>
-              <option>7</option>
-              <option>8</option>
-              <option>9</option>
-              <option>10</option>
-            </select>
+            <input type="number" class="form-control" name="laser_copies" min="1" max="100" step="1" id="supports" value="1" required />
             <div class="invalid-feedback">
               Please provide a valid response.
             </div>
@@ -467,27 +662,70 @@ header("location: customer-dashboard.php");
 
         <hr class="mb-4">
         <!--change link to a future laser cut FAQ page-->
-        <h3 class="mb-2">Laser Cut Material Type <a href="https://onlineacademiccommunity.uvic.ca/dsc/how-to-laser-cut/#colours" target="_blank" data-toggle="tooltip" data-placement="right" title="FAQ Material section">?</a></h3>
+        <h3 class="mb-2">Laser Cut Material Type</h3>
         <div class="d-block my-3">
           <div class="custom-control custom-radio">
             <input id="plywood_3mm" name="laser_material_type" value="Plywood 3mm" type="radio" class="custom-control-input" checked required>
             <label class="custom-control-label" for="plywood_3mm">Plywood 3mm</label>
+              <span class="popup">
+                &#9432
+                <span class="popuptext" id="myPopup">
+                  <p><b>Plywood:</b> our cheapest material, in 3mm and 6mm thicknesses
+                  </p>
+                  <span class="close-btn">x</span>
+                </span>
+              </span>
           </div>
           <div class="custom-control custom-radio">
             <input id="plywood_6mm" name="laser_material_type" value="Plywood 6mm" type="radio" class="custom-control-input" required>
             <label class="custom-control-label" for="plywood_6mm">Plywood 6mm</label>
+              <span class="popup">
+                &#9432
+                <span class="popuptext" id="myPopup">
+                  <p><b>Plywood:</b> our cheapest material, in 3mm and 6mm thicknesses
+                  </p>
+                <span class="close-btn">x</span>
+                </span>
+              </span>
           </div>
           <div class="custom-control custom-radio">
             <input id="mdf_3mm" name="laser_material_type" value="MDF 3mm" type="radio" class="custom-control-input" required>
             <label class="custom-control-label" for="mdf_3mm">MDF 3mm</label>
+            <span class="popup">
+              &#9432
+              <span class="popuptext" id="myPopup">
+                <p><b>MDF Wood (Medium-Density Fibreboard):</b> slightly denser and darker than plywood, available in 3mm and 6mm thicknesses.
+                </p>
+                <span class="close-btn">x</span>
+              </span>
+            </span>
           </div>
           <div class="custom-control custom-radio">
             <input id="mdf_6mm" name="laser_material_type" value="MDF 6mm" type="radio" class="custom-control-input" required>
             <label class="custom-control-label" for="mdf_6mm">MDF 6mm</label>
+            <span class="popup">
+              &#9432
+              <span class="popuptext" id="myPopup">
+                <p><b>MDF Wood (Medium-Density Fibreboard):</b> slightly denser and darker than plywood, available in 3mm and 6mm thicknesses.
+                </p>
+                <span class="close-btn">x</span>
+              </span>
+            </span>
           </div>
           <div class="custom-control custom-radio">
             <input id="laser_cut_other" name="laser_material_type" value="Other" type="radio" class="custom-control-input" required>
-            <label class="custom-control-label" for="laser_cut_other">Other</label>
+            <label class="custom-control-label" for="laser_cut_other">Other
+            </label>
+            <span class="popup">
+              &#9432
+              <span class="popuptext" id="myPopup">
+                <p><b>Higher-quality wood:</b> contact us for special requests.<br>
+                    We can also engrave metals such as anodized aluminum, but you must provide the material yourself – email us at <a href="mailto:dscommons@uvic.ca">dscommons@uvic.ca</a> for more information.<br>
+                    If no special settings are requested, we will use the recommended settings for the material.
+                </p>
+                <span class="close-btn">x</span>
+              </span>
+            </span>
             <small class="text-muted"> - Elaborate in Additional Comments section</small>
           </div>
         </div>
@@ -497,7 +735,7 @@ header("location: customer-dashboard.php");
       <hr class="mb-4">
           <h3 class="mb-2">Additional Comments</h3>
               <div class="input-group">
-                  <textarea class="form-control" name="comments" aria-label="additional-comments"></textarea>
+                  <textarea rows="5" cols="50" class="form-control" name="comments" aria-label="additional-comments"></textarea>
               </div>
               <div class="invalid-feedback">
                 Please enter additional comments.
@@ -519,7 +757,38 @@ header("location: customer-dashboard.php");
   <br>
   <p></p>
 
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+  <script>
+    // Function to toggle popup
+    function togglePopup(event) {
+      event.stopPropagation();  // Stop event from propagating to parent elements
+      console.log("popup clicked");
+      var popup = event.currentTarget.querySelector('.popuptext');
+      popup.classList.toggle('show');
+    }
+
+    // Function to close popup
+    function closePopup(event) {
+      event.stopPropagation();  // Stop event from propagating to parent elements
+      event.stopPropagation();
+      event.currentTarget.parentElement.classList.remove('show');
+    }
+
+    // Attach toggle function to all popups
+    var popups = document.querySelectorAll('.popup');
+    for (var i = 0; i < popups.length; i++) {
+      popups[i].addEventListener('click', togglePopup);
+    }
+
+    // Attach close function to all close buttons
+    var closeButtons = document.querySelectorAll('.close-btn');
+    for (var i = 0; i < closeButtons.length; i++) {
+      closeButtons[i].addEventListener('click', closePopup);
+    }
+  </script>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
       <script>window.jQuery || document.write('<script src="/docs/4.5/assets/js/vendor/jquery.slim.min.js"><\/script>')</script><script src="/docs/4.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-1CmrxMRARb6aLqgBO7yyAxTOQE2AKb9GfXnEo760AUcUmFx3ibVJJAzGytlQcNXd" crossorigin="anonymous"></script>
-        <script src="form-validation.js"></script></body>
+        <script src="form-validation.js"></script>
+
+  </body>
 </html>
