@@ -12,6 +12,22 @@ $stm = $conn->prepare("SELECT * FROM web_job INNER JOIN laser_cut_job ON id=lase
 $stm->execute([$_GET["job_id"]]);
 $job=$stm->fetch();
 
+$status_date=""; //To display date that the current status was set
+if($job['status'] == "submitted"){
+  status_date=$job["submission_date"];
+}
+elseif($job['status'] == "on hold"){
+  status_date=$job["hold_date"];
+}
+elseif($job['status'] == "pending payment"){
+  status_date=$job["priced_date"];
+}
+elseif($job['status'] == "printing"){
+  status_date=$job["printing_date"];
+}
+elseif($job['status'] == "completed"){
+  status_date=$job["completed_date"];
+}
 /*
 $stm = $conn->prepare("SELECT * FROM print_job WHERE id=?");
 $stm->execute([$_GET["job_id"]]);
@@ -47,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
   }
 
-  $stmt = $conn->prepare("UPDATE web_job INNER JOIN laser_cut_job ON id=laser_cut_id SET price = :price, copies=:copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, hold_date = :hold_date, model_name_2 =:model_name_2 WHERE id = :job_id;");
+  $stmt = $conn->prepare("UPDATE web_job INNER JOIN laser_cut_job ON id=laser_cut_id SET price = :price, copies=:copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, delivered_date = :delivered_date, hold_date = :hold_date, hold_signer= :hold_signer, cancelled_signer = :cancelled_signer, model_name_2 =:model_name_2 WHERE id = :job_id;");
   //$stmt = $conn->prepare("UPDATE print_job SET price = :price, infill = :infill, scale = :scale, layer_height = :layer_height, supports = :supports, copies = :copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, model_name_2 =:model_name_2 WHERE id = :job_id;
   //");
   $current_date = date("Y-m-d");
@@ -67,13 +83,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $d1 = $job['priced_date'];
   $d2 = $job['paid_date'];
   $d3 = $job['printing_date'];
-  $d4 = $job['completed_date'];
+  $d6 = $job['completed_date'];
   $d5 = $job['hold_date'];
+  $d4 = $job['delivered_date'];
   $stmt->bindParam(':priced_date', $d1);
   $stmt->bindParam(':paid_date', $d2);
   $stmt->bindParam(':printing_date', $d3);
-  $stmt->bindParam(':completed_date', $d4);
+  $stmt->bindParam(':completed_date', $d6);
   $stmt->bindParam(':hold_date', $d5);
+  $stmt->bindParam(':delivered_date', $d4);
 
   //need variable to check if admin wants to send email. case: updating notes but dont send email
   if ($_POST['status'] == "pending payment") {
@@ -116,7 +134,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo "d5";
     $d5 = $current_date;
 
-  } elseif ($_POST['status'] == "completed") {
+
+  }elseif($_POST['status'] == "completed"){
+    echo "d6";
+    $d6 = $current_date;
+
+    
+  } elseif ($_POST['status'] == "delivered") {
     $d4 = $current_date;
 
     //email user
@@ -226,23 +250,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h4 class="mb-3">Status</h4>
           <div class="row">
             <div class="col-md-3 mb-3">
-                <select class="custom-select d-block w-100" name="status" id="layer-height">
-                  <?php if ($job["status"] == "cancelled") {
-                    ?> <option value="cancelled" echo "selected" readonly>cancelled</option>
-                  <?php } else { ?>
-                    <option value="submitted" <?php if ($job["status"]== "submitted"){echo "selected";} ?>>Not Priced</option>
-                    <option value="pending payment" <?php if ($job["status"]== "pending payment"){echo "selected";} ?>>Pending Payment</option>
-                    <option value="on hold" <?php if ($job["status"]== "on hold"){echo "selected";} ?>>On Hold</option>
-                    <option value="paid" <?php if ($job["status"]== "paid"){echo "selected";} ?>>Paid</option>
-                    <option value="printing" <?php if ($job["status"]== "printing"){echo "selected";} ?>>Printing</option>
-                    <option value="printed" <?php if ($job["status"]== "printed"){echo "selected";} ?>>Printed</option>
-                    <option value="completed" <?php if ($job["status"]== "completed"){echo "selected";} ?>>Completed</option>
-                    <option value="archived" <?php if ($job["status"]== "archived"){echo "selected";} ?>>Archived</option>
-                  <?php } ?>
-                </select>
+              <select class="custom-select d-block w-100" name="status" id="layer-height">
+                <?php if ($job["status"] == "cancelled") {
+                  ?> <option value="cancelled" echo "selected" readonly>cancelled</option>
+                <?php } else { ?>
+                  <option value="submitted" <?php if ($job["status"]== "submitted"){echo "selected";} ?>>Not Priced</option>
+                  <option value="pending payment" <?php if ($job["status"]== "pending payment"){echo "selected";} ?>>Pending Payment</option>
+                  <option value="on hold" <?php if ($job["status"]== "on hold"){echo "selected";} ?>>On Hold</option>
+                  <option value="paid" <?php if ($job["status"]== "paid"){echo "selected";} ?>>Paid</option>
+                  <option value="printing" <?php if ($job["status"]== "printing"){echo "selected";} ?>>Printing</option>
+                  <option value="printed" <?php if ($job["status"]== "completed"){echo "selected";} ?>>Completed</option>
+                  <option value="completed" <?php if ($job["status"]== "delivered"){echo "selected";} ?>>Delivered</option>
+                  <option value="archived" <?php if ($job["status"]== "archived"){echo "selected";} ?>>Archived</option>
+                <?php } ?>
+              </select>
+            </div>
+            <div class="col-md-3 mb-3">
+              <div class="input-group">
+                <div class="input-group">
+                  <input type="text" class="form-control" value="status_date" readonly>
+                </div>
               </div>
-              </div>
+            </div>
           </div>
+        </div>
 
           <div class="col-md-12 order-md-1">
             <h4 class="mb-3">Submission Date</h4>
@@ -256,7 +287,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                       <div class="invalid-feedback" style="width: 100%;">
                       Status is required.
                       </div>
-                      </div>
+                    </div>
                   </div>
               </div>
 
