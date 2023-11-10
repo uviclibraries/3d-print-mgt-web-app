@@ -13,21 +13,21 @@ $stm->execute([$_GET["job_id"]]);
 $job=$stm->fetch();
 
 $status_date=""; //To display date that the current status was set
-if($job['status'] == "submitted"){
-  status_date=$job["submission_date"];
-}
-elseif($job['status'] == "on hold"){
-  status_date=$job["hold_date"];
-}
-elseif($job['status'] == "pending payment"){
-  status_date=$job["priced_date"];
-}
-elseif($job['status'] == "printing"){
-  status_date=$job["printing_date"];
-}
-elseif($job['status'] == "completed"){
-  status_date=$job["completed_date"];
-}
+// if($job['status'] == "submitted"){
+//   status_date=$job["submission_date"];
+// }
+// elseif($job['status'] == "on hold"){
+//   status_date=$job["hold_date"];
+// }
+// elseif($job['status'] == "pending payment"){
+//   status_date=$job["priced_date"];
+// }
+// elseif($job['status'] == "printing"){
+//   status_date=$job["printing_date"];
+// }
+// elseif($job['status'] == "completed"){
+//   status_date=$job["completed_date"];
+// }
 /*
 $stm = $conn->prepare("SELECT * FROM print_job WHERE id=?");
 $stm->execute([$_GET["job_id"]]);
@@ -93,6 +93,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $stmt->bindParam(':hold_date', $d5);
   $stmt->bindParam(':delivered_date', $d4);
 
+  $hs = $job['hold_signer'];
+  $cs = $job['cancelled_signer'];
+  $stmt->bindParam(':hold_signer', $hs);
+  $stmt->bindParam(':cancelled_signer', $cs);
   //need variable to check if admin wants to send email. case: updating notes but dont send email
   if ($_POST['status'] == "pending payment") {
     $d1 = $current_date;
@@ -130,9 +134,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   } elseif($_POST['status'] == "printing"){
     $d3 = $current_date;
 
-  } elseif($_POST['status'] == "on_hold"){
-    echo "d5";
+  } elseif($_POST['status'] == "on hold"){
+    echo "post status == on hold";
     $d5 = $current_date;
+    $hs = $user;
 
 
   }elseif($_POST['status'] == "completed"){
