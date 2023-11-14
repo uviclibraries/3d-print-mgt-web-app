@@ -12,10 +12,11 @@ $sql_line =array(); //sql builder
 $getcheck = array_fill(0,3, FALSE);
 if (isset($_GET['searchdate_start']) && ($_GET['searchdate_start'] != "" && $_GET['searchdate_start'] != NULL)) {
   $getcheck[0] = True;
-  $sql_line[] = "completed_date >= :searchdate_start";
+  $sql_line[] = "(submission_date >= :searchdate_start OR delivered_date >= :searchdate_start OR cancelled_date >= :searchdate_start OR completed_date >= :searchdate_start)";
+
 }if (isset($_GET['searchdate_end']) && ($_GET['searchdate_end'] != "" && $_GET['searchdate_end'] != NULL)) {
   $getcheck[1] = True;
-  $sql_line[] = "completed_date <= :searchdate_end";
+  $sql_line[] = "(submission_date <= :searchdate_end OR delivered_date <= :searchdate_end OR cancelled_date <= :searchdate_end OR completed_date <= :searchdate_end)";
 }if (isset($_GET['search_id']) && ($_GET['search_id'] != "" && $_GET['search_id'] != NULL)) {
   $getcheck[2] = True;
   $sql_line[] = "netlink_id LIKE :search_id";
@@ -24,13 +25,13 @@ if (isset($_GET['searchdate_start']) && ($_GET['searchdate_start'] != "" && $_GE
 //3D PRINT JOBS
 //Check if parameters are empty 
 if ($getcheck[0]==FALSE && $getcheck[1]==FALSE && $getcheck[2]==FALSE) {
-  $stm = $conn->query("SELECT id, job_name, netlink_id, status, completed_date FROM web_job INNER JOIN 3d_print_job ON web_job.id=3d_print_job.3d_print_id WHERE status = 'completed' OR status = 'archived' OR status = 'cancelled' ORDER BY completed_date DESC");
+  $stm = $conn->query("SELECT id, job_name, netlink_id, status, completed_date, delivered_date, submission_date, cancelled_date FROM web_job INNER JOIN 3d_print_job ON web_job.id=3d_print_job.3d_print_id WHERE status = 'completed' OR status = 'archived' OR status = 'cancelled' ORDER BY completed_date DESC");
 }
 //find out what parameters are being searched for
 else{
 
   //build sql query line based on search parameters
-  $searchline = "SELECT id, job_name, netlink_id, status, completed_date FROM web_job INNER JOIN 3d_print_job ON web_job.id=3d_print_job.3d_print_id WHERE (status = 'completed' OR status = 'archived' OR status = 'cancelled') AND " . implode(" AND ", $sql_line) . " ORDER BY completed_date DESC";
+  $searchline = "SELECT id, job_name, netlink_id, status, completed_date, delivered_date, submission_date, cancelled_date FROM web_job INNER JOIN 3d_print_job ON web_job.id=3d_print_job.3d_print_id WHERE (status = 'completed' OR status = 'archived' OR status = 'cancelled') AND " . implode(" AND ", $sql_line) . " ORDER BY completed_date DESC";
   $stm = $conn->prepare($searchline);
   //echo $searchline . "\n";
 
@@ -53,13 +54,13 @@ $d_history = $stm->fetchAll();
 //LASER CUT JOBS
 //Check if parameters are empty 
 if ($getcheck[0]==FALSE && $getcheck[1]==FALSE && $getcheck[2]==FALSE) {
-  $stm = $conn->query("SELECT id, job_name, netlink_id, status, completed_date FROM web_job INNER JOIN laser_cut_job ON web_job.id=laser_cut_job.laser_cut_id WHERE status = 'completed' OR status = 'archived' OR status = 'cancelled' ORDER BY completed_date DESC");
+  $stm = $conn->query("SELECT id, job_name, netlink_id, status, completed_date, delivered_date, submission_date, cancelled_date FROM web_job INNER JOIN laser_cut_job ON web_job.id=laser_cut_job.laser_cut_id WHERE status = 'completed' OR status = 'archived' OR status = 'cancelled' ORDER BY completed_date DESC");
 }
 //find out what parameters are being searched for
 else{
 
   //build sql query line based on search parameters
-  $searchline = "SELECT id, job_name, netlink_id, status, completed_date FROM web_job INNER JOIN laser_cut_job ON web_job.id=laser_cut_job.laser_cut_id WHERE (status = 'completed' OR status = 'archived' OR status = 'cancelled') AND " . implode(" AND ", $sql_line) . " ORDER BY completed_date DESC";
+  $searchline = "SELECT id, job_name, netlink_id, status, completed_date, delivered_date, submission_date, cancelled_date FROM web_job INNER JOIN laser_cut_job ON web_job.id=laser_cut_job.laser_cut_id WHERE (status = 'completed' OR status = 'archived' OR status = 'cancelled') AND " . implode(" AND ", $sql_line) . " ORDER BY completed_date DESC";
   $stm = $conn->prepare($searchline);
   //echo $searchline . "\n";
 
