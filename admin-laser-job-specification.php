@@ -181,6 +181,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   elseif($job['status'] == "completed"){
     $status_date=$job["completed_date"];
   }
+    elseif($job['status'==("delivered")]){
+    $status_date=$job['delivered_date'];
+  }
+  elseif($job['status'==("cancelled")]){
+    $status_date=$job['cancelled_date'];
+  }
+  elseif($job['status'==("archived")]){
+    $status_date=$job['delivered_date'];
+  }
 ?>
 
 

@@ -9,6 +9,9 @@ if ($user_type == 1) {
 }
 
 
+/*
+User querey fields
+*/
 $sql_line =array(); //sql builder
 $getcheck = array_fill(0,3, FALSE);
 if (isset($_GET['searchdate_start']) && ($_GET['searchdate_start'] != "" && $_GET['searchdate_start'] != NULL)) {
@@ -22,34 +25,62 @@ if (isset($_GET['searchdate_start']) && ($_GET['searchdate_start'] != "" && $_GE
   $sql_line[] = "netlink_id LIKE :search_id";
 }
 
-//Check if parameters are empty
-if ($getcheck[0]==FALSE && $getcheck[1]==FALSE && $getcheck[2]==FALSE) {
-  $stm = $conn->query("SELECT id, job_name, netlink_id, status, completed_date FROM web_job WHERE status = 'completed' OR status = 'archived' OR status = 'cancelled' ORDER BY completed_date DESC");
-}
-//find out what parameters are being searched for
-else{
-
+/*3D PRINT JOBS
+*/
   //build sql query line based on search parameters
-  $searchline = "SELECT id, job_name, netlink_id, status, completed_date FROM web_job WHERE (status = 'completed' OR status = 'archived' OR status = 'cancelled') AND " . implode(" AND ", $sql_line) . " ORDER BY completed_date DESC";
-  $stm = $conn->prepare($searchline);
-  //echo $searchline . "\n";
+  $searchline = "SELECT web_job.id AS id, web_job.job_name AS job_name, web_job.status AS status, web_job.submission_date AS submission_date, web_job.delivered_date AS delivered_date, web_job.cancelled_date AS cancelled_date, web_job.job_purpose AS job_purpose, users.name AS name FROM web_job INNER JOIN users ON web_job.netlink_id=users.netlink_id INNER JOIN laser_cut_job ON web_job.id=3d_print_job.3d_print_id WHERE status IN ('completed', 'delivered', 'archived', 'cancelled')";
 
-  //Bind search parameters
-  if ($getcheck[0] == TRUE) {
-    $stm->bindParam(':searchdate_start', $_GET['searchdate_start'], PDO::PARAM_STR);
-  }if ($getcheck[1] == TRUE) {
-    $stm->bindParam(':searchdate_end', $_GET['searchdate_end'], PDO::PARAM_STR);
-  }if ($getcheck[2] == TRUE) {
-    $temp = $_GET['search_id']."%";
-    $stm->bindParam(':search_id', $temp, PDO::PARAM_STR);
+  if(!empty($sql_line)){
+    $searchline .= " AND " . implode(" AND ", $sql_line);
   }
 
-  $stm->execute();
+  $searchline .= "ORDER BY completed_date DESC";
 
+  $stm = $conn ->prepare($searchline);
+
+//Bind search parameters
+if ($getcheck[0] == TRUE) {
+  $stm->bindParam(':searchdate_start', $_GET['searchdate_start'], PDO::PARAM_STR);
+}if ($getcheck[1] == TRUE) {
+  $stm->bindParam(':searchdate_end', $_GET['searchdate_end'], PDO::PARAM_STR);
+}if ($getcheck[2] == TRUE) {
+  $temp = $_GET['search_id']."%";
+  $stm->bindParam(':search_id', $temp, PDO::PARAM_STR);
 }
-//SQL results
-$completed = $stm->fetchAll();
 
+$stm->execute(); //**ERROR HERE!!
+
+//SQL results
+$d_history = $stm->fetchAll();
+
+/*laser cut JOBS
+*/
+  $searchline = "SELECT web_job.id AS id, web_job.job_name AS job_name, web_job.status AS status, web_job.submission_date AS submission_date, web_job.delivered_date AS delivered_date, web_job.cancelled_date AS cancelled_date, web_job.job_purpose AS job_purpose, users.name AS name FROM web_job INNER JOIN users ON web_job.netlink_id=users.netlink_id INNER JOIN laser_cut_job ON web_job.id=laser_cut_job.laser_cut_id WHERE status IN ('completed', 'delivered', 'archived', 'cancelled')";
+
+  if(!empty($sql_line)){
+    $searchline .= " AND " . implode(" AND ", $sql_line);
+  }
+
+  $searchline .= "ORDER BY completed_date DESC";
+
+  $stm = $conn ->prepare($searchline);
+
+//Bind search parameters
+if ($getcheck[0] == TRUE) {
+  $stm->bindParam(':searchdate_start', $_GET['searchdate_start'], PDO::PARAM_STR);
+}if ($getcheck[1] == TRUE) {
+  $stm->bindParam(':searchdate_end', $_GET['searchdate_end'], PDO::PARAM_STR);
+}if ($getcheck[2] == TRUE) {
+  $temp = $_GET['search_id']."%";
+  $stm->bindParam(':search_id', $temp, PDO::PARAM_STR);
+}
+
+$stm->execute();
+
+//SQL results
+$l_history = $stm->fetchAll();
+
+/*more to do with search query*/
 $get_line = array();
 //Seach button clicked
 if($_SERVER['REQUEST_METHOD'] === 'POST'){
@@ -64,9 +95,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
   }
   header("Location: admin-print-history.php?". implode("&", $get_line));
 }
-
-
 ?>
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -171,7 +201,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
   </div>
 
 
-
+  <button class="accordion active">3D Print Jobs</button>
+    <div class="panel" style="display:block;">
   <div class="py-3"></div>
   <div class="table-responsive">
   <table class="table table-striped table-md">
@@ -187,14 +218,15 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
   </thead>
   <tbody>
 
-  <?php foreach ($completed as $row) {
+  <?php foreach ($d_history as $row) {
   ?>
   <tr>
     <td><?php echo $row["id"]; ?></td>
     <td><?php echo $row["netlink_id"]; ?></td>
       <!--CHANGE TO UNEDITABLE SCREEN -->
-      <td><a href="admin-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
-    <td><?php echo $row["completed_date"]; ?></td>
+      <!-- Conditional link based on job_type -->
+      <td style="width:95px;"><a href="admin-3d-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>   
+      <td><?php echo $row["completed_date"]; ?></td>
     <td><?php echo $row["status"]; ?></td>
   </tr>
   <?php
@@ -204,6 +236,44 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
   </tbody>
   </table>
   </div>
+</div>
+
+  <button class="accordion active">Laser Cut Jobs</button>
+  <div class="panel" style="display:block;">
+  <div class="py-3"></div>
+  <div class="table-responsive">
+  <table class="table table-striped table-md">
+  <thead>
+  <tr>
+    <!-- table header-->
+    <th>Job id</th>
+    <th>Username</th>
+    <th>Name</th>
+    <th>Completion Date</th>
+    <th>Status</th>
+  </tr>
+  </thead>
+  <tbody>
+
+  <?php foreach ($l_history as $row) {
+  ?>
+  <tr>
+    <td><?php echo $row["id"]; ?></td>
+    <td><?php echo $row["netlink_id"]; ?></td>
+      <!--CHANGE TO UNEDITABLE SCREEN -->
+      <!-- Conditional link based on job_type -->
+      <td style="width:95px;"><a href="admin-laser-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>   
+      <td><?php echo $row["completed_date"]; ?></td>
+    <td><?php echo $row["status"]; ?></td>
+  </tr>
+  <?php
+  }
+  ?>
+
+  </tbody>
+  </table>
+  </div>
+</div>
 
   <hr class="mb-12">
 
