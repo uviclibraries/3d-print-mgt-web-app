@@ -12,27 +12,10 @@ $stm = $conn->prepare("SELECT * FROM web_job INNER JOIN laser_cut_job ON id=lase
 $stm->execute([$_GET["job_id"]]);
 $job=$stm->fetch();
 
-$status_date=""; //To display date that the current status was set
-// if($job['status'] == "submitted"){
-//   status_date=$job["submission_date"];
-// }
-// elseif($job['status'] == "on hold"){
-//   status_date=$job["hold_date"];
-// }
-// elseif($job['status'] == "pending payment"){
-//   status_date=$job["priced_date"];
-// }
-// elseif($job['status'] == "printing"){
-//   status_date=$job["printing_date"];
-// }
-// elseif($job['status'] == "completed"){
-//   status_date=$job["completed_date"];
-// }
-/*
-$stm = $conn->prepare("SELECT * FROM print_job WHERE id=?");
-$stm->execute([$_GET["job_id"]]);
-$job=$stm->fetch();
-*/
+// $stm = $conn->prepare("SELECT * FROM print_job WHERE id=?");
+// $stm->execute([$_GET["job_id"]]);
+// $job=$stm->fetch();
+
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -181,7 +164,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   //exit to dashboard after saving
   header("location: admin-dashboard.php");
 }
+
+  $status_date=""; //To display date that the current status was set
+  if($job['status'] == "submitted"){
+   $status_date=$job["submission_date"];
+   }
+  elseif($job['status'] == "on hold"){
+    $status_date=$job["hold_date"];
+  }
+  elseif($job['status'] == "pending payment"){
+    $status_date=$job["priced_date"];
+  }
+  elseif($job['status'] == "printing"){
+    $status_date=$job["printing_date"];
+  }
+  elseif($job['status'] == "completed"){
+    $status_date=$job["completed_date"];
+  }
 ?>
+
+
 
 <!doctype html>
 <html lang="en">
@@ -273,7 +275,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="col-md-3 mb-3">
               <div class="input-group">
                 <div class="input-group">
-                  <input type="text" class="form-control" value="status_date" readonly>
+                  <input type="text" class="form-control" value="<?php echo $status_date;?>" readonly>
                 </div>
               </div>
             </div>
@@ -378,11 +380,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h5 class="mb-2">Material Type</h5>
         <div class="d-block my-3">
         <div class="custom-control custom-radio">
-            <input id="plywood_3mm" name="material_type" value="Plywood_3mm" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "Plywood 3mm"){echo "checked";} ?>>
+            <input id="plywood_3mm" name="material_type" value="Plywood_3mm" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "Plywood_3mm"){echo "checked";} ?>>
             <label class="custom-control-label" for="plywood_3mm">Plywood 3mm</label>
           </div>
           <div class="custom-control custom-radio">
-            <input id="plywood_6mm" name="material_type" value="Plywood_6mm" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "Plywood 6mm"){echo "checked";} ?>>
+            <input id="plywood_6mm" name="material_type" value="Plywood_6mm" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "Plywood_6mm"){echo "checked";} ?>>
             <label class="custom-control-label" for="plywood_6mm">Plywood 6mm</label>
           </div>
           <div class="custom-control custom-radio">
