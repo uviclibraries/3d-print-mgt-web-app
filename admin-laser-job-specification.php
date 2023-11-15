@@ -16,7 +16,11 @@ $job=$stm->fetch();
 // $stm->execute([$_GET["job_id"]]);
 // $job=$stm->fetch();
 
-
+//Get users name & email
+$userSQL = $conn->prepare("SELECT * FROM users WHERE netlink_id = :netlink_id");
+$userSQL->bindParam(':netlink_id', $job['netlink_id']);
+$userSQL->execute();
+$job_owner = $userSQL->fetch();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   //used if modify is not updated.
@@ -87,10 +91,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     //email user
     if (isset($_POST['email_enabaled']) && $_POST['email_enabaled'] == "enabled") {
       //get job owner details
-      $userSQL = $conn->prepare("SELECT * FROM users WHERE netlink_id = :netlink_id");
-      $userSQL->bindParam(':netlink_id', $job['netlink_id']);
-      $userSQL->execute();
-      $job_owner = $userSQL->fetch();
+      // $userSQL = $conn->prepare("SELECT * FROM users WHERE netlink_id = :netlink_id");
+      // $userSQL->bindParam(':netlink_id', $job['netlink_id']);
+      // $userSQL->execute();
+      // $job_owner = $userSQL->fetch();
       $direct_link = "https://webapp.library.uvic.ca/3dprint/customer-laser-job-information.php?job_id=". $job['id'];
       $direct_link2 = "https://onlineacademiccommunity.uvic.ca/dsc/how-to-laser-cut/";
       $msg = "
@@ -166,29 +170,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
   $status_date=""; //To display date that the current status was set
+  $status_signer="";
   if($job['status'] == "submitted"){
    $status_date=$job["submission_date"];
+   $status_signer=$job_owner["name"];
    }
   elseif($job['status'] == "on hold"){
     $status_date=$job["hold_date"];
+    $status_signer=$job["hold_signer"];
   }
   elseif($job['status'] == "pending payment"){
     $status_date=$job["priced_date"];
+    //add priced_signer;
   }
   elseif($job['status'] == "printing"){
     $status_date=$job["printing_date"];
+    //add printing_signer
   }
   elseif($job['status'] == "completed"){
     $status_date=$job["completed_date"];
+    //add completed_signer;
   }
     elseif($job['status'==("delivered")]){
     $status_date=$job['delivered_date'];
+    //add delivered signer
   }
   elseif($job['status'==("cancelled")]){
     $status_date=$job['cancelled_date'];
+    $status_signer=$job['cancelled_signer'];
   }
   elseif($job['status'==("archived")]){
     $status_date=$job['delivered_date'];
+    //add archived signer
   }
 ?>
 
@@ -258,19 +271,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <div class="container">
     <form method="POST" enctype="multipart/form-data">
-  <div class="py-5 text-center">
-    <h1><?php echo $job["job_name"]; ?></h1>
+    <div class="py-5 text-center">
+      <h1><?php echo " Job name: " . $job["job_name"];?></h1>
+      <h2><?php echo "Customer: " . $job_owner["name"];?></h2>
     </div>
-
     <div class="col-md-12 order-md-1">
         <h4 class="mb-3">Status</h4>
           <div class="row">
             <div class="col-md-3 mb-3">
               <select class="custom-select d-block w-100" name="status" id="layer-height">
-                <?php if ($job["status"] == "cancelled") {
-                  ?> <option value="cancelled" echo "selected" readonly>cancelled</option>
-                <?php } else { ?>
-                  <option value="submitted" <?php if ($job["status"]== "submitted"){echo "selected";} ?>>Not Priced</option>
+                <?php 
+                  if ($job["status"] == "cancelled") {?> 
+                    <option value="cancelled" selected readonly>cancelled</option> 
+                <?php } 
+                  else { ?>
+                    <option value="submitted" <?php if ($job["status"]== "submitted"){echo "selected";} ?>>Not Priced</option>
                   <option value="pending payment" <?php if ($job["status"]== "pending payment"){echo "selected";} ?>>Pending Payment</option>
                   <option value="on hold" <?php if ($job["status"]== "on hold"){echo "selected";} ?>>On Hold</option>
                   <option value="paid" <?php if ($job["status"]== "paid"){echo "selected";} ?>>Paid</option>
@@ -282,14 +297,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               </select>
             </div>
             <div class="col-md-3 mb-3">
-              <div class="input-group">
-                <div class="input-group">
-                  <input type="text" class="form-control" value="<?php echo $status_date;?>" readonly>
-                </div>
-              </div>
+              <p><?php echo "Status changed: <br>" .$status_date;?></p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <p><?php 
+                if ($job["status"] == "submitted" || $job["status"] == "on hold" || $job["status"] == "cancelled"){
+                  echo "Status changed by: <br>" . $status_signer;}
+              ?></p>
             </div>
           </div>
-        </div>
 
           <div class="col-md-12 order-md-1">
             <h4 class="mb-3">Submission Date</h4>

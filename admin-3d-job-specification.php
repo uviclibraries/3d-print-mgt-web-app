@@ -233,9 +233,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <div class="row">
             <div class="col-md-3 mb-3">
                 <select class="custom-select d-block w-100" name="status" id="layer-height">
-                  <?php if ($job["status"] == "cancelled") {
-                    ?> <option value="cancelled" echo "selected" readonly>cancelled</option>
-                  <?php } else { ?>
+                  <?php 
+                  if ($job["status"] == "cancelled") {?> 
+                    <option value="cancelled" selected readonly>cancelled</option> 
+                  <?php } 
+                  else { ?>
                     <option value="submitted" <?php if ($job["status"]== "submitted"){echo "selected";} ?>>Not Priced</option>
                     <option value="pending payment" <?php if ($job["status"]== "pending payment"){echo "selected";} ?>>Pending Payment</option>
                     <option value="paid" <?php if ($job["status"]== "paid"){echo "selected";} ?>>Paid</option>

@@ -96,7 +96,7 @@ if ($user != $job["netlink_id"] && $user_type == 1) {
             <div class="col-md-12 mb-3">
               <input type="text" class="form-control" id="printJobName" placeholder="Velociraptor" value="<?php echo $job["job_name"]; ?>" required readonly>
               <div class="invalid-feedback">
-                Valid lsaer cut job name is required.
+                Valid laser cut job name is required.
               </div>
             </div>
           </div>
@@ -207,7 +207,7 @@ if ($user != $job["netlink_id"] && $user_type == 1) {
         <hr class="mb-4">
         <h5 class="mb-2">Additional Comments</h5>
             <div class="input-group">
-                <textarea class="form-control" aria-label="additional-comments"readonly ><?php echo $job["comments"]; ?>
+                <textarea rows="5" cols="50" class="form-control" aria-label="additional-comments"readonly ><?php echo $job["comments"]; ?>
                 </textarea>
             </div>
         </div>

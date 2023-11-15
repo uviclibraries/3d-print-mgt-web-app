@@ -737,7 +737,7 @@ foreach ($laser_job7 as $job) {
           <tr>
             <td style="width:95px;"><?php echo $row["name"]; ?></td>
             <td style="width:95px;"><a href="admin-laser-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
-            <td style="width:95px;"><?php echo $row["completed_date"]; ?></td>
+            <td style="width:95px;"><?php echo $row["delivered_date"]; ?></td>
             <td style="width:95px;"><?php echo $row["status"]; ?></td>
             <td style="width:20px;"><?php echo $row["job_purpose"]; ?></td>
           </tr>

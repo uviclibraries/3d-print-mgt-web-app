@@ -323,14 +323,15 @@ header("location: customer-dashboard.php");
     <script type="text/JavaScript">
       //Function will be triggered by the selection of job_purpose ("academic" and "personal") radio buttons. 
       //Shows the academic_code text box if the "academic" rafio button is selected, hides otherwise.
-      function showAcademicCodeText() {
+      function showAcademicCodeText(clickedRadio) {
         var academiccode_div = document.getElementById("academiccode_textbox");
-        if (academiccode_div.style.display == "none") {      
-          academiccode_div.style.display = "inline-block";
-          academiccode_div.style.width = "300px";
-        } else {
-          academiccode_div.style.display = "none";  // Hide if it's already visible
-        }
+          // Check the value of the clicked radio button
+          if (clickedRadio.value === "academic") {
+            academiccode_div.style.display = "inline-block";
+            academiccode_div.style.width = "300px";
+          } else if (clickedRadio.value === "personal") {
+            academiccode_div.style.display = "none";
+          }
       }
     </script><!--showAcademicCodeText()-->
 
@@ -338,7 +339,7 @@ header("location: customer-dashboard.php");
     <!-- contains radio buttons and optional textbox to indicate if it's a personal or academic (and academic code) job-->
       <div class="d-block my-3">
         <div class="custom-control custom-radio">
-          <input id="academic-purpose" name="job_purpose" value="academic" type="radio" class="custom-control-input" onclick="showAcademicCodeText()" required>
+          <input id="academic-purpose" name="job_purpose" value="academic" type="radio" class="custom-control-input" onclick="showAcademicCodeText(this)" required>
           <label class="custom-control-label" for="academic-purpose">Academic
             <div class="col-md-12 mb-3" id="academiccode_textbox" style="display:none;">
               <input type="text" id="academic-purpose" class="form-control" name="academic_code" placeholder="Academic code" autocomplete="off">
@@ -353,7 +354,7 @@ header("location: customer-dashboard.php");
           </span> <!-- popup box for job_purpose =="academic"-->
         </div><!--to fill TABLE `web_job` column `job_purpose`=="academic"; *selection will cause academiccode_textbox to appear-->
         <div class="custom-control custom-radio">
-          <input type="text" id="personal-purpose" name="job_purpose" value="personal" type="radio" class="custom-control-input" onclick="showAcademicCodeText()" required>
+          <input type="radio" id="personal-purpose" name="job_purpose" value="personal" class="custom-control-input" onclick="showAcademicCodeText(this)" required>
           <label class="custom-control-label" for="personal-purpose">Personal</label>
         </div><!--to fill TABLE `web_job` column `job_purpose`=="personal"-->
     

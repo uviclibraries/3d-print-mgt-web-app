@@ -8,8 +8,8 @@ if ($user_type == 1) {
   die();
 }
 
-$sql_line =array(); //sql builder
-$getcheck = array_fill(0,3, FALSE);
+$sql_line =array(); //sql builder //parameters
+$getcheck = array_fill(0,3, FALSE); //where conditions
 if (isset($_GET['searchdate_start']) && ($_GET['searchdate_start'] != "" && $_GET['searchdate_start'] != NULL)) {
   $getcheck[0] = True;
   $sql_line[] = "(submission_date >= :searchdate_start OR delivered_date >= :searchdate_start OR cancelled_date >= :searchdate_start OR completed_date >= :searchdate_start)";
@@ -203,7 +203,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
   <div class="container">
   <div class="py-5 text-left">
 
-  <h3>Archived &amp; Cancelled Jobs</h3>
+  <h3 id="topOfPage">Archived &amp; Cancelled Jobs</h3>
   <br>
 
   <!--Search bar-->
@@ -212,15 +212,15 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
       <form method="POST">
         <div>
           <label for = "searchdate_start">Start date:</label>
-          <input type="date" id= "searchdate_start" name="searchdate_start">
+            <input type="date" id= "searchdate_start" name="searchdate_start" value="<?php echo isset($_POST['searchdate_start']) ? $_POST['searchdate_start'] : ''; ?>">
         </div>
         <div class="">
-          <label for = "searchdate_end">End date  :</label>
-          <input type="date" id= "searchdate_end" name="searchdate_end">
+          <label for = "searchdate_end">End date:</label>
+            <input type="date" id= "searchdate_end" name="searchdate_end" value="<?php echo isset($_POST['searchdate_end']) ? $_POST['searchdate_end'] : ''; ?>">
         </div>
         <div class="">
           <label for = "search_id">netlink id:</label>
-          <input type="text" id= "search_id" name="search_id">
+            <input type="text" id= "search_id"name="search_id" value="<?php echo isset($_POST['id= "search_id"']) ? htmlspecialchars($_POST['id= "search_id"']) : ''; ?>">
         </div>
         <!-- extra search criteria
         <div class="">
@@ -236,80 +236,84 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     </div>
   </div>
 
-
+  <div>
+    <p id = "3dSection"><a href="#laserSection">(Jump to Laser Cut jobs)</a></p>
+  </div>
   <button class="accordion active">3D Print Jobs</button>
     <div class="panel" style="display:block;">
   <div class="py-3"></div>
   <div class="table-responsive">
-  <table class="table table-striped table-md">
-  <thead>
-  <tr>
-    <!-- table header-->
-    <th>Job id</th>
-    <th>Username</th>
-    <th>Name</th>
-    <th>Completion Date</th>
-    <th>Status</th>
-  </tr>
-  </thead>
-  <tbody>
-
-  <?php foreach ($d_history as $row) {
-  ?>
-  <tr>
-    <td style="width:95px;"><?php echo $row["id"]; ?></td>
-    <td style="width:95px;"><?php echo $row["netlink_id"]; ?></td>
-      <!--CHANGE TO UNEDITABLE SCREEN -->
-      <!-- Conditional link based on job_type -->
-      <td style="width:95px;"><a href="admin-3d-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>   
-      <td style="width:95px;"><?php echo $row["completed_date"]; ?></td>
-    <td style="width:95px;"><?php echo $row["status"]; ?></td>
-  </tr>
-  <?php
-  }
-  ?>
-
-  </tbody>
-  </table>
+    <table class="table table-striped table-md">
+      <thead>
+        <tr>
+          <!-- table header-->
+          <th>Job id</th>
+          <th>Username</th>
+          <th>Name</th>
+          <th>Completion Date</th>
+          <th>Status</th>
+        </tr>
+        </thead>
+      <tbody>
+        <?php foreach ($d_history as $row) {
+        ?>
+        <tr>
+          <td style="width:95px;"><?php echo $row["id"]; ?></td>
+          <td style="width:95px;"><?php echo $row["netlink_id"]; ?></td>
+            <!--CHANGE TO UNEDITABLE SCREEN -->
+            <!-- Conditional link based on job_type -->
+            <td style="width:95px;"><a href="admin-3d-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>   
+            <td style="width:95px;"><?php echo $row["completed_date"]; ?></td>
+          <td style="width:95px;"><?php echo $row["status"]; ?></td>
+        </tr>
+        <?php
+        }
+        ?>
+      </tbody>
+    </table>
   </div>
-</div>
-
+  </div>
+  <div>
+    <p id = "laserSection"><a href="#3dSection">(Jump to 3D Print jobs)</a></p>
+  </div>
   <button class="accordion active">Laser Cut Jobs</button>
-  <div class="panel" style="display:block;">
-  <div class="py-3"></div>
-  <div class="table-responsive">
-  <table class="table table-striped table-md">
-  <thead>
-  <tr>
-    <!-- table header-->
-    <th>Job id</th>
-    <th>Username</th>
-    <th>Name</th>
-    <th>Completion Date</th>
-    <th>Status</th>
-  </tr>
-  </thead>
-  <tbody>
+    <div class="panel" style="display:block;">
+    <div class="py-3"></div>
+      <div class="table-responsive">
+        <table class="table table-striped table-md">
+          <thead>
+          <tr>
+            <!-- table header-->
+            <th>Job id</th>
+            <th>Username</th>
+            <th>Name</th>
+            <th>Completion Date</th>
+            <th>Status</th>
+          </tr>
+          </thead>
+          <tbody>
 
-  <?php foreach ($l_history as $row) {
-  ?>
-  <tr>
-    <td style="width:95px;"><?php echo $row["id"]; ?></td>
-    <td style="width:95px;"><?php echo $row["netlink_id"]; ?></td>
-      <!--CHANGE TO UNEDITABLE SCREEN -->
-      <!-- Conditional link based on job_type -->
-      <td style="width:95px;"><a href="admin-laser-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>   
-      <td style="width:95px;"><?php echo $row["completed_date"]; ?></td>
-    <td style="width:95px;"><?php echo $row["status"]; ?></td>
-  </tr>
-  <?php
-  }
-  ?>
-
-  </tbody>
-  </table>
+          <?php foreach ($l_history as $row) {
+          ?>
+          <tr>
+            <td style="width:95px;"><?php echo $row["id"]; ?></td>
+            <td style="width:95px;"><?php echo $row["netlink_id"]; ?></td>
+              <!--CHANGE TO UNEDITABLE SCREEN -->
+              <!-- Conditional link based on job_type -->
+              <td style="width:95px;"><a href="admin-laser-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>   
+              <td style="width:95px;"><?php echo $row["completed_date"]; ?></td>
+            <td style="width:95px;"><?php echo $row["status"]; ?></td>
+          </tr>
+          <?php
+          }
+          ?>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <div>
+    <p><a href="#topOfPage">(Jump to Top)</a></p>
   </div>
-</div>
 
   <hr class="mb-12">
 
