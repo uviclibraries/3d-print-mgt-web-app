@@ -22,6 +22,17 @@ $userSQL->bindParam(':netlink_id', $job['netlink_id']);
 $userSQL->execute();
 $job_owner = $userSQL->fetch();
 
+$stm = $conn->prepare("SELECT * FROM web_job INNER JOIN laser_cut_job ON web_job.id=laser_cut_job.laser_cut_id WHERE web_job.status NOT IN ('delivered', 'archived', 'cancelled') AND web_job.netlink_id = :netlink_id;");
+  $stm->bindParam(':netlink_id', $job['netlink_id']);
+  $stm->execute();
+  $user_web_jobs = $stm->fetchAll();
+
+  $active_user_jobs = [];
+  foreach ($user_web_jobs as $related_job) {
+    $active_user_jobs[] = $related_job;
+  }
+  print_r(count($active_user_jobs));
+    
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   //used if modify is not updated.
   $modify_value = $job["model_name_2"];
@@ -49,6 +60,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new RuntimeException('Unknown errors.');
     }
   }
+
+  // $stm = $conn->query("SELECT web_job.id AS id, web_job.job_name AS job_name, web_job.status AS status, web_job.hold_date AS hold_date FROM web_job WHERE web_job.status NOT IN ('delivered', 'archived', 'cancelled') AND web_job.netlink_id = netlink_id;");
+
 
   $stmt = $conn->prepare("UPDATE web_job INNER JOIN laser_cut_job ON id=laser_cut_id SET price = :price, copies=:copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, delivered_date = :delivered_date, hold_date = :hold_date, hold_signer= :hold_signer, cancelled_signer = :cancelled_signer, model_name_2 =:model_name_2 WHERE id = :job_id;");
   //$stmt = $conn->prepare("UPDATE print_job SET price = :price, infill = :infill, scale = :scale, layer_height = :layer_height, supports = :supports, copies = :copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, model_name_2 =:model_name_2 WHERE id = :job_id;
@@ -203,6 +217,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $status_date=$job['delivered_date'];
     //add archived signer
   }
+
 ?>
 
 
@@ -251,7 +266,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           font-size: 3.5rem;
         }
       }
+
+      .scrollable-container {
+        max-height: 300px; /* Set a maximum height for the container */
+        overflow-y: auto; /* Enable vertical scrolling when content exceeds the container height */
+      }
+
+      /* Style for the container div */
+      .user_jobs_container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      /* Style for each checkbox */
+      .job_checkbox {
+        display: inline-block;
+      }
     </style>
+
     <!-- Custom styles for this template -->
     <link href="form-validation.css" rel="stylesheet">
   </head>
@@ -314,13 +347,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                       <div class="input-group">
                         <div class="input-group">
                           <input type="text" class="form-control" value="<?php echo $job["submission_date"]; ?>" readonly>
-                          </div>
+                        </div>
                       </div>
                       <div class="invalid-feedback" style="width: 100%;">
                       Status is required.
                       </div>
+                  </div>
+
+                  <div class="scrollable-container">
+                    <div class="user_jobs_container">
+                      <?php print_r($user_web_jobs);?>
                     </div>
                   </div>
+                </div>
               </div>
 
           <div class="col-md-12 order-md-1">
