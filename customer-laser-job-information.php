@@ -18,6 +18,10 @@ if ($user != $job["netlink_id"] && $user_type == 1) {
   die();
 }
 
+// if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+//   $stm = $conn->prepare("UPDATE * FROM web_job INNER JOIN laser_cut_job ON id=laser_cut_id WHERE id=?");
+//   $current_date = date("Y-m-d");
+// }
 
 ?>
 
@@ -222,9 +226,178 @@ if ($user != $job["netlink_id"] && $user_type == 1) {
     </div>
   </div>
 
-  <p></p>
-  <br>
-  <p></p>
+
+<!-- CANCEL AND DUPLICATE JOB BUTTONS-->
+
+<?php
+// Check if the form has been submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+ 
+  // Check which form was submitted
+  if (isset($_POST['cancel_job'])) {
+    $query = "UPDATE web_job INNER JOIN laser_cut_job ON id=laser_cut_id 
+              SET status = :status, cancelled_date = :cancelled_date, cancelled_signer = :cancelled_signer 
+              WHERE id = :id";
+    
+    $stmt = $conn->prepare($query);
+    
+    // You can directly bind the values in the execute() method
+    $stmt->execute([
+        ':status' => 'cancelled',
+        ':cancelled_date' => date("Y-m-d"),
+        ':cancelled_signer' => $user,
+        ':id' => $_POST['job_id'] // Assuming job_id is coming from form data
+    ]);
+  }
+
+  elseif (isset($_POST['duplicate_job'])) {
+      // Handle Duplicate Job logic
+      $jobId = $_POST['job_id'];
+      // (Duplicate job logic goes here)
+  }
+
+  // Redirect or display a success message after processing
+  // header("Location: samepage.php");
+  // exit();
+}
+?>
+
+<style>
+/* Button style */
+#myBtn {
+    width: 50px;
+    background-color: red;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+}
+
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+}
+
+/* The Close Button */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+</style>
+
+
+
+<hr class="mb-4">
+  <center>
+    <!-- Button to trigger 'Cancel Job' confirmation popup; button background color set to red-->
+    <button id="myBtn1" class="btn btn-primary btn-lg" style="background-color: #f44336;">Cancel Job</button> <!--cancel button-->
+      <!-- The First Popup -->
+      <div id="myModal1" class="modal">
+        <div class="modal-content">
+          <span class="close" data-modal="myModal1">&times;</span>
+          <p>Are you sure you want to cancel your job?</p>
+          <form method="post">
+              <input type="hidden" name="job_id" value="<?php echo htmlspecialchars($job['id']); ?>">
+              <input type="hidden" name="cancel_job" value="1">
+              <button type="submit" class="btn btn-primary btn-lg" style="background-color: #f44336;">Cancel Job</button>
+          </form>
+        </div>
+      </div>
+
+    <!-- Button to trigger 'Duplicate Job' confirmation popup; button background color set to purple-->
+    <button id="myBtn2" class="btn btn-primary btn-lg" style="background-color:#CF9FFF;">Duplicate Job</button> <!--duplicate button-->
+      <!-- The Second Popup -->
+      <div id="myModal2" class="modal">
+        <div class="modal-content">
+          <span class="close" data-modal="myModal2">&times;</span>
+          <p>Are you sure you want to duplicate your job?</p>
+          <form method="post">
+              <input type="hidden" name="job_id" value="<?php echo htmlspecialchars($job['id']); ?>">
+              <input type="hidden" name="duplicate_job" value="1">
+              <button type="submit" class="btn btn-primary btn-lg" style="background-color:#CF9FFF;">Duplicate Job</button>
+          </form>
+        </div>
+      </div>
+  </center>
+
+<script>
+window.onload = function() {
+    // Function to open a modal
+    function openModal(modalId) {
+        var modal = document.getElementById(modalId);
+        if (modal) {
+            modal.style.display = "block";
+        }
+    }
+
+    // Function to close a modal
+    function closeModal(modalId) {
+        var modal = document.getElementById(modalId);
+        if (modal) {
+            modal.style.display = "none";
+        }
+    }
+
+    // Attach event listeners to buttons
+    var btn1 = document.getElementById("myBtn1");
+    var btn2 = document.getElementById("myBtn2");
+
+    if (btn1) {
+        btn1.onclick = function() { openModal("myModal1"); }
+    }
+    if (btn2) {
+        btn2.onclick = function() { openModal("myModal2"); }
+    }
+
+    // Attach event listeners to close buttons
+    var closeButtons = document.getElementsByClassName("close");
+    for (var i = 0; i < closeButtons.length; i++) {
+        closeButtons[i].onclick = function() {
+            var modalId = this.getAttribute("data-modal");
+            closeModal(modalId);
+        }
+    }
+
+    // Close modal when clicking outside of it
+    window.onclick = function(event) {
+        if (event.target.classList.contains("modal")) {
+            event.target.style.display = "none";
+        }
+    }
+}
+</script>
+
+<p></p>
+<br>
+<p></p>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
       <script>window.jQuery || document.write('<script src="/docs/4.5/assets/js/vendor/jquery.slim.min.js"><\/script>')</script><script src="/docs/4.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-1CmrxMRARb6aLqgBO7yyAxTOQE2AKb9GfXnEo760AUcUmFx3ibVJJAzGytlQcNXd" crossorigin="anonymous"></script>

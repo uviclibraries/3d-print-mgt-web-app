@@ -3,7 +3,7 @@ session_start();
 require ('auth-sec.php'); //Gets CAS & db
 //auth-sec includes: $user, $user_email, $user_type, $user_name
 
-$stm = $conn->query("SELECT id, job_name, status, submission_date, priced_date, paid_date, printing_date, completed_date FROM web_job INNER JOIN 3d_print_job ON id=3d_print_id WHERE netlink_id = '$user' ORDER BY id DESC");
+$stm = $conn->query("SELECT id, job_name, status, submission_date, priced_date, paid_date, printing_date, completed_date, cancelled_date FROM web_job INNER JOIN 3d_print_job ON id=3d_print_id WHERE netlink_id = '$user' ORDER BY id DESC");
 $data = $stm->fetchAll();
 //split results by Status
 $d_pending_payment = [];
@@ -24,7 +24,7 @@ foreach ($data as $job) {
 
 }
 
-$stm = $conn->query("SELECT id, job_name, status, submission_date, priced_date, paid_date, printing_date, completed_date FROM web_job INNER JOIN laser_cut_job ON id=laser_cut_id WHERE netlink_id = '$user' ORDER BY id DESC");
+$stm = $conn->query("SELECT id, job_name, status, submission_date, priced_date, paid_date, printing_date, completed_date, cancelled_date FROM web_job INNER JOIN laser_cut_job ON id=laser_cut_id WHERE netlink_id = '$user' ORDER BY id DESC");
 $data = $stm->fetchAll();
 //split results by Status
 $l_pending_payment = [];
@@ -337,7 +337,7 @@ foreach ($data as $job) {
             <?php foreach ($l_other_jobs as $row) {
             ?>
             <tr>
-              <td><?php echo $row["completed_date"]; ?></td>
+              <td><?php echo (!empty($row["completed_date"]) && $row["completed_date"] != 'NA') ? $row["completed_date"] : $row["cancelled_date"]; ?></td>
               <td><a href="customer-laser-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
               <td><?php echo $row["status"]; ?></td>
             </tr>

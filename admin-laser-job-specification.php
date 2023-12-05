@@ -23,7 +23,7 @@ $userSQL->execute();
 $job_owner = $userSQL->fetch();
 
 //get list of active jobs associated with the job's owner
-$stm = $conn->prepare("SELECT web_job.id AS other_id, web_job.job_name AS other_name, web_job.status AS other_status FROM web_job INNER JOIN laser_cut_job ON web_job.id=laser_cut_job.laser_cut_id WHERE web_job.status NOT IN ('delivered', 'archived', 'cancelled') AND web_job.netlink_id = :netlink_id;");
+$stm = $conn->prepare("SELECT web_job.id AS id, web_job.job_name AS name, web_job.status AS status, web_job.submission_date AS submission_date, web_job.priced_date AS priced_date, web_job.paid_date AS paid_date,web_job.printing_date AS printing_date,web_job.completed_date AS completed_date,web_job.delivered_date AS delivered_date,web_job.hold_date AS hold_date,web_job.hold_signer AS hold_signer,web_job.cancelled_signer AS cancelled_signer FROM web_job INNER JOIN laser_cut_job ON web_job.id=laser_cut_job.laser_cut_id WHERE web_job.status NOT IN ('delivered', 'archived', 'cancelled') AND web_job.netlink_id = :netlink_id");
   $stm->bindParam(':netlink_id', $job['netlink_id']);
   $stm->execute();
   $user_web_jobs = $stm->fetchAll();
@@ -32,46 +32,13 @@ $stm = $conn->prepare("SELECT web_job.id AS other_id, web_job.job_name AS other_
   foreach ($user_web_jobs as $related_job) {
     $active_user_jobs[] = $related_job;
   }
-  // print_r(count($active_user_jobs));
+  echo 'row 35 active user jobs: ';
+  print_r(count($active_user_jobs));
+  echo '<br>';
     
 
-  // function setOtherStatuses($checked_jobs, $status, $user){
-  //   if (isset($_POST['checked_jobs']) && is_array($_POST['checked_jobs'])) {
-  //      foreach ($_POST['checked_jobs'] as $other_job) { // job IDs are posted as an array named 'checked_jobs' under <h4 class="mb-3">Other Active Jobs</h4>
-  //     $other_job["status"]= $_POST['status'];
-  //     switch ($_POST['status']) {
-  //       case "submitted":
-  //         $other_job["submission_date"] = $current_date;
-  //         break;
-  //       case "pending payment":
-  //         $other_job["priced_date"] = $current_date;
-  //         break;
-  //       case "paid":
-  //         $other_job["paid_date"] = $current_date;
-  //         break;
-  //       case "printing":
-  //         $other_job["printing_date"] = $current_date;
-  //         break;
-  //       case "completed":
-  //         $other_job["completed_date"] = $current_date;
-  //         break;
-  //       case "delivered":
-  //         $other_job["delivered_date"] = $current_date;
-  //         break;
-  //       case "cancelled":
-  //         $other_job["cancelled_date"] = $current_date;
-  //         $other_job["cancelled_signer"] = $user;
-  //         break;
-  //       case "hold":
-  //         $other_job["hold_date"] = $current_date;
-  //         $other_job["hold_signer"] = $user;
-  //         break;
-  //       }
-  //     }
-  //   }
-  // }
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  echo 'method is post<br>';
   //used if modify is not updated.
   $modify_value = $job["model_name_2"];
   if (isset($_FILES["modify"]['name'])) {
@@ -100,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
 
-  $stmt = $conn->prepare("UPDATE web_job INNER JOIN laser_cut_job ON id=laser_cut_id SET price = :price, copies=:copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, delivered_date = :delivered_date, hold_date = :hold_date, hold_signer= :hold_signer, cancelled_signer = :cancelled_signer, model_name_2 =:model_name_2 WHERE id = :job_id");
+  $stmt = $conn->prepare("UPDATE web_job INNER JOIN laser_cut_job ON id=laser_cut_id SET price = :price, copies=:copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date,cancelled_date = :cancelled_date, delivered_date = :delivered_date, hold_date = :hold_date, hold_signer= :hold_signer, cancelled_signer = :cancelled_signer, model_name_2 =:model_name_2 WHERE id = :job_id");
   //$stmt = $conn->prepare("UPDATE print_job SET price = :price, infill = :infill, scale = :scale, layer_height = :layer_height, supports = :supports, copies = :copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, model_name_2 =:model_name_2 WHERE id = :job_id;
   //");
   $current_date = date("Y-m-d");
@@ -120,62 +87,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $d1 = $job['priced_date'];
   $d2 = $job['paid_date'];
   $d3 = $job['printing_date'];
-  $d6 = $job['completed_date'];
-  $d5 = $job['hold_date'];
   $d4 = $job['delivered_date'];
-  $d7 = $job['cancelled_date']
-  $d8 = $job['archived_date']
+  $d5 = $job['hold_date'];
+  $d6 = $job['completed_date'];
+  $d7 = $job['cancelled_date'];
   $stmt->bindParam(':priced_date', $d1);
   $stmt->bindParam(':paid_date', $d2);
   $stmt->bindParam(':printing_date', $d3);
-  $stmt->bindParam(':completed_date', $d6);
-  $stmt->bindParam(':hold_date', $d5);
   $stmt->bindParam(':delivered_date', $d4);
+  $stmt->bindParam(':hold_date', $d5);
+  $stmt->bindParam(':completed_date', $d6);
   $stmt->bindParam(':cancelled_date', $d7);
-  $stmt->bindParam(':archived_date', $d8);
+
   $hs = $job['hold_signer'];
   $cs = $job['cancelled_signer'];
   $stmt->bindParam(':hold_signer', $hs);
   $stmt->bindParam(':cancelled_signer', $cs);
 
-    //Set status details for associated jobs selected from associated jobs table
-  $checked_jobs_ids =[];
-  foreach($checked_jobs as $checked_job){
-    $checked_jobs_ids= $checked_job['other_id'];
-  }
-
-  $stm = $conn->prepare("UPDATE web_job INNER JOIN laser_cut_job ON id=laser_cut_id SET status = :status, priced_date = :priced_date, paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, delivered_date = :delivered_date, hold_date = :hold_date, hold_signer= :hold_signer, cancelled_date=:cancelled_datecancelled_signer = :cancelled_signer, WHERE id IN $checked_jobs_ids");
-  $set_associated = $stm->fetchAll();
-
-  $set_associated->bindParam(':job_id', $user_web_jobs['id']);
-  $user_web_jobs->bindParam(':status', $_POST["status"]);
-
-  $a1 = $user_web_jobs['priced_date'];
-  $a2 = $user_web_jobs['paid_date'];
-  $a3 = $user_web_jobs['printing_date'];
-  $a6 = $user_web_jobs['completed_date'];
-  $a5 = $user_web_jobs['hold_date'];
-  $a4 = $user_web_jobs['delivered_date'];
-  $a7 = $user_web_jobs['cancelled_date']
-  $a8 = $user_web_jobs['archived_date']
-  $set_associated->bindParam(':priced_date', $a1);
-  $set_associated->bindParam(':paid_date', $a2);
-  $set_associated->bindParam(':printing_date', $a3);
-  $set_associated->bindParam(':completed_date', $a6);
-  $set_associated->bindParam(':hold_date', $a5);
-  $set_associated->bindParam(':delivered_date', $a4);
-  $set_associated->bindParam(':cancelled_date', $a7);
-  $set_associated->bindParam(':archived_date', $a8);
- 
-  $ahs = $user_web_jobs['hold_signer'];
-  $acs = $user_web_jobs['cancelled_signer'];
-  $set_associated->bindParam(':hold_signer', $ahs);
-  $set_associated->bindParam(':cancelled_signer', $acs);
-
   //need variable to check if admin wants to send email. case: updating notes but dont send email
   if ($_POST['status'] == "pending payment") {
     $d1 = $current_date;
-    $a1 = $current_date;
 
     //email user
     if (isset($_POST['email_enabaled']) && $_POST['email_enabaled'] == "enabled") {
@@ -206,25 +137,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   } elseif($_POST['status'] == "paid"){
     //this is done automatically when payment is received.
     $d2 = $current_date;
-    $a2 = $current_date;
 
   } elseif($_POST['status'] == "printing"){
     $d3 = $current_date;
-    $a3 = $current_date;
 
-  } elseif($_POST['status'] == "on hold"){
-    $d5 = $current_date;
-    $hs = $user;
-    $a5 = $current_date;
-    $ahs = $user;
-
-  } elseif($_POST['status'] == "completed"){
-    echo "d6";
-    $d6 = $current_date;
-    $a6 = $current_date;
-
-  } elseif ($_POST['status'] == "delivered") {
-    $d4 = $current_date;
+  }  elseif ($_POST['status'] == "delivered" OR $_POST['status'] == "archived") {
     $d4 = $current_date;
 
     //email user
@@ -252,25 +169,106 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $headers .= "From: dscommons@uvic.ca" . "\r\n";
       mail($job_owner['email'], "Your laser cut is ready for collection",$msg,$headers);
     }
-  } elseif($_POST['status'] == "archived"){
-    $d4 = $current_date;
-    $a4 = $current_date;
-  }
+  }elseif($_POST['status'] == "on hold"){
+    $d5 = $current_date;
+    $hs = $user;
 
-   elseif($_POST['status'] == "cancelled"){
+  } elseif($_POST['status'] == "completed"){
+    $d6 = $current_date;
+
+  }elseif($_POST['status'] == "cancelled"){
     $d7 = $current_date;
-    $a7 = $current_date;
     $cs = $user;
-    $acs = $user;
   }
-
 
   $stmt->execute();
 
+  
+//Set status details for associated jobs selected from associated jobs table
+  if (isset($_POST['checked_jobs'])) {
+    $checked_jobs = $_POST['checked_jobs'];
+    echo 'line190 checked jobs exists';
+    print_r($checked_jobs);echo '<br>';
 
+    // $checked_jobs_ids =[];
+    // foreach($checked_jobs as $checked_job){
+    //   $checked_jobs_ids[] = $checked_job['id'];
+    // }
+
+    $checkedIDs_sql = implode(',', $checked_jobs);
+    echo 'line199 imploded jobIDs:' . $checkedIDs_sql . "<br>";
+
+    
+    if(count($checked_jobs)>0){
+      echo 'checked jobs >0<br>';
+      $stm = $conn->prepare("SELECT * FROM web_job INNER JOIN laser_cut_job ON id=laser_cut_id WHERE id IN ($checkedIDs_sql)");
+      $stm->bindParam(':netlink_id', $job['netlink_id']);
+      $stm->execute();
+      $setJobs = $stm->fetchAll();
+
+      $stm = $conn->prepare("UPDATE web_job INNER JOIN laser_cut_job ON id=laser_cut_id SET status = :status, priced_date = :priced_date, paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, delivered_date = :delivered_date, hold_date = :hold_date, hold_signer= :hold_signer, cancelled_date=:cancelled_datecancelled_signer = :cancelled_signer, WHERE id IN ($checkedIDs_sql)");
+      // $stm->bindParam(':netlink_id', $job['netlink_id']);
+
+      // $stm->bindParam(':job_id', $user_web_jobs['id']);
+      $stm->bindParam(':status', $_POST["status"]);
+
+      $a1 = $setJobs['priced_date'];
+      $a2 = $setJobs['paid_date'];
+      $a3 = $setJobs['printing_date'];
+      $a6 = $setJobs['completed_date'];
+      $a5 = $setJobs['hold_date'];
+      $a4 = $setJobs['delivered_date'];
+      $a7 = $setJobs['cancelled_date'];
+      $stm->bindParam(':priced_date', $a1);
+      $stm->bindParam(':paid_date', $a2);
+      $stm->bindParam(':printing_date', $a3);
+      $stm->bindParam(':completed_date', $a6);
+      $stm->bindParam(':hold_date', $a5);
+      $stm->bindParam(':delivered_date', $a4);
+      $stm->bindParam(':cancelled_date', $a7);
+     
+      $ahs = $setJobs['hold_signer'];
+      $acs = $setJobs['cancelled_signer'];
+      $stm->bindParam(':hold_signer', $ahs);
+      $stm->bindParam(':cancelled_signer', $acs);
+
+      $current_date = date("Y-m-d");
+      //need variable to check if admin wants to send email. case: updating notes but dont send email
+      if ($_POST['status'] == "pending payment") {
+        $a1 = $current_date;
+
+      } elseif($_POST['status'] == "paid"){
+        //this is done automatically when payment is received.
+        $a2 = $current_date;
+
+      } elseif($_POST['status'] == "printing"){
+        $a3 = $current_date;
+
+      } elseif($_POST['status'] == "on hold"){
+        $a5 = $current_date;
+        $ahs = $user;
+
+      } elseif($_POST['status'] == "completed"){
+        echo "d6";
+        $a6 = $current_date;
+
+      } elseif ($_POST['status'] == "delivered" or $_POST['status'] == "archived") {
+        $a4 = $current_date;
+      }
+       elseif($_POST['status'] == "cancelled"){
+        $a7 = $current_date;
+        $acs = $user;
+      }
+
+      $stm->execute();
+    }
+  } else {
+  echo 'no checked jobs apparently';
+  }//end set associated jobs status
   //exit to dashboard after saving
   // header("location: admin-dashboard.php");
-}
+}//end form execution
+
 
 
   
@@ -365,7 +363,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
       }
 
-
       /* Style for the container div */
       .user_jobs_container {
         display: grid;
@@ -391,6 +388,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         flex: 1 1 calc(33.333% - 10px); 
         box-sizing: border-box;
       }
+
+      .popup {
+          position: relative;
+          display: inline;  /* Unchanged */
+          cursor: pointer;
+          padding-left: 5px;
+      }
+
+      .popup .popuptext {
+          visibility: hidden;
+          width: 500px;
+          background-color: #555;
+          color: #fff;
+          text-align: center;
+          border-radius: 6px;
+          padding: 8px 0;
+          position: absolute;
+          z-index: 1;
+          top: 0;
+          left: 110%;
+          margin-left: 20px;
+      }
+
+      .popup .popuptext::after {
+          content: "";
+          position: absolute;
+          top: 50%;
+          left: 0;
+          margin-top: -5px;
+          border-width: 5px 0 5px 5px;
+          border-style: solid;
+          border-color: transparent transparent transparent #555;
+      }
+
+      
+      .popup:hover .popuptext, .popup .popuptext:hover {
+          visibility: visible; /* Show or keep the popup when hovering */
+          -webkit-animation: fadeIn 1s;
+          animation: fadeIn 1s;
+      }
+
+      
+      .popup .show {
+        visibility: visible;
+        -webkit-animation: fadeIn 1s;
+        animation: fadeIn 1s;
+      }
+
 
       /* Adjust for medium screens to 2 columns */
       @media (max-width: 800px) {
@@ -511,6 +556,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               checkbox.checked = false;
             });
           }
+
+          function populatePopup(other_job) {
+            const popupElement = document.querySelector('.popuptext');
+
+            // Clear existing content
+            popupElement.innerHTML = '';
+            //Fill popup with job-specific details
+            popupElement.innerHTML = '${other_job['name']}<br>${other_job['status']}<br>${other_job['submission_date']}';
+          }
+
         </script>    
 
           <div class="col-md-12 order-md-1">
@@ -524,28 +579,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <?php
                 try {
                     $num_jobs = count($active_user_jobs);
-                    if($num_jobs == 0){echo 'This customer has no other active jobs';}
+                    if($num_jobs == 0){
+                      echo 'This customer has no other active jobs';
+                      echo '<p>No Connected Jobs</p>';
+                    }
                 } catch (PDOException $e) {
                     echo "Error: " . $e->getMessage();
                 }
 
                 // Iterate through the $active_user_jobs array
                 foreach ($active_user_jobs as $other_active_job) {
-                    if($job['id'] != $other_active_job['other_id']){
+                    if($job['id'] != $other_active_job['id']){
                       echo '<div class="job-item">';
-                      echo '<input type="checkbox" class ="job-checkbox" id="' . $other_active_job['other_id'] . '" name="checked_jobs[]" value="' . $other_active_job['other_id'] . '">';
-                      echo '<label for="' . $other_active_job['other_id'] . '">';
-                      if ($other_active_job['other_status'] == "on hold") {
+                      echo '<input type="checkbox" class ="job-checkbox" id="' . $other_active_job['id'] . '" name="checked_jobs[]" value="' . $other_active_job['id'] . '">';
+                      echo '<label for="' . $other_active_job['id'] . '">';
+                      if ($other_active_job['status'] == "on hold") {
                           echo "  On hold -";
                       }
                       // Check if 'name' index is set
-                        if (isset($other_active_job['other_name'])) {
-                            echo "  " . $other_active_job['other_name'];
+                        if (isset($other_active_job['name'])) {
+                            echo "  " . $other_active_job['name'];
                         } else {
                             echo "No id available"; 
                         }
                       echo '</label>';
                       echo '</div>';
+
+                      // ! Popup div not working
+                      echo '<span class="popup">';
+                        echo '<span class="popuptext" id="myPopup">';
+                          echo '<p>${other_active_job["name"]}<br>${other_active_job["status"]}<br>${other_active_job["submission_date"]}';
+                        echo '</span>';
+                      echo '</span>'; 
                     }
                   }
                 ?>
