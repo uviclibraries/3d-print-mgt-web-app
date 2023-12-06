@@ -11,7 +11,7 @@ if ($user_type == 1) {
 $stm = $conn->prepare("SELECT * FROM web_job INNER JOIN laser_cut_job ON id=laser_cut_id WHERE id=?");
 $stm->execute([$_GET["job_id"]]);
 $job=$stm->fetch();
-
+echo $job['name']; 
 // $stm = $conn->prepare("SELECT * FROM print_job WHERE id=?");
 // $stm->execute([$_GET["job_id"]]);
 // $job=$stm->fetch();
@@ -38,7 +38,7 @@ $stm = $conn->prepare("SELECT web_job.id AS id, web_job.job_name AS name, web_jo
     
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  echo 'method is post<br>';
+  // echo 'method is post<br>';
   //used if modify is not updated.
   $modify_value = $job["model_name_2"];
   if (isset($_FILES["modify"]['name'])) {
@@ -701,11 +701,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h5 class="mb-2">Material Type</h5>
         <div class="d-block my-3">
         <div class="custom-control custom-radio">
-            <input id="plywood_3mm" name="material_type" value="Plywood_3mm" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "Plywood_3mm"){echo "checked";} ?>>
+            <input id="plywood_3mm" name="material_type" value="Plywood 3mm" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "Plywood 3mm"){echo "checked";} ?>>
             <label class="custom-control-label" for="plywood_3mm">Plywood 3mm</label>
           </div>
           <div class="custom-control custom-radio">
-            <input id="plywood_6mm" name="material_type" value="Plywood_6mm" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "Plywood_6mm"){echo "checked";} ?>>
+            <input id="plywood_6mm" name="material_type" value="Plywood 6mm" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "Plywood 6mm"){echo "checked";} ?>>
             <label class="custom-control-label" for="plywood_6mm">Plywood 6mm</label>
           </div>
           <div class="custom-control custom-radio">

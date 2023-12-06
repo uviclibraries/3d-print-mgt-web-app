@@ -250,12 +250,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     ]);
   }
 
-  elseif (isset($_POST['duplicate_job'])) {
-      // Handle Duplicate Job logic
-      $jobId = $_POST['job_id'];
-      // (Duplicate job logic goes here)
-  }
-
   // Redirect or display a success message after processing
   // header("Location: samepage.php");
   // exit();
@@ -339,11 +333,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="modal-content">
           <span class="close" data-modal="myModal2">&times;</span>
           <p>Are you sure you want to duplicate your job?</p>
-          <form method="post">
-              <input type="hidden" name="job_id" value="<?php echo htmlspecialchars($job['id']); ?>">
-              <input type="hidden" name="duplicate_job" value="1">
-              <button type="submit" class="btn btn-primary btn-lg" style="background-color:#CF9FFF;">Duplicate Job</button>
-          </form>
+            <a href="customer-duplicate-laser-job.php?job_id=<?php echo $job["id"]; ?>">
+                <button type="submit" class="btn btn-primary btn-lg" style="background-color:#CF9FFF;">Duplicate Job</button>
+            </a>
         </div>
       </div>
   </center>
