@@ -242,6 +242,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $status_date = $job["priced_date"];
       // add priced_signer;
       break;
+    case "paid":
+      $status_date = $job["paid_date"];
+      // add paid_signer
+      break;
     case "printing":
       $status_date = $job["printing_date"];
       // add printing_signer
@@ -494,7 +498,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           </div>
 
 
- <!-- Scrollable container with a 4-column list of the user's active web jobs. Used for batch status changes -->
+ <!-- container with a 4-column list of the user's active web jobs. Used for batch status changes -->
         <script type="text/javascript">
           function checkAll() {
             var checkboxes = document.querySelectorAll('.job-checkbox');
@@ -523,52 +527,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
           <div class="col-md-12 order-md-1">
             <h4 class="mb-3">Other Active Jobs</h4>
-              <?php 
-              echo '<button type="button" id="selectJobsButton" onclick="checkAll()">Check All</button>';
-              echo '<button type="button" id="selectJobsButton" onclick="uncheckAll()">Uncheck All</button>'; 
-              ?>
-              <div class="user_jobs_container">
+            <?php 
+            echo '<button type="button" id="selectJobsButton" onclick="checkAll()">Check All</button>';
+            echo '<button type="button" id="selectJobsButton" onclick="uncheckAll()">Uncheck All</button>'; 
+            ?>
+          <div class="user_jobs_container">
 
+          <!--text saying there's no other active jobs isnt appearing-->
           <?php
-                try {
-                    $num_jobs = count($active_user_jobs);
-                    if($num_jobs == 0){
-                      echo 'This customer has no other active jobs';
-                      echo '<p>No Connected Jobs</p>';
-                    }
-                } catch (PDOException $e) {
-                    echo "Error: " . $e->getMessage();
+            try {
+                $num_jobs = count($active_user_jobs);
+                if($num_jobs == 0){?>
+                  <p><?php echo 'This customer has no other active jobs<br>';?></p>;
+                <?php }
+            } catch (PDOException $e) {
+                echo "Error: " . $e->getMessage();
+            }
+
+            // Iterate through the $active_user_jobs array
+            foreach ($active_user_jobs as $other_active_job) {
+              if($job['id'] != $other_active_job['id']){
+                echo '<div class="job-item">';
+                echo '<input type="checkbox" class ="job-checkbox" id="' . $other_active_job['id'] . '" name="checked_jobs[]" value="' . $other_active_job['id'] . '">';
+                echo '<label for="' . $other_active_job['id'] . '">';
+                if ($other_active_job['status'] == "on hold") {
+                    echo "  On hold -";
                 }
-
-                // Iterate through the $active_user_jobs array
-                foreach ($active_user_jobs as $other_active_job) {
-                    if($job['id'] != $other_active_job['id']){
-                      echo '<div class="job-item">';
-                      echo '<input type="checkbox" class ="job-checkbox" id="' . $other_active_job['id'] . '" name="checked_jobs[]" value="' . $other_active_job['id'] . '">';
-                      echo '<label for="' . $other_active_job['id'] . '">';
-                      if ($other_active_job['status'] == "on hold") {
-                          echo "  On hold -";
-                      }
-                      // Check if 'name' index is set
-                        if (isset($other_active_job['name'])) {
-                            echo "  " . $other_active_job['name'];
-                        } else {
-                            echo "No id available"; 
-                        }
-                      echo '</label>';
-                      echo '</div>';
-
-                      // ! Popup div not working
-                      echo '<span class="popup">';
-                        echo '<span class="popuptext" id="myPopup">';
-                          echo '<p>${other_active_job["name"]}<br>${other_active_job["status"]}<br>${other_active_job["submission_date"]}';
-                        echo '</span>';
-                      echo '</span>'; 
-                    }
+                // Check if 'name' index is set
+                  if (isset($other_active_job['name'])) {
+                      echo "  " . $other_active_job['name'];
+                  } else {
+                      echo "No id available"; 
                   }
-                ?>
+                echo '</label>';
+                echo '</div>';
+
+                  // ! Popup div not working
+                  echo '<span class="popup">';
+                    echo '<span class="popuptext" id="myPopup">';
+                      echo '<p>${other_active_job["name"]}<br>${other_active_job["status"]}<br>${other_active_job["submission_date"]}';
+                    echo '</span>';
+                  echo '</span>'; 
+                }
+              }
+            ?>
               </div>
-            </div>
+            </div> <!--End of associated jobs list-->
 
 
 
@@ -638,16 +642,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="input-group">
             <textarea rows="5" cols="50" class="form-control" aria-label="additional-comments" readonly><?php echo $job["specifications"]; ?></textarea>
         </div>
-        <hr class="mb-4">
-        <h5 class="mb-2">Copies</h5>
-        <div class="col-md-3 mb-3">
-            <label for="copies">Copies</label>
-            <input type="number" class="form-control" name="copies" min="1" max="100" step="1" value="1" id="supports" placeholder="<?php if ($job["copies"]!= ""){echo "{$job["copies"]}";} else{"Enter # of copies";}?>" required />
-            <div class="invalid-feedback">
-              Please provide a valid response.
-            </div>
+      <hr class="mb-4">
+      <h5 class="mb-2">Copies</h5>
+      <div class="col-md-3 mb-3">
+          <label for="copies">Copies</label>
+          <input type="number" class="form-control" name="copies" min="1" max="100" step="1" value="1" id="supports" placeholder="<?php if ($job["copies"]!= ""){echo "{$job["copies"]}";} else{"Enter # of copies";}?>" required />
+          <div class="invalid-feedback">
+            Please provide a valid response.
           </div>
         </div>
+      </div>
 
         
         <hr class="mb-4">
@@ -781,7 +785,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <span class="close" data-popup="DuplicateJobPopup">&times;</span>
           <p>Are you sure you want to duplicate your job?</p>
             <a href="customer-duplicate-laser-job.php?job_id=<?php echo $job["id"]; ?>">
-                <button type="submit" class="btn btn-primary btn-lg" style="background-color:#CF9FFF;">Duplicate Job</button>
+                <button class="btn btn-primary btn-lg" style="background-color:#CF9FFF;">Duplicate Job</button>
             </a>
         </div>
       </div>

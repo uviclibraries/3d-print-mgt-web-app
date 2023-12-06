@@ -96,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $laser_copies = intval($_POST["laser_copies"]);
   $good_statement = True;
   $stmt = $conn->prepare("INSERT INTO web_job (netlink_id, job_name, job_purpose, academic_code, submission_date, status) VALUES (:netlink_id, :job_name, :job_purpose, :academic_code, :submission_date, :job_status)");
-  $stmt->bindParam(':netlink_id', $user);
+  $stmt->bindParam(':netlink_id', $job['netlink_id']);
   $stmt->bindParam(':job_name', $_POST["job_name"]);
   $stmt->bindParam(':job_purpose', $_POST["job_purpose"]);
   $stmt->bindParam(':academic_code', $_POST["academic_code"]);
@@ -113,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   // Extract most recent use id from the web job table based on user netlink id
 
   $stmt = $conn->prepare("SELECT MAX(id) FROM web_job WHERE netlink_id=:user_netlink");
-  $stmt->bindParam(':user_netlink', $user);
+  $stmt->bindParam(':user_netlink',  $job['netlink_id']);
   $good_statement &= $stmt->execute();
   $curr_id = $stmt->fetch(PDO::FETCH_NUM)[0];
 
@@ -122,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   if(!$curr_id){
-    die('No web job entry for username {$user}');
+    die('No web job entry for username {$job['netlink_id']}');
   }
 
   $stmt = $conn->prepare("INSERT INTO 3d_print_job (3d_print_id, model_name, infill, scale, layer_height, supports, copies, material_type, comments) VALUES (:3d_print_id, :model_name, :infill, :scale, :layer_height, :supports, :copies, :material_type, :comments)");
