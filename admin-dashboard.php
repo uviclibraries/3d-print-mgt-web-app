@@ -228,16 +228,21 @@ foreach ($laser_job7 as $job) {
 
     <div class="container">
         <div class="py-5 text-center">
+          <?php
+            // Create a DateTime object for the current date
+            $prior10Days = (new DateTime())->modify('-10 days')->format('Y-m-d');
+            // echo $prior10Days;
 
+          ?>
             <div class="row">
                 <div class="col-md-4 mb-3">
-                    <a href="admin-reports.php?searchdate_start=<?php echo date("Y-m-01") ?>&searchdate_end=<?php echo date("Y-m-d") ?>&approved=on">
+                    <a href="admin-reports.php?searchdate_start=<?php echo $prior10Days ?>&searchdate_end=<?php echo date("Y-m-d") ?>&approved=on">
                         <button class="btn btn-primary btn-lg btn-block" class="form-control" type="submit" data-inline="true">Reports</button>
                     </a>
                 </div>
 
                 <div class="col-md-4 mb-3">
-                    <a href="admin-print-history.php?searchdate_start=<?php echo date("Y-m-d") ?>">
+                    <a href="admin-print-history.php?searchdate_start=<?php echo $prior10Days ?>&searchdate_end=<?php echo date("Y-m-d") ?>">
                         <button class="btn btn-primary btn-lg btn-block" class="form-control" type="submit" data-inline="true">Job History</button>
                     </a>
                 </div>

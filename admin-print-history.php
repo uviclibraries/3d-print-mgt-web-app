@@ -9,18 +9,24 @@ if ($user_type == 1) {
 }
 
 $sql_line =array(); //sql builder //parameters
-$getcheck = array_fill(0,4, FALSE); //where conditions
+$getcheck = array_fill(0,3, FALSE); //where conditions
+// echo $_GET['searchdate_start'];
+//startdate_search is set onload to 10 days prior to the current date, as set in admin-dashboard.php
+//if the start date is set, append to filter line
 if (isset($_GET['searchdate_start']) && ($_GET['searchdate_start'] != "" && $_GET['searchdate_start'] != NULL)) {
   $getcheck[0] = True;
-  $sql_line[] = "(submission_date >= :searchdate_start OR delivered_date >= :searchdate_start OR cancelled_date >= :searchdate_start OR completed_date >= :searchdate_start)";
-
-}if (isset($_GET['searchdate_end']) && ($_GET['searchdate_end'] != "" && $_GET['searchdate_end'] != NULL)) {
+  $sql_line[] = "(web_job.submission_date >= :searchdate_start OR web_job.delivered_date >= :searchdate_start OR web_job.cancelled_date >= :searchdate_start OR web_job.completed_date >= :searchdate_start)";
+}
+//if the end date is set, append to filter line
+if (isset($_GET['searchdate_end']) && ($_GET['searchdate_end'] != "" && $_GET['searchdate_end'] != NULL)) {
   $getcheck[1] = True;
-  $sql_line[] = "(submission_date <= :searchdate_end OR delivered_date <= :searchdate_end OR cancelled_date <= :searchdate_end OR completed_date <= :searchdate_end)";
-}if (isset($_GET['search_id']) && ($_GET['search_id'] != "" && $_GET['search_id'] != NULL)) {
+  $sql_line[] = "(web_job.submission_date <= :searchdate_end OR web_job.delivered_date <= :searchdate_end OR web_job.cancelled_date <= :searchdate_end OR web_job.completed_date <= :searchdate_end)";
+}
+
+//if the search name is set, append to filter line
+if (isset($_GET['search_id']) && ($_GET['search_id'] != "" && $_GET['search_id'] != NULL)) {
   $getcheck[2] = True;
-  $sql_line[] = "netlink_id LIKE :search_id OR users.name LIKE :search_name";
-  $joinUsers = "INNER JOIN users ON web_job.netlink_id = table3.netlink_id";
+  $sql_line[] = "(web_job.netlink_id LIKE :search_id OR users.name LIKE :search_id)";
 }
 
 
@@ -28,12 +34,14 @@ if (isset($_GET['searchdate_start']) && ($_GET['searchdate_start'] != "" && $_GE
 //execute query if parameters are empty 
 // if ($getcheck[0]==FALSE && $getcheck[1]==FALSE && $getcheck[2]==FALSE && $getcheck[3]==FALSE) {
 if (!array_filter($getcheck)){
-  $stm = $conn->query("SELECT id, job_name, netlink_id, status, completed_date, delivered_date, submission_date, cancelled_date FROM web_job INNER JOIN 3d_print_job ON web_job.id=3d_print_job.3d_print_id WHERE status IN ('completed','archived','cancelled') ORDER BY completed_date DESC");
+  $stm = $conn->query("SELECT web_job.id, web_job.job_name, web_job.netlink_id, web_job.status, web_job.completed_date, web_job.delivered_date, web_job.submission_date, web_job.cancelled_date, users.name FROM web_job INNER JOIN `3d_print_job` ON web_job.id=`3d_print_job`.`3d_print_id` INNER JOIN users ON web_job.netlink_id=`users`.`netlink_id` WHERE (web_job.status IN ('completed', 'archived', 'cancelled')) ORDER BY web_job.completed_date DESC");
+
 }
+
 //find out what parameters are being searched for
 else{
   //build sql query line based on search parameters
-  $searchline = "SELECT id, job_name, netlink_id, status, completed_date, delivered_date, submission_date, cancelled_date FROM web_job INNER JOIN 3d_print_job ON web_job.id=3d_print_job.3d_print_id WHERE status IN ('completed','archived','cancelled') AND " . implode(" AND ", $sql_line) . " ORDER BY completed_date DESC";
+  $searchline = "SELECT web_job.id, web_job.job_name, web_job.netlink_id, web_job.status, web_job.completed_date, web_job.delivered_date, web_job.submission_date, web_job.cancelled_date, users.name FROM web_job INNER JOIN `3d_print_job` ON web_job.id=`3d_print_job`.`3d_print_id` INNER JOIN users ON web_job.netlink_id=`users`.`netlink_id` WHERE (web_job.status IN ('completed', 'archived', 'cancelled')) AND " . implode(" AND ", $sql_line) . " ORDER BY web_job.completed_date DESC";
   $stm = $conn->prepare($searchline);
   //echo $searchline . "\n";
 
@@ -47,9 +55,9 @@ else{
     $stm->bindParam(':search_id', $temp, PDO::PARAM_STR);
   }
   
-
+  
   $stm->execute();
-
+  // print_r($stm);
 }
 //SQL results
 $d_history = $stm->fetchAll();
@@ -58,12 +66,12 @@ $d_history = $stm->fetchAll();
 //Check if parameters are empty 
 // if ($getcheck[0]==FALSE && $getcheck[1]==FALSE && $getcheck[2]==FALSE && $getcheck[3]==FALSE) {
 if (!array_filter($getcheck)){
-  $stm = $conn->query("SELECT id, job_name, netlink_id, status, completed_date, delivered_date, submission_date, cancelled_date FROM web_job INNER JOIN laser_cut_job ON web_job.id=laser_cut_job.laser_cut_id WHERE status IN ('completed','archived','cancelled') ORDER BY completed_date DESC");
+  $stm = $conn->query("SELECT web_job.id, web_job.job_name, web_job.netlink_id, web_job.status, web_job.completed_date, web_job.delivered_date, web_job.submission_date, web_job.cancelled_date, users.name FROM web_job INNER JOIN `laser_cut_job` ON web_job.id=`laser_cut_job`.`laser_cut_id` INNER JOIN users ON web_job.netlink_id=`users`.`netlink_id` WHERE web_job.status IN ('completed', 'archived', 'cancelled') ORDER BY web_job.completed_date DESC");
 }
 //find out what parameters are being searched for
 else{
   //build sql query line based on search parameters
-  $searchline = "SELECT id, job_name, netlink_id, status, completed_date, delivered_date, submission_date, cancelled_date FROM web_job INNER JOIN laser_cut_job ON web_job.id=laser_cut_job.laser_cut_id WHERE status IN ('completed','archived','cancelled') AND " . implode(" AND ", $sql_line) . " ORDER BY completed_date DESC";
+  $searchline = "SELECT web_job.id, web_job.job_name, web_job.netlink_id, web_job.status, web_job.completed_date, web_job.delivered_date, web_job.submission_date, web_job.cancelled_date, users.name FROM web_job INNER JOIN `laser_cut_job` ON web_job.id=`laser_cut_job`.`laser_cut_id` INNER JOIN users ON web_job.netlink_id=`users`.`netlink_id` WHERE (web_job.status IN ('completed', 'archived', 'cancelled')) AND " . implode(" AND ", $sql_line) . " ORDER BY web_job.completed_date DESC";
   $stm = $conn->prepare($searchline);
   //echo $searchline . "\n";
 
@@ -206,7 +214,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
   <div class="container">
   <div class="py-5 text-left">
 
-  <h3 id="topOfPage">Archived &amp; Cancelled Jobs</h3>
+  <h3 id="topOfPage">Completed, Archived &amp; Cancelled Jobs</h3>
   <br>
 
   <!--Search bar-->
@@ -215,17 +223,17 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     <div class="row">
       <div class="mb-2">
         <label for = "searchdate_start">Start date:</label>
-        <input type="date" id= "searchdate_start" name="searchdate_start" value="<?php echo isset($_POST['searchdate_start']) ? $_POST['searchdate_start'] : ''; ?>">
+        <input type="date" id= "searchdate_start" name="searchdate_start" value="<?php echo isset($_GET['searchdate_start']) ? $_GET['searchdate_start'] : $_POST['searchdate_start']; ?>">
       </div>
       <div class="mb-2">
         <label for = "searchdate_end">End date:</label>
-        <input type="date" id= "searchdate_end" name="searchdate_end" value="<?php echo isset($_POST['searchdate_end']) ? $_POST['searchdate_end'] : ''; ?>">
+        <input type="date" id= "searchdate_end" name="searchdate_end" value="<?php echo isset($_GET['searchdate_end']) ? $_GET['searchdate_end'] : $_POST['searchdate_end']; ?>">
       </div>
   </div>
   <div class="row">
     <div class="mb-2">
-      <label for = "search_id">netlink id:</label>
-        <input type="text" id= "search_id"name="search_id" value="<?php echo isset($_POST['id= "search_id"']) ? htmlspecialchars($_POST['id= "search_id"']) : ''; ?>">
+      <label for = "search_id">Name or netlink id:</label>
+        <input type="text" id= "search_id"name="search_id" value="<?php echo isset($_GET['search_id']) ? htmlspecialchars($_GET['search_id']) : htmlspecialchars($_POST['id= "search_id"']); ?>">
     </div>
 
   </div>

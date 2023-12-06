@@ -11,10 +11,7 @@ if ($user_type == 1) {
 $stm = $conn->prepare("SELECT * FROM web_job INNER JOIN laser_cut_job ON id=laser_cut_id WHERE id=?");
 $stm->execute([$_GET["job_id"]]);
 $job=$stm->fetch();
-echo $job['name']; 
-// $stm = $conn->prepare("SELECT * FROM print_job WHERE id=?");
-// $stm->execute([$_GET["job_id"]]);
-// $job=$stm->fetch();
+// echo $job['job_name']; 
 
 //Get users name & email
 $userSQL = $conn->prepare("SELECT * FROM users WHERE netlink_id = :netlink_id");
@@ -32,9 +29,9 @@ $stm = $conn->prepare("SELECT web_job.id AS id, web_job.job_name AS name, web_jo
   foreach ($user_web_jobs as $related_job) {
     $active_user_jobs[] = $related_job;
   }
-  echo 'row 35 active user jobs: ';
-  print_r(count($active_user_jobs));
-  echo '<br>';
+  // echo 'row 35 active user jobs: ';
+  // print_r(count($active_user_jobs));
+  // echo '<br>';
     
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -68,8 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
   $stmt = $conn->prepare("UPDATE web_job INNER JOIN laser_cut_job ON id=laser_cut_id SET price = :price, copies=:copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date,cancelled_date = :cancelled_date, delivered_date = :delivered_date, hold_date = :hold_date, hold_signer= :hold_signer, cancelled_signer = :cancelled_signer, model_name_2 =:model_name_2 WHERE id = :job_id");
-  //$stmt = $conn->prepare("UPDATE print_job SET price = :price, infill = :infill, scale = :scale, layer_height = :layer_height, supports = :supports, copies = :copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, model_name_2 =:model_name_2 WHERE id = :job_id;
-  //");
+  
   $current_date = date("Y-m-d");
 
   $stmt->bindParam(':job_id', $job['id']);
@@ -91,6 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $d5 = $job['hold_date'];
   $d6 = $job['completed_date'];
   $d7 = $job['cancelled_date'];
+
   $stmt->bindParam(':priced_date', $d1);
   $stmt->bindParam(':paid_date', $d2);
   $stmt->bindParam(':printing_date', $d3);
@@ -141,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   } elseif($_POST['status'] == "printing"){
     $d3 = $current_date;
 
-  }  elseif ($_POST['status'] == "delivered" OR $_POST['status'] == "archived") {
+  } elseif ($_POST['status'] == "delivered" OR $_POST['status'] == "archived") {
     $d4 = $current_date;
 
     //email user
@@ -169,14 +166,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $headers .= "From: dscommons@uvic.ca" . "\r\n";
       mail($job_owner['email'], "Your laser cut is ready for collection",$msg,$headers);
     }
-  }elseif($_POST['status'] == "on hold"){
+  } elseif($_POST['status'] == "on hold"){
     $d5 = $current_date;
     $hs = $user;
 
   } elseif($_POST['status'] == "completed"){
     $d6 = $current_date;
 
-  }elseif($_POST['status'] == "cancelled"){
+  } elseif($_POST['status'] == "cancelled"){
     $d7 = $current_date;
     $cs = $user;
   }
@@ -185,88 +182,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   
 //Set status details for associated jobs selected from associated jobs table
+  print_r($_POST);
   if (isset($_POST['checked_jobs'])) {
     $checked_jobs = $_POST['checked_jobs'];
-    echo 'line190 checked jobs exists';
-    print_r($checked_jobs);echo '<br>';
+    // echo 'line190 checked jobs exists';
+    // print_r($checked_jobs);echo '<br>';
 
-    // $checked_jobs_ids =[];
-    // foreach($checked_jobs as $checked_job){
-    //   $checked_jobs_ids[] = $checked_job['id'];
-    // }
-
-    $checkedIDs_sql = implode(',', $checked_jobs);
-    echo 'line199 imploded jobIDs:' . $checkedIDs_sql . "<br>";
-
-    
     if(count($checked_jobs)>0){
-      echo 'checked jobs >0<br>';
-      $stm = $conn->prepare("SELECT * FROM web_job INNER JOIN laser_cut_job ON id=laser_cut_id WHERE id IN ($checkedIDs_sql)");
-      $stm->bindParam(':netlink_id', $job['netlink_id']);
-      $stm->execute();
-      $setJobs = $stm->fetchAll();
+    
+      $checked_jobs = array_map(function($item) {
+        return "'" . $item . "'";
+      }, $checked_jobs);
+      // print_r($checked_jobs);
 
-      $stm = $conn->prepare("UPDATE web_job INNER JOIN laser_cut_job ON id=laser_cut_id SET status = :status, priced_date = :priced_date, paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, delivered_date = :delivered_date, hold_date = :hold_date, hold_signer= :hold_signer, cancelled_date=:cancelled_datecancelled_signer = :cancelled_signer, WHERE id IN ($checkedIDs_sql)");
-      // $stm->bindParam(':netlink_id', $job['netlink_id']);
+      $checkedIDs_sql = implode(',', $checked_jobs);//to create comma separated list for update query
+      // echo $checkedIDs_sql;
 
-      // $stm->bindParam(':job_id', $user_web_jobs['id']);
+      $stm = $conn->prepare("UPDATE web_job INNER JOIN laser_cut_job ON id=laser_cut_id SET status = :status, priced_date = :priced_date, paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, delivered_date = :delivered_date, hold_date = :hold_date, hold_signer= :hold_signer, cancelled_date=:cancelled_date, cancelled_signer = :cancelled_signer WHERE id IN ($checkedIDs_sql)");
+
       $stm->bindParam(':status', $_POST["status"]);
 
-      $a1 = $setJobs['priced_date'];
-      $a2 = $setJobs['paid_date'];
-      $a3 = $setJobs['printing_date'];
-      $a6 = $setJobs['completed_date'];
-      $a5 = $setJobs['hold_date'];
-      $a4 = $setJobs['delivered_date'];
-      $a7 = $setJobs['cancelled_date'];
-      $stm->bindParam(':priced_date', $a1);
-      $stm->bindParam(':paid_date', $a2);
-      $stm->bindParam(':printing_date', $a3);
-      $stm->bindParam(':completed_date', $a6);
-      $stm->bindParam(':hold_date', $a5);
-      $stm->bindParam(':delivered_date', $a4);
-      $stm->bindParam(':cancelled_date', $a7);
+      $stm->bindParam(':priced_date', $d1);
+      $stm->bindParam(':paid_date', $d2);
+      $stm->bindParam(':printing_date', $d3);
+      $stm->bindParam(':completed_date', $d6);
+      $stm->bindParam(':hold_date', $d5);
+      $stm->bindParam(':delivered_date', $d4);
+      $stm->bindParam(':cancelled_date', $d7);
      
-      $ahs = $setJobs['hold_signer'];
-      $acs = $setJobs['cancelled_signer'];
-      $stm->bindParam(':hold_signer', $ahs);
-      $stm->bindParam(':cancelled_signer', $acs);
-
-      $current_date = date("Y-m-d");
-      //need variable to check if admin wants to send email. case: updating notes but dont send email
-      if ($_POST['status'] == "pending payment") {
-        $a1 = $current_date;
-
-      } elseif($_POST['status'] == "paid"){
-        //this is done automatically when payment is received.
-        $a2 = $current_date;
-
-      } elseif($_POST['status'] == "printing"){
-        $a3 = $current_date;
-
-      } elseif($_POST['status'] == "on hold"){
-        $a5 = $current_date;
-        $ahs = $user;
-
-      } elseif($_POST['status'] == "completed"){
-        echo "d6";
-        $a6 = $current_date;
-
-      } elseif ($_POST['status'] == "delivered" or $_POST['status'] == "archived") {
-        $a4 = $current_date;
-      }
-       elseif($_POST['status'] == "cancelled"){
-        $a7 = $current_date;
-        $acs = $user;
-      }
+      $stm->bindParam(':hold_signer', $hs);
+      $stm->bindParam(':cancelled_signer', $cs);
 
       $stm->execute();
     }
   } else {
-  echo 'no checked jobs apparently';
+  // echo 'no checked jobs';
   }//end set associated jobs status
   //exit to dashboard after saving
-  // header("location: admin-dashboard.php");
+  header("location: admin-dashboard.php");
 }//end form execution
 
 
@@ -762,7 +715,120 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
     </form>
   </div>
+  
 
+<!-- DUPLICATE JOB BUTTONS-->
+<style>
+/* Button style */
+/*#myBtn{
+    width: 50px;
+    background-color: red;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+}*/
+
+/* The Popup (background) */
+.popup {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Popup Content */
+.popup-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+}
+
+/* The Close Button */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+</style>
+
+
+
+<hr class="mb-4">
+  <center>
+    <!-- Button to trigger 'Duplicate Job' confirmation popup; button background color set to purple-->
+    <button id="duplicate-button" class="btn btn-primary btn-lg" style="background-color:#CF9FFF;">Duplicate Job</button> <!--duplicate button-->
+      <!-- The Duplicate Popup -->
+      <div id="DuplicateJobPopup" class="popup">
+        <div class="popup-content">
+          <span class="close" data-popup="DuplicateJobPopup">&times;</span>
+          <p>Are you sure you want to duplicate your job?</p>
+            <a href="customer-duplicate-laser-job.php?job_id=<?php echo $job["id"]; ?>">
+                <button type="submit" class="btn btn-primary btn-lg" style="background-color:#CF9FFF;">Duplicate Job</button>
+            </a>
+        </div>
+      </div>
+  </center>
+
+<script>
+window.onload = function() {
+    // Function to open a popup
+    function openPopup(popupId) {
+        var popup = document.getElementById(popupId);
+        if (popup) {
+            popup.style.display = "block";
+        }
+    }
+
+    // Function to close a popup
+    function closePopup(popupId) {
+        var popup = document.getElementById(popupId);
+        if (popup) {
+            popup.style.display = "none";
+        }
+    }
+
+    // Attach event listeners to buttons
+    var duplicateButton = document.getElementById("duplicate-button");
+
+    if (duplicateButton) {
+        duplicateButton.onclick = function() { openPopup("DuplicateJobPopup"); }
+    }
+
+    // Attach event listeners to close buttons
+    var closeButtons = document.getElementsByClassName("close");
+    for (var i = 0; i < closeButtons.length; i++) {
+        closeButtons[i].onclick = function() {
+            var popupId = this.getAttribute("data-popup");
+            closePopup(popupId);
+        }
+    }
+
+    // Close popup when clicking outside of it
+    window.onclick = function(event) {
+        if (event.target.classList.contains("popup")) {
+            event.target.style.display = "none";
+        }
+    }
+}
+</script>
   <p></p>
   <br>
   <p></p>
