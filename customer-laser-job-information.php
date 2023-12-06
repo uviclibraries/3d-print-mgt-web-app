@@ -258,7 +258,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <style>
 /* Button style */
-#myBtn {
+#myBtn{
     width: 50px;
     background-color: red;
     color: white;
@@ -268,8 +268,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     text-align: center;
 }
 
-/* The Modal (background) */
-.modal {
+/* The Popup (background) */
+.popup {
     display: none; /* Hidden by default */
     position: fixed;
     z-index: 1; /* Sit on top */
@@ -282,8 +282,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 }
 
-/* Modal Content */
-.modal-content {
+/* Popup Content */
+.popup-content {
     background-color: #fefefe;
     margin: 15% auto;
     padding: 20px;
@@ -312,11 +312,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <hr class="mb-4">
   <center>
     <!-- Button to trigger 'Cancel Job' confirmation popup; button background color set to red-->
-    <button id="myBtn1" class="btn btn-primary btn-lg" style="background-color: #f44336;">Cancel Job</button> <!--cancel button-->
+    <button id="cancel-button" class="btn btn-primary btn-lg" style="background-color: #f44336;">Cancel Job</button> <!--cancel button-->
       <!-- The First Popup -->
-      <div id="myModal1" class="modal">
-        <div class="modal-content">
-          <span class="close" data-modal="myModal1">&times;</span>
+      <div id="CancelJobPopup" class="popup">
+        <div class="popup-content">
+          <span class="close" data-popup="CancelJobPopup">&times;</span>
           <p>Are you sure you want to cancel your job?</p>
           <form method="post">
               <input type="hidden" name="job_id" value="<?php echo htmlspecialchars($job['id']); ?>">
@@ -327,11 +327,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       </div>
 
     <!-- Button to trigger 'Duplicate Job' confirmation popup; button background color set to purple-->
-    <button id="myBtn2" class="btn btn-primary btn-lg" style="background-color:#CF9FFF;">Duplicate Job</button> <!--duplicate button-->
+    <button id="duplicate-button" class="btn btn-primary btn-lg" style="background-color:#CF9FFF;">Duplicate Job</button> <!--duplicate button-->
       <!-- The Second Popup -->
-      <div id="myModal2" class="modal">
-        <div class="modal-content">
-          <span class="close" data-modal="myModal2">&times;</span>
+      <div id="DuplicateJobPopup" class="popup">
+        <div class="popup-content">
+          <span class="close" data-popup="DuplicateJobPopup">&times;</span>
           <p>Are you sure you want to duplicate your job?</p>
             <a href="customer-duplicate-laser-job.php?job_id=<?php echo $job["id"]; ?>">
                 <button type="submit" class="btn btn-primary btn-lg" style="background-color:#CF9FFF;">Duplicate Job</button>
@@ -342,45 +342,45 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <script>
 window.onload = function() {
-    // Function to open a modal
-    function openModal(modalId) {
-        var modal = document.getElementById(modalId);
-        if (modal) {
-            modal.style.display = "block";
+    // Function to open a popup
+    function openPopup(popupId) {
+        var popup = document.getElementById(popupId);
+        if (popup) {
+            popup.style.display = "block";
         }
     }
 
-    // Function to close a modal
-    function closeModal(modalId) {
-        var modal = document.getElementById(modalId);
-        if (modal) {
-            modal.style.display = "none";
+    // Function to close a popup
+    function closePopup(popupId) {
+        var popup = document.getElementById(popupId);
+        if (popup) {
+            popup.style.display = "none";
         }
     }
 
     // Attach event listeners to buttons
-    var btn1 = document.getElementById("myBtn1");
-    var btn2 = document.getElementById("myBtn2");
+    var cancelButton = document.getElementById("cancel-button");
+    var duplicateButton = document.getElementById("duplicate-button");
 
-    if (btn1) {
-        btn1.onclick = function() { openModal("myModal1"); }
+    if (cancelButton) {
+        cancelButton.onclick = function() { openPopup("CancelJobPopup"); }
     }
-    if (btn2) {
-        btn2.onclick = function() { openModal("myModal2"); }
+    if (duplicateButton) {
+        duplicateButton.onclick = function() { openPopup("DuplicateJobPopup"); }
     }
 
     // Attach event listeners to close buttons
     var closeButtons = document.getElementsByClassName("close");
     for (var i = 0; i < closeButtons.length; i++) {
         closeButtons[i].onclick = function() {
-            var modalId = this.getAttribute("data-modal");
-            closeModal(modalId);
+            var popupId = this.getAttribute("data-popup");
+            closePopup(popupId);
         }
     }
 
-    // Close modal when clicking outside of it
+    // Close popup when clicking outside of it
     window.onclick = function(event) {
-        if (event.target.classList.contains("modal")) {
+        if (event.target.classList.contains("popup")) {
             event.target.style.display = "none";
         }
     }

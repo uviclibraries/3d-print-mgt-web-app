@@ -112,12 +112,8 @@ if ($user != $job["netlink_id"] && $user_type == 1) {
                 Status is required.
                 </div>
             </div>
-            <?php if ($job["status"] =="archived" && is_file(("uploads/" . $job['model_name']))){ ?>
-              <!-- <a class="btn btn-md btn-primary btn-" href="customer-revive-job.php?job_id=<?php echo $job['id']?>" role="button">Revive</a> */
-            <?php } ?>
             </div>
-            </div>
-            <!------------------->
+        </div>
 
 
           <hr class="mb-6">
@@ -267,6 +263,166 @@ if ($user != $job["netlink_id"] && $user_type == 1) {
       </form>
     </div>
   </div>
+
+  <!-- CANCEL AND DUPLICATE JOB BUTTONS-->
+
+<?php
+// Check if the form has been submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+ 
+  // Check which form was submitted
+  if (isset($_POST['cancel_job'])) {
+    $query = "UPDATE web_job INNER JOIN laser_cut_job ON id=laser_cut_id 
+              SET status = :status, cancelled_date = :cancelled_date, cancelled_signer = :cancelled_signer 
+              WHERE id = :id";
+    
+    $stmt = $conn->prepare($query);
+    
+    // You can directly bind the values in the execute() method
+    $stmt->execute([
+        ':status' => 'cancelled',
+        ':cancelled_date' => date("Y-m-d"),
+        ':cancelled_signer' => $user,
+        ':id' => $_POST['job_id'] // Assuming job_id is coming from form data
+    ]);
+  }
+
+  // Redirect or display a success message after processing
+  // header("Location: samepage.php");
+  // exit();
+}
+?>
+
+<style>
+/* Button style */
+#myBtn{
+    width: 50px;
+    background-color: red;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+}
+
+/* The Popup (background) */
+.popup {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Popup Content */
+.popup-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+}
+
+/* The Close Button */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+</style>
+
+
+
+<hr class="mb-4">
+  <center>
+    <!-- Button to trigger 'Cancel Job' confirmation popup; button background color set to red-->
+    <button id="cancel-button" class="btn btn-primary btn-lg" style="background-color: #f44336;">Cancel Job</button> <!--cancel button-->
+      <!-- The First Popup -->
+      <div id="CancelJobPopup" class="popup">
+        <div class="popup-content">
+          <span class="close" data-popup="CancelJobPopup">&times;</span>
+          <p>Are you sure you want to cancel your job?</p>
+          <form method="post">
+              <input type="hidden" name="job_id" value="<?php echo htmlspecialchars($job['id']); ?>">
+              <input type="hidden" name="cancel_job" value="1">
+              <button type="submit" class="btn btn-primary btn-lg" style="background-color: #f44336;">Cancel Job</button>
+          </form>
+        </div>
+      </div>
+
+    <!-- Button to trigger 'Duplicate Job' confirmation popup; button background color set to purple-->
+    <button id="duplicate-button" class="btn btn-primary btn-lg" style="background-color:#CF9FFF;">Duplicate Job</button> <!--duplicate button-->
+      <!-- The Second Popup -->
+      <div id="DuplicateJobPopup" class="popup">
+        <div class="popup-content">
+          <span class="close" data-popup="DuplicateJobPopup">&times;</span>
+          <p>Are you sure you want to duplicate your job?</p>
+            <a href="customer-duplicate-3d-job.php?job_id=<?php echo $job["id"]; ?>">
+                <button type="submit" class="btn btn-primary btn-lg" style="background-color:#CF9FFF;">Duplicate Job</button>
+            </a>
+        </div>
+      </div>
+  </center>
+
+    <script>
+    window.onload = function() {
+        // Function to open a popup
+        function openPopup(popupId) {
+            var popup = document.getElementById(popupId);
+            if (popup) {
+                popup.style.display = "block";
+            }
+        }
+
+        // Function to close a popup
+        function closePopup(popupId) {
+            var popup = document.getElementById(popupId);
+            if (popup) {
+                popup.style.display = "none";
+            }
+        }
+
+        // Attach event listeners to buttons
+        var cancelButton = document.getElementById("cancel-button");
+        var duplicateButton = document.getElementById("duplicate-button");
+
+        if (cancelButton) {
+            cancelButton.onclick = function() { openPopup("CancelJobPopup"); }
+        }
+        if (duplicateButton) {
+            duplicateButton.onclick = function() { openPopup("DuplicateJobPopup"); }
+        }
+
+        // Attach event listeners to close buttons
+        var closeButtons = document.getElementsByClassName("close");
+        for (var i = 0; i < closeButtons.length; i++) {
+            closeButtons[i].onclick = function() {
+                var popupId = this.getAttribute("data-popup");
+                closePopup(popupId);
+            }
+        }
+
+        // Close popup when clicking outside of it
+        window.onclick = function(event) {
+            if (event.target.classList.contains("popup")) {
+                event.target.style.display = "none";
+            }
+        }
+    }
+    </script>
 
   <p></p>
   <br>
