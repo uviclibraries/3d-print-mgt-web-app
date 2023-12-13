@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               // Check MIME Type by yourself.
               $file_name = $_FILES["3d_model"]['name'];
               $file_array = explode(".",$file_name);
-              $ext = end($file_array);
+              $ext = array_pop($file_array);
               $explode_len = count($file_array);
               if (!in_array($ext, ["stl", "STL", "obj", "3mf", "gcode","svg", "pdf", "PDF"])|| $explode_len > 2) {
                   throw new RuntimeException('Invalid file format.');
@@ -148,7 +148,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $headers .= "From: dscommons@uvic.ca" . "\r\n";
   mail($user_email,"DSC - New laser cut Job",$msg,$headers);
 
-// header("location: customer-dashboard.php");
+header("location: customer-dashboard.php");
 }
 
 ?>
@@ -299,7 +299,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <input id="academic-purpose" name="job_purpose" value="academic" type="radio" class="custom-control-input" onclick="showAcademicCodeText(this)" <?php echo ($job['job_purpose'] === 'academic') ? 'checked' : ''; ?> required >
           <label class="custom-control-label" for="academic-purpose">Academic
             <div class="col-md-12 mb-3" id="academiccode_textbox" style="display:none;">
-              <input type="text" id="academic-purpose" class="form-control" name="academic_code" placeholder="<?php echo ($job['academic_code'] == '') ? 'Academic code' : $job['academic_code']; ?>" autocomplete="off">
+              <input type="text" id="academic-purpose" class="form-control" name="academic_code" placeholder="<?php echo ($job['academic_code'] == '') ? 'Course code' : $job['academic_code']; ?>" autocomplete="off">
             </div> <!-- to fill TABLE `web_job` column `academic_code` if `job_purpose` == "academic"-->
           </label>
           <span class="popup">

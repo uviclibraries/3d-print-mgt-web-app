@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Check MIME Type by yourself.
             $file_name = $_FILES["3d_model"]['name'];
             $file_array = explode(".",$file_name);
-            $ext = end($file_array);
+            $ext = array_pop($file_array);
             $explode_len = count($file_array);
             if (!in_array($ext, ["stl", "STL", "obj", "3mf", "gcode","svg", "pdf", "PDF"])|| $explode_len > 2) {
                 throw new RuntimeException('Invalid file format.');
@@ -122,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   if(!$curr_id){
-    die('No web job entry for username {$job['netlink_id']}');
+    die('No web job entry for username {$user}');
   }
 
   $stmt = $conn->prepare("INSERT INTO 3d_print_job (3d_print_id, model_name, infill, scale, layer_height, supports, copies, material_type, comments) VALUES (:3d_print_id, :model_name, :infill, :scale, :layer_height, :supports, :copies, :material_type, :comments)");
@@ -303,7 +303,7 @@ header("location: customer-dashboard.php");
           <input id="academic-purpose" name="job_purpose" value="academic" type="radio" class="custom-control-input" onclick="showAcademicCodeText(this)" <?php echo ($job['job_purpose'] === 'academic') ? 'checked' : ''; ?> required>
           <label class="custom-control-label" for="academic-purpose">Academic
             <div class="col-md-12 mb-3" id="academiccode_textbox" style="display:none;">
-              <input type="text" id="academic-purpose" class="form-control" name="academic_code" placeholder="<?php echo ($job['academic_code'] == '') ? 'Academic code' : $job['academic_code']; ?>" autocomplete="off">
+              <input type="text" id="academic-purpose" class="form-control" name="academic_code" placeholder="<?php echo ($job['academic_code'] == '') ? 'Coruse code' : $job['academic_code']; ?>" autocomplete="off">
             </div> <!-- to fill TABLE `web_job` column `academic_code` if `job_purpose` == "academic"-->
           </label>
           <span class="popup">

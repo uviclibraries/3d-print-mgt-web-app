@@ -246,7 +246,7 @@ if ($user != $job["netlink_id"] && $user_type == 1) {
         <hr class="mb-4">
         <h5 class="mb-2">Additional Comments</h5>
             <div class="input-group">
-                <textarea class="form-control" aria-label="additional-comments"readonly ><?php echo $job["comments"]; ?>
+                <textarea rows="5" cols="50" class="form-control" aria-label="additional-comments"readonly ><?php echo $job["comments"]; ?>
                 </textarea>
             </div>
             <div class="invalid-feedback">
@@ -288,7 +288,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   }
 
   // Redirect or display a success message after processing
-  // header("Location: samepage.php");
+  header("location: customer-dashboard.php");
   // exit();
 }
 ?>
@@ -349,7 +349,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <hr class="mb-4">
   <center>
     <!-- Button to trigger 'Cancel Job' confirmation popup; button background color set to red-->
-    <button id="cancel-button" class="btn btn-primary btn-lg" style="background-color: #f44336;">Cancel Job</button> <!--cancel button-->
+    <button id="cancel-button" class="btn btn-primary btn-lg" style="background-color: #f44336; display:<?php if($job['status'] =='submitted'||$job['status'] == 'on hold' || $job['status'] == 'pending payment'){echo "inline-block";} else{echo "none";}?>;">Cancel Job</button> <!--cancel button-->
       <!-- The First Popup -->
       <div id="CancelJobPopup" class="popup">
         <div class="popup-content">

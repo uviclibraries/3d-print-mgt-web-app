@@ -248,11 +248,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         ':cancelled_signer' => $user,
         ':id' => $_POST['job_id'] // Assuming job_id is coming from form data
     ]);
+    
   }
-
+  
   // Redirect or display a success message after processing
-  // header("Location: samepage.php");
-  // exit();
+  // header("location: customer-dashboard.php");
+  // die();
 }
 ?>
 
@@ -312,7 +313,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <hr class="mb-4">
   <center>
     <!-- Button to trigger 'Cancel Job' confirmation popup; button background color set to red-->
-    <button id="cancel-button" class="btn btn-primary btn-lg" style="background-color: #f44336;">Cancel Job</button> <!--cancel button-->
+    <button id="cancel-button" class="btn btn-primary btn-lg" style="background-color: #f44336; display:<?php if($job['status'] =='submitted'||$job['status'] == 'on hold' || $job['status'] == 'pending payment'){echo "inline-block";} else{echo "none";}?>;">Cancel Job</button> <!--cancel button-->
       <!-- The First Popup -->
       <div id="CancelJobPopup" class="popup">
         <div class="popup-content">
@@ -327,7 +328,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       </div>
 
     <!-- Button to trigger 'Duplicate Job' confirmation popup; button background color set to purple-->
-    <button id="duplicate-button" class="btn btn-primary btn-lg" style="background-color:#CF9FFF;">Duplicate Job</button> <!--duplicate button-->
+    <button id="duplicate-button" class="btn btn-primary btn-lg" style="background-color:#CF9FFF">Duplicate Job</button> <!--duplicate button-->
       <!-- The Second Popup -->
       <div id="DuplicateJobPopup" class="popup">
         <div class="popup-content">

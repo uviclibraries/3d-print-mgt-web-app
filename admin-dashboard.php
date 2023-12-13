@@ -205,7 +205,6 @@ foreach ($laser_job7 as $job) {
         content: "\21A5"; /* Unicode character for "up" sign (↥) */
         font-size: 15px;
       }
-
     </style>
 
     <!-- Custom styles for this template -->
@@ -272,12 +271,13 @@ foreach ($laser_job7 as $job) {
             <div class="container">
           <div class="py-5 text-left">
 
+
 <h2 id="3d-print-jobs">3D Print Jobs</h2>
   <p><a href="#laser-cut-jobs" >(Jump to Laser Cut jobs)</a></p>
   <button class="accordion active">Submitted</button>
     <div class="panel" style="display:block;">
       <div class="table-responsive">
-        <table class="table table-striped table-md">
+        <table id='d_not_priced' class="table table-striped table-md">
           <thead>
             <tr>
               <!-- table header-->
@@ -310,7 +310,7 @@ foreach ($laser_job7 as $job) {
     <button class="accordion active">On Hold</button>
     <div class="panel" style="display:block;">
       <div class="table-responsive">
-        <table class="table table-striped table-md">
+        <table id='d_on_hold' class="table table-striped table-md">
           <thead>
             <tr>
               <!-- table header-->
@@ -344,7 +344,7 @@ foreach ($laser_job7 as $job) {
   <button class="accordion">Pending Payment</button>
     <div class="panel">
       <div class="table-responsive">
-        <table class="table table-striped table-md">
+        <table id='d_pending_payment' class="table table-striped table-md">
           <thead>
             <tr>
               <!-- table header-->
@@ -377,7 +377,7 @@ foreach ($laser_job7 as $job) {
   <button class="accordion active">Paid</button>
     <div class="panel" style="display:block;">
       <div class="table-responsive">
-        <table class="table table-striped table-md">
+        <table id='d_paid' class="table table-striped table-md">
           <thead>
             <tr>
               <!-- table header-->
@@ -409,7 +409,7 @@ foreach ($laser_job7 as $job) {
   <button class="accordion active">Printing</button>
     <div class="panel" style="display:block;">
       <div class="table-responsive">
-        <table class="table table-striped table-md">
+        <table id='d_printing' class="table table-striped table-md">
           <thead>
             <tr>
               <!-- table header-->
@@ -442,7 +442,7 @@ foreach ($laser_job7 as $job) {
   <button class="accordion active">Completed Print</button>
     <div class="panel" style="display:block;">
       <div class="table-responsive">
-        <table class="table table-striped table-md">
+        <table id='d_completed' class="table table-striped table-md">
           <thead>
             <tr>
               <!-- table header-->
@@ -474,7 +474,7 @@ foreach ($laser_job7 as $job) {
   <button class="accordion">Ready for pickup</button>
     <div class="panel">
       <div class="table-responsive">
-        <table class="table table-striped table-md">
+        <table id='d_delivered' class="table table-striped table-md">
         <thead>
           <tr>
             <!-- table header-->
@@ -512,7 +512,7 @@ foreach ($laser_job7 as $job) {
   <button class="accordion active">Submitted</button>
     <div class="panel" style="display:block;">
       <div class="table-responsive">
-        <table class="table table-striped table-md">
+        <table id='l_not_priced' class="table table-striped table-md">
           <thead>
             <tr>
               <!-- table header-->
@@ -547,7 +547,7 @@ foreach ($laser_job7 as $job) {
   <button class="accordion active">On Hold</button>
       <div class="panel" style="display:block;">
         <div class="table-responsive">
-          <table class="table table-striped table-md">
+          <table id='l_on_hold' class="table table-striped table-md">
             <thead>
               <tr>
                 <!-- table header-->
@@ -583,7 +583,7 @@ foreach ($laser_job7 as $job) {
   <button class="accordion">Pending Payment</button>
     <div class="panel">
       <div class="table-responsive">
-        <table class="table table-striped table-md">
+        <table id='l_pending_payment' class="table table-striped table-md">
           <thead>
             <tr>
               <!-- table header-->
@@ -618,7 +618,7 @@ foreach ($laser_job7 as $job) {
   <button class="accordion active">Paid</button> 
     <div class="panel" style="display:block;">
       <div class="table-responsive">
-        <table class="table table-striped table-md">
+        <table id='l_paid' class="table table-striped table-md">
           <thead>
             <tr>
               <!-- table header-->
@@ -653,7 +653,7 @@ foreach ($laser_job7 as $job) {
   <button class="accordion active">Cutting</button> 
     <div class="panel" style="display:block;">
       <div class="table-responsive">
-        <table class="table table-striped table-md">
+        <table id='l_printing' class="table table-striped table-md">
           <thead>
             <tr>
               <!-- table header-->
@@ -689,7 +689,7 @@ foreach ($laser_job7 as $job) {
   <button class="accordion active">Completed</button> 
     <div class="panel" style="display:block;">
       <div class="table-responsive">
-        <table class="table table-striped table-md">
+        <table id='l_completed' class="table table-striped table-md">
           <thead>
             <tr>
               <!-- table header-->
@@ -724,7 +724,7 @@ foreach ($laser_job7 as $job) {
   <button class="accordion">Ready for pickup</button>
     <div class="panel">
       <div class="table-responsive">
-        <table class="table table-striped table-md">
+        <table id='l_delivered' class="table table-striped table-md">
         <thead>
           <tr>
             <!-- table header-->
@@ -774,6 +774,95 @@ foreach ($laser_job7 as $job) {
       }
     });
   }
+</script>
+
+<script>
+
+// function sortTablePurpose(tableId) {
+//   var table, rows, switching, i, x, x2, y, y2, shouldSwitch;
+//   table = document.getElementById(tableId);
+
+//   //Start by saying: no switching is done:
+//   switching = true;
+  
+//   //Loop to continue until switching done: 
+//   while (switching) {
+//     switching = false;
+//     rows = table.rows;
+//     //Loop through all table rows (except the first, which contains table headers): 
+//         for (i = 1; i < (rows.length - 1); i++) {
+//       shouldSwitch = false;
+
+//       //Get the two elements to compare, one from current row and one from the next: 
+//       // Compare first by 'purpose' column i=4, then by 'date' column i=3
+//       x = rows[i].getElementsByTagName("TD")[4];
+//       y = rows[i + 1].getElementsByTagName("TD")[4];
+//       x2 = rows[i].getElementsByTagName("TD")[2];
+//       y2 = rows[i + 1].getElementsByTagName("TD")[2];
+
+//       //Check if the two rows should switch place:-->
+//       if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+//         shouldSwitch = true;
+//         break;
+//       }
+//     }
+
+//     if (shouldSwitch) {
+//     //If a switch has been marked, make the switch and mark that a switch has been done: 
+//       rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+//       switching = true;
+//     }
+//   }
+// }
+
+function sortTable(tableId) {
+  var table, rows, switching, i, shouldSwitch;
+  table = document.getElementById(tableId);
+  switching = true;
+
+  // Convert rows to an array
+  rows = Array.from(table.rows).slice(1); // skip the header row
+
+  // Custom sort function
+  rows.sort(function(rowA, rowB) {
+    var col4A = rowA.cells[4].textContent.toLowerCase(); // Column purpose
+    var col4B = rowB.cells[4].textContent.toLowerCase();
+    var col3A = rowA.cells[2].textContent.toLowerCase(); // Column date
+    var col3B = rowB.cells[2].textContent.toLowerCase();
+
+    if (col4A < col4B) return -1;
+    if (col4A > col4B) return 1;
+    if (col3A < col3B) return -1;
+    if (col3A > col3B) return 1;
+    return 0;
+  });
+
+  // Re-adding the sorted rows to the table
+  for (i = 0; i < rows.length; i++) {
+    table.appendChild(rows[i]);
+  }
+}
+
+function sortAllTablesPurpose() {
+  sortTable('d_not_priced');
+  sortTable('d_on_hold');
+  sortTable('d_pending_payment');
+  sortTable('d_paid');
+  sortTable('d_printing');
+  sortTable('d_completed');
+  sortTable('d_delivered');
+  console.log('sorted 3d');
+  sortTable('l_not_priced');
+  sortTable('l_on_hold');
+  sortTable('l_pending_payment');
+  sortTable('l_paid');
+  sortTable('l_printing');
+  sortTable('l_completed');
+  sortTable('l_delivered');
+  console.log('sorted laser');
+}
+
+window.onload = sortAllTablesPurpose();
 </script>
   
 </div>

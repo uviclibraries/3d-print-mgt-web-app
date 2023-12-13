@@ -223,17 +223,17 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     <div class="row">
       <div class="mb-2">
         <label for = "searchdate_start">Start date:</label>
-        <input type="date" id= "searchdate_start" name="searchdate_start" value="<?php echo isset($_GET['searchdate_start']) ? $_GET['searchdate_start'] : $_POST['searchdate_start']; ?>">
+        <input type="date" id= "searchdate_start" name="searchdate_start" style='width:150px;' value="<?php echo isset($_GET['searchdate_start']) ? $_GET['searchdate_start'] : $_POST['searchdate_start']; ?>">
       </div>
       <div class="mb-2">
         <label for = "searchdate_end">End date:</label>
-        <input type="date" id= "searchdate_end" name="searchdate_end" value="<?php echo isset($_GET['searchdate_end']) ? $_GET['searchdate_end'] : $_POST['searchdate_end']; ?>">
+        <input type="date" id= "searchdate_end" name="searchdate_end" style='width:150px;' value="<?php echo isset($_GET['searchdate_end']) ? $_GET['searchdate_end'] : $_POST['searchdate_end']; ?>">
       </div>
   </div>
   <div class="row">
     <div class="mb-2">
       <label for = "search_id">Name or netlink id:</label>
-        <input type="text" id= "search_id"name="search_id" value="<?php echo isset($_GET['search_id']) ? htmlspecialchars($_GET['search_id']) : htmlspecialchars($_POST['id= "search_id"']); ?>">
+        <input type="text" id="search_id" name="search_id" style='width:250px;' value="<?php echo isset($_GET['search_id']) ? $_GET['search_id'] : '';?>">
     </div>
 
   </div>

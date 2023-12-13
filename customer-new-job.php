@@ -43,15 +43,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       // Check MIME Type by yourself.
       $file_name = $_FILES["3d_model"]['name'];
       $file_array = explode(".",$file_name);
-      $ext = end($file_array);
+
+      //save ext val (val following final '.') to $ext
+      $ext = array_pop($file_array);
+
       $explode_len = count($file_array);
-      if (!in_array($ext, ["stl", "STL", "obj", "3mf", "gcode","svg", "pdf", "PDF"])|| $explode_len > 2) {
+      if (!in_array(strtolower($ext), ["stl", "STL", "obj", "3mf", "gcode","svg", "pdf", "PDF"])) {
           throw new RuntimeException('Invalid file format.');
       }
 
       // You should name it uniquely.
       // DO NOT USE $_FILES["3d_model"]['name'] WITHOUT ANY VALIDATION !!
       // On this example, obtain safe unique name from its binary data.
+      
       $date = new DateTime();
       $hash_name = sprintf("%s-%s.%s", sha1_file($_FILES["3d_model"]['tmp_name']),
       $date->getTimestamp(),
@@ -336,13 +340,13 @@ header("location: customer-dashboard.php");
     </script><!--showAcademicCodeText()-->
 
     <h3 class="mb-2">Job Purpose</h3>
-    <!-- contains radio buttons and optional textbox to indicate if it's a personal or academic (and academic code) job-->
+    <!-- contains radio buttons and optional textbox to indicate if it's a personal or academic (and academic code aka course code) job-->
       <div class="d-block my-3">
         <div class="custom-control custom-radio">
           <input id="academic-purpose" name="job_purpose" value="academic" type="radio" class="custom-control-input" onclick="showAcademicCodeText(this)" required>
           <label class="custom-control-label" for="academic-purpose">Academic
             <div class="col-md-12 mb-3" id="academiccode_textbox" style="display:none;">
-              <input type="text" id="academic-purpose" class="form-control" name="academic_code" placeholder="Academic code" autocomplete="off">
+              <input type="text" id="academic-purpose" class="form-control" name="academic_code" placeholder="Course code" autocomplete="off">
             </div> <!-- to fill TABLE `web_job` column `academic_code` if `job_purpose` == "academic"-->
           </label>
           <span class="popup">

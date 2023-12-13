@@ -19,7 +19,7 @@ $userSQL->execute();
 $job_owner = $userSQL->fetch();
 
 //get list of active jobs associated with the job's owner
-$stm = $conn->prepare("SELECT web_job.id AS id, web_job.job_name AS name, web_job.status AS status, web_job.submission_date AS submission_date, web_job.priced_date AS priced_date, web_job.paid_date AS paid_date,web_job.printing_date AS printing_date,web_job.completed_date AS completed_date,web_job.delivered_date AS delivered_date,web_job.hold_date AS hold_date,web_job.hold_signer AS hold_signer,web_job.cancelled_signer AS cancelled_signer FROM web_job INNER JOIN 3d_print_job ON web_job.id=3d_print_job.3d_print_id WHERE web_job.status NOT IN ('delivered', 'archived', 'cancelled') AND web_job.netlink_id = :netlink_id");
+$stm = $conn->prepare("SELECT web_job.id AS id, web_job.job_name AS name, web_job.status AS status, web_job.submission_date AS submission_date, web_job.priced_date AS priced_date, web_job.paid_date AS paid_date,web_job.printing_date AS printing_date,web_job.completed_date AS completed_date,web_job.delivered_date AS delivered_date,web_job.hold_date AS hold_date,web_job.hold_signer AS hold_signer,web_job.cancelled_signer AS cancelled_signer,  web_job.priced_signer AS priced_signer, web_job.paid_signer AS paid_signer, web_job.printing_signer AS printing_signer, web_job.completed_signer AS completed_signer, web_job.delivered_signer AS delivered_signer, web_job.job_purpose AS job_purpose, web_job.academic_code AS academic_code FROM web_job INNER JOIN 3d_print_job ON web_job.id=3d_print_job.3d_print_id WHERE web_job.status NOT IN ('delivered', 'archived', 'cancelled') AND web_job.netlink_id = :netlink_id");
 
   $stm->bindParam(':netlink_id', $job['netlink_id']);
   $stm->execute();
@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   // change to source from web job and 3d_print_job
-  $stmt = $conn->prepare("UPDATE web_job INNER JOIN 3d_print_job ON id=3d_print_id SET price = :price, infill = :infill, scale = :scale, layer_height = :layer_height, supports = :supports, copies = :copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date,cancelled_date = :cancelled_date, delivered_date = :delivered_date, hold_date = :hold_date, hold_signer= :hold_signer,cancelled_signer= :cancelled_signer, model_name_2 =:model_name_2 WHERE id = :job_id;");
+  $stmt = $conn->prepare("UPDATE web_job INNER JOIN 3d_print_job ON id=3d_print_id SET price = :price, infill = :infill, scale = :scale, layer_height = :layer_height, supports = :supports, copies = :copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, cancelled_date = :cancelled_date, delivered_date = :delivered_date, priced_signer =:priced_signer,  paid_signer= :paid_signer, printing_signer=:printing_signer, completed_signer=:completed_signer, delivered_signer=:delivered_signer, hold_date = :hold_date, hold_signer= :hold_signer,cancelled_signer= :cancelled_signer, model_name_2 =:model_name_2 WHERE id = :job_id;");
   
   $current_date = date("Y-m-d");
 
@@ -103,15 +103,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $stmt->bindParam(':hold_date', $d5);
   $stmt->bindParam(':completed_date', $d6);
   $stmt->bindParam(':cancelled_date', $d7);
+
   $hs = $job['hold_signer'];
   $cs = $job['cancelled_signer'];
+  $priceds = $job['priced_signer'];
+  $paids = $job['paid_signer'];
+  $printings = $job['printing_signer'];
+  $completes = $job['completed_signer'];
+  $ds = $job['delivered_signer'];
+
   $stmt->bindParam(':hold_signer', $hs);
   $stmt->bindParam(':cancelled_signer', $cs);
+  $stmt->bindParam(':priced_signer', $priceds);
+  $stmt->bindParam(':paid_signer', $paids);
+  $stmt->bindParam(':printing_signer', $printings);
+  $stmt->bindParam(':completed_signer', $completes);
+  $stmt->bindParam(':delivered_signer', $ds);
 
   //need variable to check if admin wants to send email. case: updating notes but dont send email
   if ($_POST['status'] == "pending payment") {
     $d1 = $current_date;
-
+    $priceds=$user;
     //email user
     if (isset($_POST['email_enabaled']) && $_POST['email_enabaled'] == "enabled") {
       //get job owner details
@@ -142,13 +154,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   } elseif($_POST['status'] == "paid"){
     //this is done automatically when payment is received.
     $d2 = $current_date;
+    $paids=$user;
 
 
   } elseif($_POST['status'] == "printing"){
     $d3 = $current_date;
+    $printings=$user;
 
   } elseif ($_POST['status'] == "completed") {
     $d4 = $current_date;
+    $completes=$user;
 
     //email user
     if (isset($_POST['email_enabaled']) && $_POST['email_enabaled'] == "enabled") {
@@ -177,9 +192,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
   } elseif($_POST['status'] == "archived"){
     $d4 = $current_date;
+    $completes = $user;
 
+  }elseif($_POST['status'] == "on hold"){
+    $d5 = $current_date;
+    $hs = $user;
   }
   $stmt->execute();
+
+//Set status details for associated jobs selected from associated jobs table
+  print_r($_POST);
+  if (isset($_POST['checked_jobs'])) {
+    $checked_jobs = $_POST['checked_jobs'];
+    // echo 'line190 checked jobs exists';
+    // print_r($checked_jobs);echo '<br>';
+
+    if(count($checked_jobs)>0){
+    
+      $checked_jobs = array_map(function($item) {
+        return "'" . $item . "'";
+      }, $checked_jobs);
+      // print_r($checked_jobs);
+
+      $checkedIDs_sql = implode(',', $checked_jobs);//to create comma separated list for update query
+      // echo $checkedIDs_sql;
+
+      $stm = $conn->prepare("UPDATE web_job INNER JOIN 3d_print_job ON id=3d_print_id SET status = :status, priced_date = :priced_date, paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, delivered_date = :delivered_date, priced_signer=:priced_signer,  paid_signer= :paid_signer, printing_signer=:printing_signer, completed_signer=:completed_signer, delivered_signer=:delivered_signer, hold_date = :hold_date, hold_signer= :hold_signer, cancelled_date=:cancelled_date, cancelled_signer = :cancelled_signer WHERE id IN ($checkedIDs_sql)");
+
+      $stm->bindParam(':status', $_POST["status"]);
+
+      $stm->bindParam(':priced_date', $d1);
+      $stm->bindParam(':paid_date', $d2);
+      $stm->bindParam(':printing_date', $d3);
+      $stm->bindParam(':completed_date', $d6);
+      $stm->bindParam(':hold_date', $d5);
+      $stm->bindParam(':delivered_date', $d4);
+      $stm->bindParam(':cancelled_date', $d7);
+     
+      $stm->bindParam(':hold_signer', $hs);
+      $stm->bindParam(':cancelled_signer', $cs);
+      $stm->bindParam(':priced_signer', $priceds);
+      $stm->bindParam(':paid_signer', $paids);
+      $stm->bindParam(':printing_signer', $printings);
+      $stm->bindParam(':completed_signer', $completes);
+      $stm->bindParam(':delivered_signer', $ds);
+
+      $stm->execute();
+    }
+  } else {
+  // echo 'no checked jobs';
+  }
 
   //exit to dashboard after saving
   header("location: admin-dashboard.php");
@@ -199,23 +261,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       break;
     case "pending payment":
       $status_date = $job["priced_date"];
-      // add priced_signer;
+      $status_signer=$job["priced_signer"];
       break;
     case "paid":
       $status_date = $job["paid_date"];
-      // add paid_signer
+      $status_signer=$job["paid_signer"];
       break;
     case "printing":
       $status_date = $job["printing_date"];
-      // add printing_signer
+      $status_signer=$job["printing_signer"];
       break;
     case "completed":
       $status_date = $job["completed_date"];
-      // add completed_signer;
+      $status_signer=$job["completed_signer"];
       break;
     case "delivered":
       $status_date = $job["delivered_date"];
-      // add delivered_signer
+      $status_signer=$job["delivered_signer"];
       break;
     case "cancelled":
       $status_date = $job["cancelled_date"];
@@ -223,7 +285,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       break;
     case "archived":
       $status_date = $job["archived_date"];
-      // add archived_signer
+      $status_signer=$job["completed_signer"];
       break;
   }
 
@@ -420,6 +482,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           Status is required.
           </div>
         </div>
+        <!--Job Purpose // academic vs. personal-->
+          <div class="col-md-3 mb-3">
+            <p><?php echo "Job purpose: <br>" .$job['job_purpose'];?></p>
+          </div>
+          <!--If Academic Purpose: course code-->
+          <div class="col-md-3 mb-3">
+            <p><?php 
+              if ($job["job_purpose"] == "academic"){
+                echo "Course Code: <br>" . $job['academic_code'];}
+            ?></p>
+          </div>
       </div>
     </div>
 
@@ -448,10 +521,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <p><?php echo "Status changed: <br>" .$status_date;?></p>
         </div>
         <div class="col-md-3 mb-3">
-          <p><?php 
-            if ($job["status"] == "submitted" || $job["status"] == "on hold" || $job["status"] == "cancelled"){
-              echo "Status changed by: <br>" . $status_signer;}
-          ?></p>
+          <p><?php echo "Status changed by: <br>" . $status_signer; ?></p>
         </div>
       </div>
 <!-- container with a 4-column list of the user's active web jobs. Used for batch status changes -->
@@ -470,14 +540,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             });
           }
 
-          function populatePopup(other_job) {
-            const popupElement = document.querySelector('.popuptext');
+          // function populatePopup(other_job) {
+          //   const popupElement = document.querySelector('.popuptext');
 
-            // Clear existing content
-            popupElement.innerHTML = '';
-            //Fill popup with job-specific details
-            popupElement.innerHTML = '${other_job['name']}<br>${other_job['status']}<br>${other_job['submission_date']}';
-          }
+          //   // Clear existing content
+          //   popupElement.innerHTML = '';
+          //   //Fill popup with job-specific details
+          //   popupElement.innerHTML = '${other_job['name']}<br>${other_job['status']}<br>${other_job['submission_date']}';
+          // }
 
         </script>    
 
@@ -518,12 +588,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 echo '</label>';
                 echo '</div>';
 
-                // ! Popup div not working
-                echo '<span class="popup">';
-                  echo '<span class="popuptext" id="myPopup">';
-                    echo '<p>${other_active_job["name"]}<br>${other_active_job["status"]}<br>${other_active_job["submission_date"]}';
-                  echo '</span>';
-                echo '</span>'; 
                 }
               }
             ?>
@@ -581,15 +645,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <a href="<?php echo "uploads/" . $job['model_name_2']; ?>" download>Download Modify 3D file</a>
     <?php } ?>
     <br/>
-
-    <?php //Allow file upload if status is pp or submitted
-    if ($job["status"] == "pending payment" || $job["status"] == "submitted" || $job["status"] == "on_hold"): ?>
-
       <small class="text-muted">(Max 200MB)</small>
       <input type="file" id="myFile" name="modify">
-    <?php endif; ?>
+  
     <br>
-
+    <hr class="mb-6">
+    
     <h5 class="mb-2">Copies</h5>
     <div class="col-md-3 mb-3">
         <label for="copies">Copies</label>
@@ -772,7 +833,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <hr class="mb-4">
   <center>
-    <!-- Button to trigger 'Duplicate Job' confirmation popup; button background color set to purple-->
+  <!-- Button to trigger 'Duplicate Job' confirmation popup; button background color set to purple-->
     <button id="duplicate-button" class="btn btn-primary btn-lg" style="background-color:#CF9FFF;">Duplicate Job</button> <!--duplicate button-->
       <!-- The Duplicate Popup -->
       <div id="DuplicateJobPopup" class="popup">
@@ -808,25 +869,25 @@ window.onload = function() {
     var duplicateButton = document.getElementById("duplicate-button");
 
     if (duplicateButton) {
-        duplicateButton.onclick = function() { openPopup("DuplicateJobPopup"); }
+      duplicateButton.onclick = function() { openPopup("DuplicateJobPopup"); }
     }
 
     // Attach event listeners to close buttons
-    var closeButtons = document.getElementsByClassName("close");
-    for (var i = 0; i < closeButtons.length; i++) {
-        closeButtons[i].onclick = function() {
-            var popupId = this.getAttribute("data-popup");
-            closePopup(popupId);
-        }
-    }
+      var closeButtons = document.getElementsByClassName("close");
+      for (var i = 0; i < closeButtons.length; i++) {
+          closeButtons[i].onclick = function() {
+              var popupId = this.getAttribute("data-popup");
+              closePopup(popupId);
+          }
+      }
 
-    // Close popup when clicking outside of it
-    window.onclick = function(event) {
-        if (event.target.classList.contains("popup")) {
-            event.target.style.display = "none";
-        }
+      // Close popup when clicking outside of it
+      window.onclick = function(event) {
+          if (event.target.classList.contains("popup")) {
+              event.target.style.display = "none";
+          }
+      }
     }
-}
 </script>
   <p></p>
   <br>
