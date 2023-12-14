@@ -763,19 +763,36 @@ header("location: customer-dashboard.php");
   <p></p>
 
   <script>
+
+    var currentPopup = null;
+
     // Function to toggle popup
     function togglePopup(event) {
       event.stopPropagation();  // Stop event from propagating to parent elements
-      console.log("popup clicked");
+      // console.log("popup clicked");
       var popup = event.currentTarget.querySelector('.popuptext');
+
+      // Close the current popup if it's different from the one being opened
+      if (currentPopup && currentPopup !== popup) {
+          currentPopup.classList.remove('show');
+      }
+
       popup.classList.toggle('show');
+
+      // Update the currentPopup reference
+      currentPopup = popup.classList.contains('show') ? popup : null;
     }
 
     // Function to close popup
     function closePopup(event) {
       event.stopPropagation();  // Stop event from propagating to parent elements
-      event.stopPropagation();
-      event.currentTarget.parentElement.classList.remove('show');
+     var popup = event.currentTarget.parentElement;
+      popup.classList.remove('show');
+      
+      // Reset the currentPopup reference
+      if (currentPopup === popup) {
+          currentPopup = null;
+      }
     }
 
     // Attach toggle function to all popups
@@ -789,6 +806,14 @@ header("location: customer-dashboard.php");
     for (var i = 0; i < closeButtons.length; i++) {
       closeButtons[i].addEventListener('click', closePopup);
     }
+
+    // Close popup if clicked outside
+    document.addEventListener('click', function(event) {
+      if (currentPopup && !event.target.closest('.popup')) {
+          currentPopup.classList.remove('show');
+          currentPopup = null;
+      }
+    });
   </script>
 
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>

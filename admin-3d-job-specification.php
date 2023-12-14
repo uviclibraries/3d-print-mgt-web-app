@@ -160,10 +160,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   } elseif($_POST['status'] == "printing"){
     $d3 = $current_date;
     $printings=$user;
-
-  } elseif ($_POST['status'] == "completed") {
-    $d4 = $current_date;
+}
+    elseif($_POST['status'] == "completed"){
+    $d3 = $current_date;
     $completes=$user;
+
+
+  } elseif ($_POST['status'] == "delivered") {
+    $d4 = $current_date;
+    $ds=$user;
 
     //email user
     if (isset($_POST['email_enabaled']) && $_POST['email_enabaled'] == "enabled") {
@@ -651,7 +656,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <br>
     <hr class="mb-6">
     
-    <h5 class="mb-2">Copies</h5>
+    <!-- <h5 class="mb-2">Copies</h5> -->
     <div class="col-md-3 mb-3">
         <label for="copies">Copies</label>
         <input type="number" class="form-control" name="copies" min="1" max="100" step="1" value="1" id="supports" placeholder="<?php if ($job["copies"]!= ""){echo "{$job["copies"]}";} else{"Enter # of copies";}?>" required />
@@ -758,8 +763,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h5 class="mb-2">Enable Email</h5>
         <div class="d-block my-3">
           <div class="custom-control custom-checkbox">
-            <input id="en_email" name="email_enabaled" value= "enabled" type="checkbox" class="custom-control-input" <?php if ($job["status"] != "pending payment" && $job["status"] != "completed"){echo "checked";} ?>>
-            <label class="custom-control-label" for="en_email">Send email for pending payment or completed when saved.</label>
+            <input id="en_email" name="email_enabaled" value= "enabled" type="checkbox" class="custom-control-input" <?php if ($job["status"] != "pending payment" && $job["status"] != "delivered"){echo "checked";} ?>>
+            <label class="custom-control-label" for="en_email">Send email for pending payment or delivered to desk when saved.</label>
           </div>
         </div>
 
