@@ -19,7 +19,7 @@ $userSQL->execute();
 $job_owner = $userSQL->fetch();
 
 //get list of active jobs associated with the job's owner
-$stm = $conn->prepare("SELECT web_job.id AS id, web_job.job_name AS name, web_job.status AS status, web_job.submission_date AS submission_date, web_job.priced_date AS priced_date, web_job.paid_date AS paid_date,web_job.printing_date AS printing_date,web_job.completed_date AS completed_date,web_job.delivered_date AS delivered_date,web_job.hold_date AS hold_date,web_job.hold_signer AS hold_signer,web_job.cancelled_signer AS cancelled_signer,  web_job.priced_signer AS priced_signer, web_job.paid_signer AS paid_signer, web_job.printing_signer AS printing_signer, web_job.completed_signer AS completed_signer, web_job.delivered_signer AS delivered_signer, web_job.job_purpose AS job_purpose, web_job.academic_code AS academic_code FROM web_job INNER JOIN 3d_print_job ON web_job.id=3d_print_job.3d_print_id WHERE web_job.status NOT IN ('delivered', 'archived', 'cancelled') AND web_job.netlink_id = :netlink_id");
+$stm = $conn->prepare("SELECT web_job.id AS id, web_job.job_name AS name, web_job.status AS status, web_job.submission_date AS submission_date, web_job.priced_date AS priced_date, web_job.paid_date AS paid_date,web_job.printing_date AS printing_date,web_job.completed_date AS completed_date,web_job.delivered_date AS delivered_date,web_job.hold_date AS hold_date,web_job.hold_signer AS hold_signer,web_job.cancelled_signer AS cancelled_signer,  web_job.priced_signer AS priced_signer, web_job.paid_signer AS paid_signer, web_job.printing_signer AS printing_signer, web_job.completed_signer AS completed_signer, web_job.delivered_signer AS delivered_signer, web_job.job_purpose AS job_purpose, web_job.academic_code AS academic_code, web_job.course_due_date AS course_due_date FROM web_job INNER JOIN 3d_print_job ON web_job.id=3d_print_job.3d_print_id WHERE web_job.status NOT IN ('delivered', 'archived', 'cancelled') AND web_job.netlink_id = :netlink_id");
 
   $stm->bindParam(':netlink_id', $job['netlink_id']);
   $stm->execute();
@@ -476,28 +476,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <div class="col-md-12 order-md-1">
     <h4 class="mb-3">Submission Date</h4>
-      <div class="row">
-        <div class="col-md-3 mb-3">
+      <div class="col-md-3 mb-3">
+        <div class="input-group">
           <div class="input-group">
-            <div class="input-group">
-              <input type="text" class="form-control" value="<?php echo $job["submission_date"]; ?>" readonly>
-              </div>
-          </div>
-          <div class="invalid-feedback" style="width: 100%;">
-          Status is required.
-          </div>
+            <input type="text" class="form-control" value="<?php echo $job["submission_date"]; ?>" readonly>
+            </div>
         </div>
+        <div class="invalid-feedback" style="width: 100%;">
+        Status is required.
+        </div>
+      </div>
         <!--Job Purpose // academic vs. personal-->
+        <div class="row">
           <div class="col-md-3 mb-3">
-            <p><?php echo "Job purpose: <br>" .$job['job_purpose'];?></p>
-          </div>
-          <!--If Academic Purpose: course code-->
-          <div class="col-md-3 mb-3">
-            <p><?php 
-              if ($job["job_purpose"] == "academic"){
-                echo "Course Code: <br>" . $job['academic_code'];}
-            ?></p>
-          </div>
+          <p><?php echo "Job purpose:<br>" .$job['job_purpose'];?></p>
+        </div>
+        <!--If Academic Purpose: course code-->
+        <div class="col-md-3 mb-3">
+          <p><?php 
+            if ($job["job_purpose"] == "academic"){
+              echo "Course Code:<br>" . $job['academic_code'];}
+          ?></p>
+        </div>
+        <div class="col-md-3 mb-3">
+          <p><?php 
+            if ($job["job_purpose"] == "academic"){
+              echo "Project deadline:<br>" . $job['course_due_date'];}
+          ?></p>
+        </div>
       </div>
     </div>
 
@@ -557,7 +563,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </script>    
 
         <div class="col-md-12 order-md-1">
-          <h4 class="mb-3">Other Active Jobs</h4>
+          <p class="mb-3">Apply status change to related jobs</p>
           <?php 
           echo '<button type="button" id="selectJobsButton" onclick="checkAll()">Check All</button>';
           echo '<button type="button" id="selectJobsButton" onclick="uncheckAll()">Uncheck All</button>'; 
@@ -598,7 +604,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ?>
           </div>
         </div> <!--End of associated jobs list-->
-
+        <hr class="mb-6">
         <div class="col-md-12 order-md-1">
           <h4 class="mb-3">Price</h4>
             <div class="row">

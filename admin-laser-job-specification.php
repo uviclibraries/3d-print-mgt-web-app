@@ -20,7 +20,7 @@ $userSQL->execute();
 $job_owner = $userSQL->fetch();
 
 //get list of active jobs associated with the job's owner
-$stm = $conn->prepare("SELECT web_job.id AS id, web_job.job_name AS name, web_job.status AS status, web_job.submission_date AS submission_date, web_job.priced_date AS priced_date, web_job.paid_date AS paid_date,web_job.printing_date AS printing_date,web_job.completed_date AS completed_date,web_job.delivered_date AS delivered_date,web_job.hold_date AS hold_date,web_job.hold_signer AS hold_signer,web_job.cancelled_signer AS cancelled_signer, web_job.priced_signer AS priced_signer, web_job.paid_signer AS paid_signer, web_job.printing_signer AS printing_signer, web_job.completed_signer AS completed_signer, web_job.delivered_signer AS delivered_signer, web_job.job_purpose AS job_purpose, web_job.academic_code AS academic_code FROM web_job INNER JOIN laser_cut_job ON web_job.id=laser_cut_job.laser_cut_id WHERE web_job.status NOT IN ('delivered', 'archived', 'cancelled') AND web_job.netlink_id = :netlink_id");
+$stm = $conn->prepare("SELECT web_job.id AS id, web_job.job_name AS name, web_job.status AS status, web_job.submission_date AS submission_date, web_job.priced_date AS priced_date, web_job.paid_date AS paid_date,web_job.printing_date AS printing_date,web_job.completed_date AS completed_date,web_job.delivered_date AS delivered_date,web_job.hold_date AS hold_date,web_job.hold_signer AS hold_signer,web_job.cancelled_signer AS cancelled_signer, web_job.priced_signer AS priced_signer, web_job.paid_signer AS paid_signer, web_job.printing_signer AS printing_signer, web_job.completed_signer AS completed_signer, web_job.delivered_signer AS delivered_signer, web_job.job_purpose AS job_purpose, web_job.academic_code AS academic_code, web_job.course_due_date AS course_due_date FROM web_job INNER JOIN laser_cut_job ON web_job.id=laser_cut_job.laser_cut_id WHERE web_job.status NOT IN ('delivered', 'archived', 'cancelled') AND web_job.netlink_id = :netlink_id");
   $stm->bindParam(':netlink_id', $job['netlink_id']);
   $stm->execute();
   $user_web_jobs = $stm->fetchAll();
@@ -470,7 +470,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
         <div class="col-md-12 order-md-1">
           <h4 class="mb-3">Submission Date</h4>
-          <div class="row">
             <div class="col-md-3 mb-3">
               <div class="input-group">
                 <div class="input-group">
@@ -482,6 +481,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               </div>
             </div>
             <!--Job Purpose // academic vs. personal-->
+            <div class="row">
             <div class="col-md-3 mb-3">
               <p><?php echo "Job purpose: <br>" .$job['job_purpose'];?></p>
             </div>
@@ -492,8 +492,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                   echo "Course Code: <br>" . $job['academic_code'];}
               ?></p>
             </div>
+            <div class="col-md-3 mb-3">
+              <p><?php 
+                if ($job["job_purpose"] == "academic"){
+                  echo "Project deadline:<br>" . $job['course_due_date'];}
+              ?></p>
+            </div>
           </div>
-
         </div>
 
         <div class="col-md-12 order-md-1">
@@ -555,7 +560,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
           <!-- container with a 4-column list of the user's active web jobs. Used for batch status changes -->
           <div class="col-md-12 order-md-1">
-            <h4 class="mb-3">Other Active Jobs</h4>
+            <p class="mb-3">Apply status change to related jobs</p>
             <?php 
             echo '<button type="button" id="selectJobsButton" onclick="checkAll()">Check All</button>';
             echo '<button type="button" id="selectJobsButton" onclick="uncheckAll()">Uncheck All</button>'; 
@@ -593,7 +598,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     echo '</span>';
                   echo '</span>'; 
  -->
-        
+        <hr class="mb-6">
           <div class="col-md-12 order-md-1">
             <h4 class="mb-3">Price</h4>
               <div class="row">

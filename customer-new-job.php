@@ -48,7 +48,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $ext = array_pop($file_array);
 
       $explode_len = count($file_array);
-      if (!in_array(strtolower($ext), ["stl", "STL", "obj", "3mf", "gcode","svg", "pdf", "PDF"])) {
+      //invalid file types should already be handled in form via js script with exhaustive list of permitted file types. This exception is a safeguard, containing a non-exhaustive array of prohibited file types.
+      if (!in_array(strtolower($ext), ["stl", "STL", "obj", "3mf", "gcode","svg", "SVG", "pdf", "PDF", "png","PNG","txt", "doc", "docx", "jpg","JPG", "JPEG", "JPG"])) {
           throw new RuntimeException('Invalid file format.');
       }
 
@@ -84,11 +85,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $copies_bind = intval($_POST["copies"]);
   $laser_copies = intval($_POST["laser_copies"]);
   $good_statement = True;
-  $stmt = $conn->prepare("INSERT INTO web_job (netlink_id, job_name, job_purpose, academic_code, submission_date, status) VALUES (:netlink_id, :job_name, :job_purpose, :academic_code, :submission_date, :job_status)");
+  $stmt = $conn->prepare("INSERT INTO web_job (netlink_id, job_name, job_purpose, academic_code, course_due_date, submission_date, status) VALUES (:netlink_id, :job_name, :job_purpose, :academic_code, :course_due_date,:submission_date, :job_status)");
   $stmt->bindParam(':netlink_id', $user);
   $stmt->bindParam(':job_name', $_POST["job_name"]);
   $stmt->bindParam(':job_purpose', $_POST["job_purpose"]);
   $stmt->bindParam(':academic_code', $_POST["academic_code"]);
+  $stmt->bindParam(':course_due_date',$_POST["academic_deadline"]);
   $stmt->bindParam(':job_status', $status);
   $stmt->bindParam(':submission_date', $current_date);
   $good_statement &= $stmt->execute();
@@ -150,6 +152,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     die("$job_type invalid job type");
   }
 
+  //email dynamically changes job type in email subject line and body text
   $direct_link = "https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/";
   $msg = "
   <html>
@@ -246,7 +249,7 @@ header("location: customer-dashboard.php");
       </div>
 
     <div class="col-md-12 order-md-1">
-
+      <!--dynamically changes submission fields, see showPrintInfo(), showLaserInfo-->
       <h3 class="mb-2">Job Type</h3>
       <div class="d-block my-3">
         <div class="custom-control custom-radio">
@@ -257,7 +260,59 @@ header("location: customer-dashboard.php");
           <input id="laser_cut" name="job_type" value="laser_cut" type="radio" class="custom-control-input" onclick="showLaserInfo()" required>
           <label class="custom-control-label" for="laser_cut">Laser Cut</label>
         </div>
+
+        <script type ="text/JavaScript">
+        function setPageInfo() {
+        //At page load, hide submission details specific to 3D print and laser cut jobs, and submission button
+          var print_div = document.getElementById("3d_specs");
+          var laser_div = document.getElementById("laser_specs");
+          var submit = document.getElementById("submit_section");
+          // var academiccode_div = document.getElementById("academiccode_textbox");
+          // var academicdeadline_div = document.getElementById("academicdeadline_textbox");
+
+          print_div.style.display = "none"; //hides 3D print specs
+          laser_div.style.display = "none"; //hides laser cut jobs
+          submit.style.display = "none"; //hides submit button
+          // academiccode_div.style.display = "none"; //hides course code field
+          // academicdeadline_div.style.display = "none";//hides project deadline as per course
+          //alert("Print info set");
+        }
+        window.onload = setPageInfo;
+      </script> <!--setPageInfo()-->
+
+      <script type="text/JavaScript">
+        function showPrintInfo() {
+        //When job_type "3d Print" radio button selected, show 3D print submission details and submit button
+          document.getElementById("header-job-type").innerText="3D Print";
+          var print_div = document.getElementById("3d_specs");
+          var laser_div = document.getElementById("laser_specs");
+          var submit = document.getElementById("submit_section");
+          //alert("Print info displayed");
+          if (print_div.style.display == "none") {
+            print_div.style.display = "block";
+            laser_div.style.display = "none";
+            submit.style.display = "block";
+          }
+        }
+      </script><!--setPrintInfo()-->
+
+      <script type="text/JavaScript">
+        function showLaserInfo() {
+        //When job_type "laser cut" radio button selected, show laser cut submission details and submit button
+          document.getElementById("header-job-type").innerText="Laser Cut";
+          var print_div = document.getElementById("3d_specs");
+          var laser_div = document.getElementById("laser_specs");
+          var submit = document.getElementById("submit_section");
+          //alert("Laser info displayed");
+          if (laser_div.style.display == "none") {
+            print_div.style.display = "none";        
+            laser_div.style.display = "block";
+            submit.style.display = "block";
+          }
+        }
+      </script><!--setLaserInfo()-->
       <br>
+      
       <hr class="mb-6">
 
       <h3 class="mb-3">Job Name</h3>
@@ -269,99 +324,68 @@ header("location: customer-dashboard.php");
           </div>
         </div>
       </div>
-      <hr class="mb-6">
-
-      <h3 class="mb-3">Upload Model or Graphic</h3>
-      <small class="text-muted">Accepted file types: .stl, .svg, .obj, .pdf (Max 200M)</small>
-      <br>    
-        <input type="file" id="myFile" name="3d_model" required>
-      <br>
-      <hr class="mb-6">
-
-    <script type ="text/JavaScript">
-      function setPageInfo() {
-      //At page load, hide submission details specific to 3D print and laser cut jobs, and submission button
-        var print_div = document.getElementById("3d_specs");
-        var laser_div = document.getElementById("laser_specs");
-        var submit = document.getElementById("submit_section");
-        print_div.style.display = "none"; //hides 3D print specs
-        laser_div.style.display = "none"; //hides laser cut jobs
-        submit.style.display = "none"; //hides submit button
-        //alert("Print info set");
-      }
-      window.onload = setPageInfo;
-    </script> <!--setPageInfo()-->
-
-    <script type="text/JavaScript">
-      function showPrintInfo() {
-      //When job_type "3d Print" radio button selected, show 3D print submission details and submit button
-        document.getElementById("header-job-type").innerText="3D Print";
-        var print_div = document.getElementById("3d_specs");
-        var laser_div = document.getElementById("laser_specs");
-        var submit = document.getElementById("submit_section");
-        //alert("Print info displayed");
-        if (print_div.style.display == "none") {
-          print_div.style.display = "block";
-          laser_div.style.display = "none";
-          submit.style.display = "block";
-        }
-      }
-    </script><!--setPrintInfo()-->
-
-    <script type="text/JavaScript">
-      function showLaserInfo() {
-      //When job_type "laser cut" radio button selected, show laser cut submission details and submit button
-        document.getElementById("header-job-type").innerText="Laser Cut";
-        var print_div = document.getElementById("3d_specs");
-        var laser_div = document.getElementById("laser_specs");
-        var submit = document.getElementById("submit_section");
-        //alert("Laser info displayed");
-        if (laser_div.style.display == "none") {
-          print_div.style.display = "none";        
-          laser_div.style.display = "block";
-          submit.style.display = "block";
-        }
-      }
-    </script><!--setLaserInfo()-->
 
     <script type="text/JavaScript">
       //Function will be triggered by the selection of job_purpose ("academic" and "personal") radio buttons. 
       //Shows the academic_code text box if the "academic" rafio button is selected, hides otherwise.
       function showAcademicCodeText(clickedRadio) {
         var academiccode_div = document.getElementById("academiccode_textbox");
-          // Check the value of the clicked radio button
-          if (clickedRadio.value === "academic") {
-            academiccode_div.style.display = "inline-block";
-            academiccode_div.style.width = "300px";
-          } else if (clickedRadio.value === "personal") {
-            academiccode_div.style.display = "none";
-          }
+        var academicdeadline_div = document.getElementById("academicdeadline_textbox");
+
+        // Check the value of the clicked radio button
+        if (clickedRadio.value === "academic") {
+          academiccode_div.style.display = "inline-block";
+          academiccode_div.style.width = "300px";
+          academicdeadline_div.style.display = "inline-block";
+          academicdeadline_div.style.width = "300px";
+          
+        } else if (clickedRadio.value === "personal") {
+          academiccode_div.style.display = "none";
+          academicdeadline_div.style.display = "none";
+        }
       }
+      //add field for academic job deadline
     </script><!--showAcademicCodeText()-->
 
-    <h3 class="mb-2">Job Purpose</h3>
+    <h3 class="mb-3">Job Purpose</h3>
     <!-- contains radio buttons and optional textbox to indicate if it's a personal or academic (and academic code aka course code) job-->
-      <div class="d-block my-3">
-        <div class="custom-control custom-radio">
-          <input id="academic-purpose" name="job_purpose" value="academic" type="radio" class="custom-control-input" onclick="showAcademicCodeText(this)" required>
-          <label class="custom-control-label" for="academic-purpose">Academic
-            <div class="col-md-12 mb-3" id="academiccode_textbox" style="display:none;">
-              <input type="text" id="academic-purpose" class="form-control" name="academic_code" placeholder="Course code" autocomplete="off">
-            </div> <!-- to fill TABLE `web_job` column `academic_code` if `job_purpose` == "academic"-->
-          </label>
-          <span class="popup">
-            &#9432
-            <span class="popuptext" id="myPopup">
-              <p>Academic jobs will be prioritized during high-volume periods.</p>
-              <span class="close-btn">x</span>
-            </span>
-          </span> <!-- popup box for job_purpose =="academic"-->
-        </div><!--to fill TABLE `web_job` column `job_purpose`=="academic"; *selection will cause academiccode_textbox to appear-->
-        <div class="custom-control custom-radio">
-          <input type="radio" id="personal-purpose" name="job_purpose" value="personal" class="custom-control-input" onclick="showAcademicCodeText(this)" required>
-          <label class="custom-control-label" for="personal-purpose">Personal</label>
-        </div><!--to fill TABLE `web_job` column `job_purpose`=="personal"-->
-    
+
+      <!--Academic Jobs-->
+      <div class="row">
+        <div class="col-md-3 mb-3">
+          <div class="custom-control custom-radio">
+            <input id="academic-purpose" name="job_purpose" value="academic" type="radio" class="custom-control-input" onclick="showAcademicCodeText(this)" required>
+            <label class="custom-control-label" for="academic-purpose">Academic
+              <span class="popup">
+                &#9432
+                <span class="popuptext" id="myPopup">
+                  <p>Academic jobs will be prioritized during high-volume periods.</p>
+                  <span class="close-btn">x</span>
+                </span>
+              </span> <!-- popup box for job_purpose =="academic"-->
+            </label>
+          </div>
+        </div><!--to fill TABLE `web_job` column `job_purpose`=="academic"; *selection will cause academiccode_textbox to appear -->
+        
+        <div class="col-md-3 mb-3 w-100" id="academiccode_textbox" style="display:none;padding-top: 0.5px;">
+          <p>Course Code:  </p>
+          <input type="text" class="form-control" name="academic_code" placeholder="Course code" autocomplete="off">
+        </div>
+        <div class="col-md-3 mb-3 w-100" id="academicdeadline_textbox" style="display:none;">
+          <p>Assignment due date:  </p>
+          <input type="date" class="form-control" name="academic_deadline" placeholder="Assignment Due Date" autocomplete="off">
+        </div>
+            
+      </div>
+
+      <!--Personal Jobs-->
+      <div class="custom-control custom-radio">
+        <input type="radio" id="personal-purpose" name="job_purpose" value="personal" class="custom-control-input" onclick="showAcademicCodeText(this)" required>
+        <label class="custom-control-label" for="personal-purpose">Personal</label>
+      </div><!--to fill TABLE `web_job` column `job_purpose`=="personal"-->
+    </div>
+
+     
     <hr class="mb-6">
       
     <style>
@@ -417,8 +441,42 @@ header("location: customer-dashboard.php");
         padding: 5px 10px;
         cursor: pointer;
       }
-    </style>
+    </style><!--Academic Job Deadline-->
 
+          <hr class="mb-6">
+
+      <h3 class="mb-3">Upload Model or Graphic</h3>
+      <small class="text-muted">Accepted file types: .stl, .svg, .obj, .pdf (Max 200M)</small>
+      <br>    
+        <input type="file" id="myFile" name="3d_model" required>
+      <br>
+      <!--Invalid files handled by following script-->
+      <div id="invalid-file-extension" style="display: none;">
+        <br>Please select a file with a valid extension: .stl, .svg, .obj, .pdf.
+      </div>
+      <hr class="mb-6">
+      
+      <script>
+      document.getElementById('myFile').addEventListener('change', function() {
+        var allowedExtensions = ['stl', 'svg', 'obj', 'pdf','STL', 'SVG', 'OBJ', 'PDF']; 
+        var fileName = this.value;
+        var extension = fileName.split('.').pop().toLowerCase();
+        var isValidFile = allowedExtensions.includes(extension);
+
+        document.getElementById('invalid-file-extension').style.display = isValidFile ? 'none' : 'block';
+        
+        if (!isValidFile) {
+            // Display the warning message
+            document.getElementById('invalid-file-extension').style.display = 'block';
+            // Reset the file input
+            this.value = ''; // Clear the selected file
+        } else { 
+            // Hide the warning message if the file is valid
+            //the else condition shouldn't ever run, because the function won't be called if the file is valid, but is added as a safeguard.
+            document.getElementById('invalid-file-extension').style.display = 'none';
+        }
+      });
+      </script><!--Handles invalid file type uploads-->
 
 
     <div id="3d_specs" class="col-md-12 order-md-1">

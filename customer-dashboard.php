@@ -344,7 +344,7 @@ foreach ($data as $job) {
                foreach ($l_submitted as $row) {
             ?>
             <tr>
-              <td><a href="customer-3d-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+              <td><a href="customer-laser-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
               <td><?php echo $row["status"]; ?></td>
               <td><?php echo $row["submission_date"]; ?></td>
             </tr>
@@ -357,7 +357,7 @@ foreach ($data as $job) {
                foreach ($l_pending_payment as $row) {
             ?>
             <tr>
-              <td><a href="customer-3d-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+              <td><a href="customer-laser-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
               <td><?php echo $row["status"]; ?></td>
               <td><?php echo $row["priced_date"]; ?></td>
             </tr>
@@ -370,7 +370,7 @@ foreach ($data as $job) {
                foreach ($l_onhold as $row) {
             ?>
             <tr>
-              <td><a href="customer-3d-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+              <td><a href="customer-laser-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
               <td><?php echo $row["status"]; ?></td>
               <td><?php echo $row["hold_date"]; ?></td>
             </tr>
@@ -383,7 +383,7 @@ foreach ($data as $job) {
                foreach ($l_paid as $row) {
               ?>
               <tr>
-                <td><a href="customer-3d-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+                <td><a href="customer-laser-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
                 <td><?php echo $row["status"]; ?></td>
                 <td><?php echo $row["paid_date"]; ?></td>
               </tr>
@@ -396,7 +396,7 @@ foreach ($data as $job) {
                foreach ($l_inprogress_completed as $row) {
               ?>
               <tr>
-                <td><a href="customer-3d-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+                <td><a href="customer-laser-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
                 <td>in progress</td>
                 
                 <?php if ($row["status"] == "printing") { ?>
@@ -414,7 +414,7 @@ foreach ($data as $job) {
               foreach ($l_delivered as $row) {
               ?>
               <tr>
-                <td><a href="customer-3d-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+                <td><a href="customer-laser-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
                 <td>ready for pickup</td>
                 <td><?php echo $row["delivered_date"]; ?></td>
               </tr>
@@ -427,7 +427,7 @@ foreach ($data as $job) {
                foreach ($l_cancelled as $row) {
               ?>
               <tr>
-                <td><a href="customer-3d-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+                <td><a href="customer-laser-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
                 <td><?php echo $row["status"]; ?></td>
                 <td><?php echo $row["cancelled_date"]; ?></td>
               </tr>
@@ -440,7 +440,7 @@ foreach ($data as $job) {
                foreach ($l_archived as $row) {
               ?>
               <tr>
-                <td><a href="customer-3d-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+                <td><a href="customer-laser-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
                 <td><?php echo $row["status"]; ?></td>
                 <td><?php echo $row["delivered_date"]; ?></td>
               </tr>
