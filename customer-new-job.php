@@ -402,7 +402,7 @@ header("location: customer-dashboard.php");
           width: 500px;
           background-color: #555;
           color: #fff;
-          text-align: center;
+          text-align: left;
           border-radius: 6px;
           padding: 8px 0;
           position: absolute;
@@ -609,6 +609,8 @@ header("location: customer-dashboard.php");
                   PLA (Polylactic Acid): 
                   <ul>
                     <li>A form of plastic made from natural starches like cornstarch that will biodegrade in some industrial composting facilities.</li>
+                    <li>This material is the best for detailed models.</li>
+                    <li>Available in multiple colours.</li>
                     <li>We charge 10 cents per gram.</li>
                   </ul>
                   </p>
@@ -616,6 +618,7 @@ header("location: customer-dashboard.php");
                 </span>
               </span>
           </div>
+          
           <div class="custom-control custom-radio">
             <input id="pla-pva" name="print_material_type" value="PLA + PVA" type="radio" class="custom-control-input" required>
             <label class="custom-control-label" for="pla-pva">PLA + PVA
@@ -636,6 +639,26 @@ header("location: customer-dashboard.php");
               </span>
             </span>
           </div>
+
+          <div class="custom-control custom-radio">
+            <input id="petg" name="print_material_type" value="PETG" type="radio" class="custom-control-input" required>
+            <label class="custom-control-label" for="petg">PETG</label>
+            <span class="popup">
+              &#9432
+              <span class="popuptext" id="myPopup">
+                <p>
+                PETG:
+                <ul>
+                  <li>This is a material similar to PLA, benefits of PETG include increased heat resistance.</li>
+                  <li>Not great for projects with a lot of details since this material tends to be stringy.</li>
+                  <li>Currently only available in red.</li>
+                  <li>We charge 10 cents per gram.</li>
+                </ul>
+                </p>
+                <span class="close-btn">x</span>
+              </span>
+            </span>
+          </div>
           <div class="custom-control custom-radio">
             <input id="tpu95" name="print_material_type" value="TPU95" type="radio" class="custom-control-input" required>
             <label class="custom-control-label" for="tpu95">TPU95</label>
@@ -645,14 +668,16 @@ header("location: customer-dashboard.php");
                 <p>
                 TPU 95a:
                 <ul>
-                  <li>A material with medium flex</li>
-                  <li>We charge 20 cents per gram</li>
+                  <li>A material with medium flex, the texture is similar to rubber.</li>
+                  <li>Better for simple shapes that do not require support since post-processing of pieces can be challenging due to stringing.</li>
+                  <li>We charge 20 cents per gram.</li>
                 </ul>
                 </p>
                 <span class="close-btn">x</span>
               </span>
             </span>
           </div>
+
           <div class="custom-control custom-radio">
             <input id="other" name="print_material_type" value="Other" type="radio" class="custom-control-input" required>
             <label class="custom-control-label" for="other">Other</label>

@@ -20,7 +20,7 @@ $userSQL->execute();
 $job_owner = $userSQL->fetch();
 
 //get list of active jobs associated with the job's owner
-$stm = $conn->prepare("SELECT web_job.id AS id, web_job.job_name AS name, web_job.status AS status, web_job.submission_date AS submission_date, web_job.priced_date AS priced_date, web_job.paid_date AS paid_date,web_job.printing_date AS printing_date,web_job.completed_date AS completed_date,web_job.delivered_date AS delivered_date,web_job.hold_date AS hold_date,web_job.hold_signer AS hold_signer,web_job.cancelled_signer AS cancelled_signer, web_job.priced_signer AS priced_signer, web_job.paid_signer AS paid_signer, web_job.printing_signer AS printing_signer, web_job.completed_signer AS completed_signer, web_job.delivered_signer AS delivered_signer, web_job.job_purpose AS job_purpose, web_job.academic_code AS academic_code, web_job.course_due_date AS course_due_date FROM web_job INNER JOIN laser_cut_job ON web_job.id=laser_cut_job.laser_cut_id WHERE web_job.status NOT IN ('delivered', 'archived', 'cancelled') AND web_job.netlink_id = :netlink_id");
+$stm = $conn->prepare("SELECT web_job.id AS id, web_job.job_name AS name, web_job.status AS status, web_job.submission_date AS submission_date, web_job.priced_date AS priced_date, web_job.paid_date AS paid_date,web_job.printing_date AS printing_date,web_job.completed_date AS completed_date,web_job.delivered_date AS delivered_date,web_job.hold_date AS hold_date,web_job.hold_signer AS hold_signer,web_job.cancelled_signer AS cancelled_signer, web_job.priced_signer AS priced_signer, web_job.paid_signer AS paid_signer, web_job.printing_signer AS printing_signer, web_job.completed_signer AS completed_signer, web_job.delivered_signer AS delivered_signer, web_job.job_purpose AS job_purpose, web_job.academic_code AS academic_code, web_job.course_due_date AS course_due_date, laser_cut_job.duration AS duration FROM web_job INNER JOIN laser_cut_job ON web_job.id=laser_cut_job.laser_cut_id WHERE web_job.status NOT IN ('delivered', 'archived', 'cancelled') AND web_job.netlink_id = :netlink_id");
   $stm->bindParam(':netlink_id', $job['netlink_id']);
   $stm->execute();
   $user_web_jobs = $stm->fetchAll();
@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
 
-  $stmt = $conn->prepare("UPDATE web_job INNER JOIN laser_cut_job ON id=laser_cut_id SET price = :price, copies=:copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date,cancelled_date = :cancelled_date, delivered_date = :delivered_date, priced_signer=:priced_signer,  paid_signer= :paid_signer, printing_signer=:printing_signer, completed_signer=:completed_signer, delivered_signer=:delivered_signer,hold_date = :hold_date, hold_signer= :hold_signer, cancelled_signer = :cancelled_signer, model_name_2 =:model_name_2 WHERE id = :job_id");
+  $stmt = $conn->prepare("UPDATE web_job INNER JOIN laser_cut_job ON id=laser_cut_id SET price = :price, copies=:copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date,cancelled_date = :cancelled_date, delivered_date = :delivered_date, priced_signer=:priced_signer,  paid_signer= :paid_signer, printing_signer=:printing_signer, completed_signer=:completed_signer, delivered_signer=:delivered_signer,hold_date = :hold_date, hold_signer= :hold_signer, cancelled_signer = :cancelled_signer, model_name_2 =:model_name_2, duration =:duration WHERE id = :job_id");
   
   $current_date = date("Y-m-d");
 
@@ -76,6 +76,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $stmt->bindParam(':price', $price);
   $copies = intval($_POST["copies"]);
   $stmt->bindParam(':copies', $copies , PDO::PARAM_INT);
+  $duration = intval($_POST["duration"]);
+  $stmt->bindParam(':duration', $duration , PDO::PARAM_INT);
   $stmt->bindParam(':material_type', $_POST["material_type"]);
   $stmt->bindParam(':staff_notes', $_POST["staff_notes"]);
   $stmt->bindParam(':status', $_POST["status"]);
@@ -602,25 +604,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <div class="col-md-12 order-md-1">
             <h4 class="mb-3">Price</h4>
               <div class="row">
-                  <div class="col-md-3 mb-3">
-                      <div class="input-group">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                              <!-- ** catch non floatable input-->
-                                <span class="input-group-text">$</span>
-                                <input type="text" name="price" autocomplete="off" class="form-control" value="<?php echo number_format((float)$job["price"], 2, '.','');?>"
-                                <?php if ($job["status"] != "submitted" && $job["status"] != "pending payment" && $job["status"] != "on hold"): ?>
-                                  readonly
-                                <?php endif; ?>
-                                >
-                            </div>
-                      </div>
-                      <small class="text-muted">Reminder: Minimum payment is $2.00.</small>
-                      <div class="invalid-feedback" style="width: 100%;">
-                      Status is required.
-                      </div>
-                      </div>
+                <div class="col-md-3 mb-3">
+                  <div class="input-group">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                          <!-- ** catch non floatable input-->
+                            <span class="input-group-text">$</span>
+                            <input type="text" name="price" autocomplete="off" class="form-control" value="<?php echo number_format((float)$job["price"], 2, '.','');?>"
+                            <?php if ($job["status"] != "submitted" && $job["status"] != "pending payment" && $job["status"] != "on hold"): ?>
+                              readonly
+                            <?php endif; ?>
+                            >
+                        </div>
+                    </div>
+                    <small class="text-muted">Reminder: Minimum payment is $2.00.</small>
+                    <div class="invalid-feedback" style="width: 100%;">
+                    Status is required.
+                    </div>
                   </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                  <div class="input-group">
+                    <input type="text" name="duration" autocomplete="off" class="form-control" value="<?php echo $job["duration"]; ?>">
+                  </div>
+                  <small class="text-muted">Number of minutes the machines were running to complete the project.</small>
+                </div>
               </div>
 
     <hr class="mb-6">
