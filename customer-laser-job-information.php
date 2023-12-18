@@ -233,27 +233,32 @@ if ($user != $job["netlink_id"] && $user_type == 1) {
 // Check if the form has been submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
  
+
   // Check which form was submitted
   if (isset($_POST['cancel_job'])) {
-    $query = "UPDATE web_job INNER JOIN laser_cut_job ON id=laser_cut_id 
-              SET status = :status, cancelled_date = :cancelled_date, cancelled_signer = :cancelled_signer 
-              WHERE id = :id";
+    $query = "UPDATE web_job INNER JOIN laser_cut_job ON id=laser_cut_id SET status = :status, cancelled_date = :cancelled_date, cancelled_signer = :cancelled_signer WHERE id = :id";
     
     $stmt = $conn->prepare($query);
+    $status_cancelled = 'cancelled';
+    $cur_date = date("Y-m-d");
+
+    $stmt->bindParam(':status', $status_cancelled);
+    $stmt->bindParam(':cancelled_signer',$user);
+    $stmt->bindParam(':cancelled_date',$cur_date);
+    $stmt->bindParam(':id',$job['id']);
     
-    // You can directly bind the values in the execute() method
-    $stmt->execute([
-        ':status' => 'cancelled',
-        ':cancelled_date' => date("Y-m-d"),
-        ':cancelled_signer' => $user,
-        ':id' => $_POST['job_id'] // Assuming job_id is coming from form data
-    ]);
-    
+
+    $stmt->execute();
+
+    //redirect to customer dashboard upon confirm cancel and update job status in db
+    echo "<script>";
+    echo "window.location.replace('https://devwebapp.library.uvic.ca/demo/3dwebapp/customer-dashboard.php');";
+    echo "setTimeout(move, 3000);";
+    echo "</script>";
+   
+  exit();
   }
-  
-  // Redirect or display a success message after processing
-  // header("location: customer-dashboard.php");
-  // die();
+ 
 }
 ?>
 
