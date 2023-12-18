@@ -284,7 +284,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $status_signer = $job["cancelled_signer"];
       break;
     case "archived":
-      $status_date = $job["archived_date"];
+      $status_date = $job["completed_date"];
       $status_signer=$job["completed_signer"];
       break;
   }
@@ -570,7 +570,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <div class="user_jobs_container">
 
           <?php
-
+            try {
+                $num_jobs = count($active_user_jobs);
+                if($num_jobs == 0){?>
+                  <p><?php echo 'This customer has no other active jobs<br>';?></p>
+                <?php }
+            } catch (PDOException $e) {
+                echo "Error: " . $e->getMessage();
+            }
+            
             // Iterate through the $active_user_jobs array
             foreach ($active_user_jobs as $other_active_job) {
               if($job['id'] != $other_active_job['id']){

@@ -291,7 +291,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $status_signer = $job["cancelled_signer"];
       break;
     case "archived":
-      $status_date = $job["archived_date"];
+      $status_date = $job["completed_date"];
       $status_signer=$job["completed_signer"];
       break;
   }
@@ -577,7 +577,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 $num_jobs = count($active_user_jobs);
                 if($num_jobs == 0){?>
-                  <p><?php echo 'This customer has no other active jobs<br>';?></p>;
+                  <p><?php echo 'This customer has no other active jobs<br>';?></p>
                 <?php }
             } catch (PDOException $e) {
                 echo "Error: " . $e->getMessage();
@@ -746,6 +746,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <div class="custom-control custom-radio">
             <input id="pla-pva" name="material_type" value="PLA + PVA" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "PLA + PVA"){echo "checked";} ?>>
             <label class="custom-control-label" for="pla-pva">PLA + PVA</label>
+          </div>
+          <div class="custom-control custom-radio">
+            <input id="petg" name="material_type" value="PETG" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "PETG"){echo "checked";} ?>>
+            <label class="custom-control-label" for="petg">PETG</label>
           </div>
           <div class="custom-control custom-radio">
             <input id="tpu95" name="material_type" value="TPU95" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "TPU95"){echo "checked";} ?>>

@@ -286,34 +286,52 @@ header("location: customer-dashboard.php");
       //Shows the academic_code text box if the "academic" rafio button is selected, hides otherwise.
       function showAcademicCodeText(clickedRadio) {
         var academiccode_div = document.getElementById("academiccode_textbox");
-          // Check the value of the clicked radio button
-          if (clickedRadio.value === "academic") {
-            academiccode_div.style.display = "inline-block";
-            academiccode_div.style.width = "300px";
-          } else if (clickedRadio.value === "personal") {
-            academiccode_div.style.display = "none";
-          }
+        var academicdeadline_div = document.getElementById("academicdeadline_textbox");
+
+        // Check the value of the clicked radio button
+        if (clickedRadio.value === "academic") {
+          academiccode_div.style.display = "inline-block";
+          academiccode_div.style.width = "300px";
+          academicdeadline_div.style.display = "inline-block";
+          academicdeadline_div.style.width = "300px";
+          
+        } else if (clickedRadio.value === "personal") {
+          academiccode_div.style.display = "none";
+          academicdeadline_div.style.display = "none";
+        }
       }
     </script><!--showAcademicCodeText()-->
 
     <h3 class="mb-2">Job Purpose</h3>
     <!-- contains radio buttons and optional textbox to indicate if it's a personal or academic (and academic code) job-->
-      <div class="d-block my-3">
-        <div class="custom-control custom-radio">
-          <input id="academic-purpose" name="job_purpose" value="academic" type="radio" class="custom-control-input" onclick="showAcademicCodeText(this)" <?php echo ($job['job_purpose'] === 'academic') ? 'checked' : ''; ?> required>
-          <label class="custom-control-label" for="academic-purpose">Academic
-            <div class="col-md-12 mb-3" id="academiccode_textbox" style="display:none;">
-              <input type="text" id="academic-purpose" class="form-control" name="academic_code" placeholder="<?php echo ($job['academic_code'] == '') ? 'Coruse code' : $job['academic_code']; ?>" autocomplete="off">
-            </div> <!-- to fill TABLE `web_job` column `academic_code` if `job_purpose` == "academic"-->
-          </label>
-          <span class="popup">
-            &#9432
-            <span class="popuptext" id="myPopup">
-              <p>Academic jobs will be prioritized during high-volume periods.</p>
-              <span class="close-btn">x</span>
-            </span>
-          </span> <!-- popup box for job_purpose =="academic"-->
-        </div><!--to fill TABLE `web_job` column `job_purpose`=="academic"; *selection will cause academiccode_textbox to appear-->
+            <!--Academic Jobs-->
+      <div class="row">
+        <div class="col-md-3 mb-3">
+          <div class="custom-control custom-radio">
+            <input id="academic-purpose" name="job_purpose" value="academic" type="radio" class="custom-control-input" onclick="showAcademicCodeText(this)" required>
+            <label class="custom-control-label" for="academic-purpose">Academic</label>
+              <span class="popup">
+                &#9432
+                <span class="popuptext" id="myPopup">
+                  <p>Academic jobs will be prioritized during high-volume periods.</p>
+                  <span class="close-btn">x</span>
+                </span>
+              </span> <!-- popup box for job_purpose =="academic"-->
+            
+          </div>
+        </div><!--to fill TABLE `web_job` column `job_purpose`=="academic"; *selection will cause academiccode_textbox to appear -->
+        
+        <div class="col-md-3 mb-3 w-100" id="academiccode_textbox" style="display:none;padding-top: 0.5px;">
+          <p>Course Code:  </p>
+          <input type="text" class="form-control" name="academic_code" placeholder="Course code" autocomplete="off">
+        </div>
+        <div class="col-md-3 mb-3 w-100" id="academicdeadline_textbox" style="display:none;">
+          <p>Assignment due date:  </p>
+          <input type="date" class="form-control" name="academic_deadline" placeholder="Assignment Due Date" autocomplete="off">
+        </div> 
+      </div>
+        
+        <!--Personal Jobs-->
         <div class="custom-control custom-radio">
           <input type="radio" id="personal-purpose" name="job_purpose" value="personal" class="custom-control-input" onclick="showAcademicCodeText(this)" <?php echo ($job['job_purpose'] === 'personal') ? 'checked' : ''; ?> required>
           <label class="custom-control-label" for="personal-purpose">Personal</label>
@@ -335,7 +353,7 @@ header("location: customer-dashboard.php");
           width: 500px;
           background-color: #555;
           color: #fff;
-          text-align: center;
+          text-align: left;
           border-radius: 6px;
           padding: 8px 0;
           position: absolute;
@@ -529,6 +547,25 @@ header("location: customer-dashboard.php");
                   <li>It dissolves when you put it in water.</li>
                   <li>Used for supports.</li>
                   <li>We charge 20 cents per gram.</li>
+                </ul>
+                </p>
+                <span class="close-btn">x</span>
+              </span>
+            </span>
+          </div>
+          <div class="custom-control custom-radio">
+            <input id="petg" name="print_material_type" value="PETG" type="radio" class="custom-control-input" required>
+            <label class="custom-control-label" for="petg">PETG</label>
+            <span class="popup">
+              &#9432
+              <span class="popuptext" id="myPopup">
+                <p>
+                PETG:
+                <ul>
+                  <li>This is a material similar to PLA, benefits of PETG include increased heat resistance.</li>
+                  <li>Not great for projects with a lot of details since this material tends to be stringy.</li>
+                  <li>Currently only available in red.</li>
+                  <li>We charge 10 cents per gram.</li>
                 </ul>
                 </p>
                 <span class="close-btn">x</span>

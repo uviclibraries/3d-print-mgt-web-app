@@ -324,7 +324,7 @@ header("location: customer-dashboard.php");
           </div>
         </div>
       </div>
-
+<hr class="mb-6">
     <script type="text/JavaScript">
       //Function will be triggered by the selection of job_purpose ("academic" and "personal") radio buttons. 
       //Shows the academic_code text box if the "academic" rafio button is selected, hides otherwise.
@@ -355,7 +355,7 @@ header("location: customer-dashboard.php");
         <div class="col-md-3 mb-3">
           <div class="custom-control custom-radio">
             <input id="academic-purpose" name="job_purpose" value="academic" type="radio" class="custom-control-input" onclick="showAcademicCodeText(this)" required>
-            <label class="custom-control-label" for="academic-purpose">Academic
+            <label class="custom-control-label" for="academic-purpose">Academic</label>
               <span class="popup">
                 &#9432
                 <span class="popuptext" id="myPopup">
@@ -363,7 +363,7 @@ header("location: customer-dashboard.php");
                   <span class="close-btn">x</span>
                 </span>
               </span> <!-- popup box for job_purpose =="academic"-->
-            </label>
+            
           </div>
         </div><!--to fill TABLE `web_job` column `job_purpose`=="academic"; *selection will cause academiccode_textbox to appear -->
         
@@ -443,7 +443,6 @@ header("location: customer-dashboard.php");
       }
     </style><!--Academic Job Deadline-->
 
-          <hr class="mb-6">
 
       <h3 class="mb-3">Upload Model or Graphic</h3>
       <small class="text-muted">Accepted file types: .stl, .svg, .obj, .pdf (Max 200M)</small>
@@ -483,7 +482,7 @@ header("location: customer-dashboard.php");
       <h3 class="mb-3">3D Print Specifications</h3>
         <div class="row">
           <div class="col-md-3 mb-3">
-            <label for="layer-height">Layer Height
+            <label for="layer-height">Layer Height</label>
               <span class="popup">
                 &#9432
                 <span class="popuptext" id="myPopup">
@@ -494,7 +493,7 @@ header("location: customer-dashboard.php");
                   <span class="close-btn">x</span>
                 </span>
               </span>
-            </label>
+            
             <select class="custom-select d-block w-100" name="layer_height" id="layer-height" required>
               <option selected="selected">0.2</option>
               <option>0.15</option>
@@ -561,7 +560,7 @@ header("location: customer-dashboard.php");
             </div>
             
           <div class="col-md-3 mb-3">
-            <label for="supports">Supports
+            <label for="supports">Supports</label>
               <span class="popup">
               &#9432
                 <span class="popuptext" id="myPopup">
@@ -572,7 +571,7 @@ header("location: customer-dashboard.php");
                   <span class="close-btn">x</span>
                 </span>
               </span>
-            </label>
+            
             <select class="custom-select d-block w-100" name="supports" id="supports" required>
               <option value="1">Yes</option>
               <option value="0">No</option>
@@ -681,7 +680,7 @@ header("location: customer-dashboard.php");
           <div class="custom-control custom-radio">
             <input id="other" name="print_material_type" value="Other" type="radio" class="custom-control-input" required>
             <label class="custom-control-label" for="other">Other</label>
-              <span class="popup">
+              <!-- <span class="popup">
               &#9432
               <span class="popuptext" id="myPopup">
                 <p>
@@ -702,7 +701,7 @@ header("location: customer-dashboard.php");
                 </p>
                 <span class="close-btn">x</span>
               </span>
-              </span>
+              </span> -->
               <small class="text-muted"> - Elaborate in Additional Comments section</small>
           </div>
         </div>
