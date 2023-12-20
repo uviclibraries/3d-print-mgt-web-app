@@ -11,6 +11,12 @@ $stm->execute([$_GET["job_id"]]);
 $job=$stm->fetch();
 // print_r(array_keys($job));
 
+//Get users name & email
+$userSQL = $conn->prepare("SELECT * FROM users WHERE netlink_id = :netlink_id");
+$userSQL->bindParam(':netlink_id', $job['netlink_id']);
+$userSQL->execute();
+$job_owner = $userSQL->fetch();
+
 
 $status = "submitted"; //declaring value that the job will take when the submission form is submitted
 
@@ -93,7 +99,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $layer_bind = floatval(number_format((float)$_POST["layer_height"], 2, '.',''));
   $support_bind = intval($_POST["supports"]);
   $copies_bind = intval($_POST["copies"]);
-  $laser_copies = intval($_POST["laser_copies"]);
   $good_statement = True;
   $stmt = $conn->prepare("INSERT INTO web_job (netlink_id, job_name, job_purpose, academic_code, submission_date, status) VALUES (:netlink_id, :job_name, :job_purpose, :academic_code, :submission_date, :job_status)");
   $stmt->bindParam(':netlink_id', $job['netlink_id']);
@@ -127,7 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   $stmt = $conn->prepare("INSERT INTO 3d_print_job (3d_print_id, model_name, infill, scale, layer_height, supports, copies, material_type, comments) VALUES (:3d_print_id, :model_name, :infill, :scale, :layer_height, :supports, :copies, :material_type, :comments)");
   $stmt->bindParam(':3d_print_id', $curr_id);
-  $stmt->bindParam(':model_name', $hash_name);
+  $stmt->bindParam(':model_name', $final_file_name);
   $stmt->bindParam(':infill', $infill_bind, PDO::PARAM_INT);
   $stmt->bindParam(':scale', $scale_bind , PDO::PARAM_INT);
   $stmt->bindParam(':layer_height', $layer_bind);
@@ -137,7 +142,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $stmt->bindParam(':comments', $_POST["comments"]);
   $stmt->execute();
 
-  
+  $userSQL = $conn->prepare("SELECT * FROM users WHERE netlink_id = :netlink_id");
+  $userSQL->bindParam(':netlink_id', $job['netlink_id']);
+  $userSQL->execute();
+  $job_owner = $userSQL->fetch();
+
 
   $direct_link = "https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/";
   $msg = "
@@ -146,14 +155,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <title>HTML email</title>
   </head>
   <body>
-  <p>Hello, ".$user_name.". This is an automated message from the DSC.</p>
+  <p>Hello, ".$job_owner['name'].". This is an automated message from the DSC.</p>
   <p>Thank you for submitting your 3D print request to the DSC at McPherson Library. We will evaluate the cost of the 3D print and you'll be notified by email when it is ready for payment. If you have any questions about the process or the status of your 3D print, please review our <a href=". $direct_link .">FAQ</a> or email us at DSCommons@uvic.ca.</p>
   </body>
   </html>";
   $headers = "MIME-Version: 1.0" . "\r\n";
   $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
   $headers .= "From: dscommons@uvic.ca" . "\r\n";
-  mail($user_email,"DSC - New 3D print Job",$msg,$headers);
+  mail($job_owner['email'],"DSC - New 3D print Job",$msg,$headers);
 
 header("location: customer-dashboard.php");
 }
@@ -251,7 +260,8 @@ header("location: customer-dashboard.php");
       <small class="text-muted">Accepted file types: .stl, .svg, .obj, .pdf (Max 200M)</small>
       <br>
         <?php
-          if (is_file(("uploads/" . $job['model_name']))) {
+          $fileExists = is_file("uploads/" . $job['model_name']);
+        if ($fileExists) {
             ?>
             <!--Grabs file and renames it to the job name when downloaded-->
             <a href="<?php echo "uploads/" . $job['model_name']; ?>" download="<?php
@@ -266,7 +276,7 @@ header("location: customer-dashboard.php");
         <?php }
         echo '<br> Replace with a new file <br>';?>
 
-        <input type="file" id="myFile" name="3d_model" required>
+        <input type="file" id="myFile" name="3d_model" <?php if (!$fileExists) { echo 'required'; } ?>>
       <br>
       <hr class="mb-6">
 
@@ -308,7 +318,7 @@ header("location: customer-dashboard.php");
       <div class="row">
         <div class="col-md-3 mb-3">
           <div class="custom-control custom-radio">
-            <input id="academic-purpose" name="job_purpose" value="academic" type="radio" class="custom-control-input" onclick="showAcademicCodeText(this)" required>
+            <input id="academic-purpose" name="job_purpose" value="academic" type="radio" class="custom-control-input" onclick="showAcademicCodeText(this)" <?php echo ($job['job_purpose'] != 'personal') ? 'checked' : ''; ?> required>
             <label class="custom-control-label" for="academic-purpose">Academic</label>
               <span class="popup">
                 &#9432
@@ -323,11 +333,11 @@ header("location: customer-dashboard.php");
         
         <div class="col-md-3 mb-3 w-100" id="academiccode_textbox" style="display:none;padding-top: 0.5px;">
           <p>Course Code:  </p>
-          <input type="text" class="form-control" name="academic_code" placeholder="Course code" autocomplete="off">
+          <input type="text" class="form-control" name="academic_code" placeholder="<?php echo ($job['job_purpose'] === 'academic') ? $job['academic_code'] : 'Course code'; ?>" autocomplete="off">
         </div>
         <div class="col-md-3 mb-3 w-100" id="academicdeadline_textbox" style="display:none;">
           <p>Assignment due date:  </p>
-          <input type="date" class="form-control" name="academic_deadline" placeholder="Assignment Due Date" autocomplete="off">
+          <input type="date" class="form-control" name="academic_deadline" autocomplete="off" min="<?php echo date('Y-m-d'); ?>" value="<?php echo ($job['job_purpose'] === 'academic' && !empty($job['assignment_due_date'])) ? $job['assignment_due_date'] : date('Y-m-d'); ?>" placeholder="<?php echo ($job['job_purpose'] === 'academic') ? 'Assignment Due Date' : ''; ?>">
         </div> 
       </div>
         

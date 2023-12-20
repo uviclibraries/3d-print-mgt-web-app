@@ -9,7 +9,7 @@ $stm = $conn->query("SELECT VERSION()");
 $status = "submitted"; //declaring value that the job will take when the submission form is submitted
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
+  $email_job_type = $_POST['job_type'];
   try {
 
       // Undefined | Multiple Files | $_FILES Corruption Attack
@@ -144,16 +144,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bindParam(':comments', $_POST["comments"]);
     $stmt->execute();
 
-
   }
+
   else{
     // Invalid job type
     $job_type = $_POST["job_type"];
     die("$job_type invalid job type");
   }
 
+  $jobType="";
   //email dynamically changes job type in email subject line and body text
-  $direct_link = "https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/";
+  if(isset($_POST["job_type"])){
+    $jobType = $_POST["job_type"] == "laser_cut" ? "laser cut" : "3d print";
+  } 
+
+  $direct_link_3d = "https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/";
+  $direct_link_laser = "https://onlineacademiccommunity.uvic.ca/dsc/how-to-laser-cut/";
+  $direct_link="";
+  $direct_link = $jobType == "laser_cut"?$direct_link_laser:$direct_link_3d;
+
   $msg = "
   <html>
   <head>
@@ -161,13 +170,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </head>
   <body>
   <p>Hello, ".$user_name.". This is an automated message from the DSC.</p>
-  <p>Thank you for submitting your ".$job_type." request to the DSC at McPherson Library. We will evaluate the cost of the ".$job_type." and you'll be notified by email when it is ready for payment. If you have any questions about the process or the status of your ".$job_type.", please review our <a href=". $direct_link .">FAQ</a> or email us at DSCommons@uvic.ca.</p>
+  <p>Thank you for submitting your ".$jobType." request to the DSC at McPherson Library. We will evaluate the cost of the ".$jobType." and you'll be notified by email when it is ready for payment. If you have any questions about the process or the status of your ".$jobType.", please review our <a href=". $direct_link .">FAQ</a> or email us at DSCommons@uvic.ca.</p>
   </body>
   </html>";
   $headers = "MIME-Version: 1.0" . "\r\n";
   $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
   $headers .= "From: dscommons@uvic.ca" . "\r\n";
-  mail($user_email,"DSC - New ".$job_type." Job",$msg,$headers);
+  mail($user_email,"DSC - New ".$jobType." job",$msg,$headers);
 
 header("location: customer-dashboard.php");
 }
@@ -345,6 +354,7 @@ header("location: customer-dashboard.php");
         }
       }
       //add field for academic job deadline
+
     </script><!--showAcademicCodeText()-->
 
     <h3 class="mb-3">Job Purpose</h3>
@@ -373,7 +383,7 @@ header("location: customer-dashboard.php");
         </div>
         <div class="col-md-3 mb-3 w-100" id="academicdeadline_textbox" style="display:none;">
           <p>Assignment due date:  </p>
-          <input type="date" class="form-control" name="academic_deadline" placeholder="Assignment Due Date" autocomplete="off">
+          <input type="date" class="form-control" name="academic_deadline" placeholder="Assignment Due Date" autocomplete="off" min="<?php echo date('Y-m-d'); ?>">
         </div>
             
       </div>

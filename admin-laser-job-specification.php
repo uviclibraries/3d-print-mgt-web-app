@@ -67,15 +67,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
 
-  $stmt = $conn->prepare("UPDATE web_job INNER JOIN laser_cut_job ON id=laser_cut_id SET price = :price, copies=:copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date,cancelled_date = :cancelled_date, delivered_date = :delivered_date, priced_signer=:priced_signer,  paid_signer= :paid_signer, printing_signer=:printing_signer, completed_signer=:completed_signer, delivered_signer=:delivered_signer,hold_date = :hold_date, hold_signer= :hold_signer, cancelled_signer = :cancelled_signer, model_name_2 =:model_name_2, duration =:duration WHERE id = :job_id");
+  $stmt = $conn->prepare("UPDATE web_job INNER JOIN laser_cut_job ON id=laser_cut_id SET price = :price, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date,cancelled_date = :cancelled_date, delivered_date = :delivered_date, priced_signer=:priced_signer,  paid_signer= :paid_signer, printing_signer=:printing_signer, completed_signer=:completed_signer, delivered_signer=:delivered_signer,hold_date = :hold_date, hold_signer= :hold_signer, cancelled_signer = :cancelled_signer, model_name_2 =:model_name_2, duration =:duration WHERE id = :job_id");
   
   $current_date = date("Y-m-d");
 
   $stmt->bindParam(':job_id', $job['id']);
   $price = floatval(number_format((float)$_POST["price"], 2, '.',''));
   $stmt->bindParam(':price', $price);
-  $copies = intval($_POST["copies"]);
-  $stmt->bindParam(':copies', $copies , PDO::PARAM_INT);
+  // $copies = intval($_POST["copies"]);
+  // $stmt->bindParam(':copies', $copies , PDO::PARAM_INT);
   $duration = intval($_POST["duration"]);
   $stmt->bindParam(':duration', $duration , PDO::PARAM_INT);
   $stmt->bindParam(':material_type', $_POST["material_type"]);
@@ -120,6 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   //need variable to check if admin wants to send email. case: updating notes but dont send email
   if ($_POST['status'] == "pending payment") {
     $d1 = $current_date;
+    $priceds=$user;
 
     //email user
     if (isset($_POST['email_enabaled']) && $_POST['email_enabaled'] == "enabled") {
@@ -150,12 +151,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   } elseif($_POST['status'] == "paid"){
     //this is done automatically when payment is received.
     $d2 = $current_date;
+    $paids=$user;
 
   } elseif($_POST['status'] == "printing"){
     $d3 = $current_date;
+    $printings=$user;
 
   } elseif ($_POST['status'] == "delivered") {
     $d4 = $current_date;
+    $ds=$user;
 
     //email user
     if (isset($_POST['email_enabaled']) && $_POST['email_enabaled'] == "enabled") {
@@ -188,10 +192,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   } elseif($_POST['status'] == "completed"){
     $d6 = $current_date;
+    $completes=$user;
 
   } elseif($_POST['status'] == "cancelled"){
     $d7 = $current_date;
     $cs = $user;
+  }
+  elseif($_POST['status'] == "archived"){
+    $d4 = $current_date;
+    $completes = $user;
+
   }
 
   $stmt->execute();
@@ -518,8 +528,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                   <option value="on hold" <?php if ($job["status"]== "on hold"){echo "selected";} ?>>On Hold</option>
                   <option value="paid" <?php if ($job["status"]== "paid"){echo "selected";} ?>>Paid</option>
                   <option value="printing" <?php if ($job["status"]== "printing"){echo "selected";} ?>>Printing</option>
-                  <option value="printed" <?php if ($job["status"]== "completed"){echo "selected";} ?>>Completed</option>
-                  <option value="completed" <?php if ($job["status"]== "delivered"){echo "selected";} ?>>Delivered</option>
+                  <<option value="completed" <?php if ($job["status"]== "completed"){echo "selected";} ?>>Completed</option>
+                <option value="delivered" <?php if ($job["status"]== "delivered"){echo "selected";} ?>>Delivered</option>
+                  <option value="cancelled" <?php if ($job["status"]== "cancelled"){echo "selected";} ?>>Cancelled</option>
                   <option value="archived" <?php if ($job["status"]== "archived"){echo "selected";} ?>>Archived</option>
                 <?php } ?>
               </select>
@@ -680,12 +691,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <hr class="mb-4">
       <!-- <h5 class="mb-2">Copies</h5> -->
       <div class="col-md-3 mb-3">
-          <label for="copies">Copies</label>
-          <input type="number" class="form-control" name="copies" min="1" max="100" step="1" value="1" id="supports" placeholder="<?php if ($job["copies"]!= ""){echo "{$job["copies"]}";} else{"Enter # of copies";}?>" required />
-          <div class="invalid-feedback">
-            Please provide a valid response.
-          </div>
-        </div>
+        <label for="copies">Copies</label>
+        <input type="text" class="form-control" value="<?php if ($job["copies"]!= ""){echo "{$job["copies"]}";} else{"Enter # of copies";}?>" readonly>
+        <!-- <input type="number" class="form-control" name="copies" min="1" max="100" step="1" value="1" id="supports" placeholder=""> -->
+        <!-- <div class="invalid-feedback">
+          Please provide a valid response.
+        </div> -->
       </div>
 
         

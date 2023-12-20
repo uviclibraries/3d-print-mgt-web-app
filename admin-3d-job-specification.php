@@ -34,8 +34,6 @@ $stm = $conn->prepare("SELECT * FROM print_job WHERE id=?");
 $stm->execute([$_GET["job_id"]]);
 $job=$stm->fetch();
 */
-
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   //used if modify is not updated.
   $modify_value = $job["model_name_2"];
@@ -65,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   // change to source from web job and 3d_print_job
-  $stmt = $conn->prepare("UPDATE web_job INNER JOIN 3d_print_job ON id=3d_print_id SET price = :price, infill = :infill, scale = :scale, layer_height = :layer_height, supports = :supports, copies = :copies, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, cancelled_date = :cancelled_date, delivered_date = :delivered_date, priced_signer =:priced_signer,  paid_signer= :paid_signer, printing_signer=:printing_signer, completed_signer=:completed_signer, delivered_signer=:delivered_signer, hold_date = :hold_date, hold_signer= :hold_signer,cancelled_signer= :cancelled_signer, model_name_2 =:model_name_2, duration = :duration WHERE id = :job_id;");
+  $stmt = $conn->prepare("UPDATE web_job INNER JOIN 3d_print_job ON id=3d_print_id SET price = :price, infill = :infill, scale = :scale, layer_height = :layer_height, supports = :supports, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, cancelled_date = :cancelled_date, delivered_date = :delivered_date, priced_signer =:priced_signer,  paid_signer= :paid_signer, printing_signer=:printing_signer, completed_signer=:completed_signer, delivered_signer=:delivered_signer, hold_date = :hold_date, hold_signer= :hold_signer,cancelled_signer= :cancelled_signer, model_name_2 =:model_name_2, duration = :duration WHERE id = :job_id;");
   
   $current_date = date("Y-m-d");
 
@@ -79,8 +77,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $stmt->bindParam(':layer_height', $_POST["layer_height"], PDO::PARAM_STR);
   $supports = intval($_POST["supports"]) ;
   $stmt->bindParam(':supports', $supports , PDO::PARAM_INT);
-  $copies = intval($_POST["copies"]);
-  $stmt->bindParam(':copies', $copies , PDO::PARAM_INT);
+  // $copies = intval($_POST["copies"]);
+  // $stmt->bindParam(':copies', $copies , PDO::PARAM_INT);
   $duration = intval($_POST["duration"]);
   $stmt->bindParam(':duration',$duration, PDO::PARAM_INT);
   $stmt->bindParam(':material_type', $_POST["material_type"]);
@@ -164,7 +162,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $printings=$user;
 }
     elseif($_POST['status'] == "completed"){
-    $d3 = $current_date;
+    $d6 = $current_date;
     $completes=$user;
 
 
@@ -205,6 +203,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $d5 = $current_date;
     $hs = $user;
   }
+  elseif($_POST['status'] == "cancelled"){
+    $d7 = $current_date;
+    $cs = $user;
+  }
+
   $stmt->execute();
 
 //Set status details for associated jobs selected from associated jobs table
@@ -524,8 +527,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               <option value="on hold" <?php if ($job["status"]== "on hold"){echo "selected";} ?>>On Hold</option>
               <option value="paid" <?php if ($job["status"]== "paid"){echo "selected";} ?>>Paid</option>
               <option value="printing" <?php if ($job["status"]== "printing"){echo "selected";} ?>>Printing</option>
-              <option value="printed" <?php if ($job["status"]== "completed"){echo "selected";} ?>>Completed</option>
-              <option value="completed" <?php if ($job["status"]== "delivered"){echo "selected";} ?>>Delivered</option>
+              <option value="completed" <?php if ($job["status"]== "completed"){echo "selected";} ?>>Completed</option>
+              <option value="delivered" <?php if ($job["status"]== "delivered"){echo "selected";} ?>>Delivered</option>
+              <option value="cancelled" <?php if ($job["status"]== "cancelled"){echo "selected";} ?>>Cancelled</option>
               <option value="archived" <?php if ($job["status"]== "archived"){echo "selected";} ?>>Archived</option>
             <?php } ?>
           </select>
@@ -675,10 +679,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- <h5 class="mb-2">Copies</h5> -->
     <div class="col-md-3 mb-3">
         <label for="copies">Copies</label>
-        <input type="number" class="form-control" name="copies" min="1" max="100" step="1" value="1" id="supports" placeholder="<?php if ($job["copies"]!= ""){echo "{$job["copies"]}";} else{"Enter # of copies";}?>" required />
-        <div class="invalid-feedback">
+        <input type="text" class="form-control" value="<?php if ($job["copies"]!= ""){echo "{$job["copies"]}";} else{"Enter # of copies";}?>" readonly>
+        <!-- <input type="number" class="form-control" name="copies" min="1" max="100" step="1" value="1" id="supports" placeholder=""> -->
+        <!-- <div class="invalid-feedback">
           Please provide a valid response.
-        </div>
+        </div> -->
       </div>
 
     <hr class="mb-6">
