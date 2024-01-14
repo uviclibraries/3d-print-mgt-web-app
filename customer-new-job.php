@@ -266,8 +266,15 @@ header("location: customer-dashboard.php");
           <label class="custom-control-label" for="3d_print">3D Print</label>
         </div>
         <div class="custom-control custom-radio">
-          <input id="laser_cut" name="job_type" value="laser_cut" type="radio" class="custom-control-input" onclick="showLaserInfo()" required>
-          <label class="custom-control-label" for="laser_cut">Laser Cut</label>
+          <input id="laser_cut" name="job_type" value="laser_cut" type="radio" class="custom-control-input" onclick="showLaserInfo()" required disabled>
+          <label class="custom-control-label" for="laser_cut">Laser Cut <strong style="color: red;">Temporarily Unavailable</strong></label>
+          <span class="popup">
+                &#9432
+                <span class="popuptext" id="myPopup">
+                  <p>Due to technical difficulties, laser cutting is temporarely unavailable. We are working to bring back the service as soon as possible, thank you for your understanding. If you have any questions, please email: <a href="mailto:dscommons@uvic.ca">dscommons@uvic.ca</a>.</p>
+                  <span class="close-btn">x</span>
+                </span>
+              </span> <!-- popup box for temporarily unavailable job-->
         </div>
 
         <script type ="text/JavaScript">

@@ -252,7 +252,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     //redirect to customer dashboard upon confirm cancel and update job status in db
     echo "<script>";
-    echo "window.location.replace('https://devwebapp.library.uvic.ca/demo/3dwebapp/customer-dashboard.php');";
+    echo "window.location.replace('https://webapp.library.uvic.ca/3dprint/customer-dashboard.php');";
     echo "setTimeout(move, 3000);";
     echo "</script>";
    
@@ -333,7 +333,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       </div>
 
     <!-- Button to trigger 'Duplicate Job' confirmation popup; button background color set to purple-->
-    <button id="duplicate-button" class="btn btn-primary btn-lg" style="background-color:#CF9FFF">Duplicate Job</button> <!--duplicate button-->
+    <!-- <button id="duplicate-button" class="btn btn-primary btn-lg" style="background-color:#CF9FFF;">Duplicate Job</button>-->
       <!-- The Second Popup -->
       <div id="DuplicateJobPopup" class="popup">
         <div class="popup-content">
