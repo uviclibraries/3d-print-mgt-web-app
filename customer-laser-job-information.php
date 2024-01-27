@@ -333,7 +333,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       </div>
 
     <!-- Button to trigger 'Duplicate Job' confirmation popup; button background color set to purple-->
-    <!-- <button id="duplicate-button" class="btn btn-primary btn-lg" style="background-color:#CF9FFF;">Duplicate Job</button>-->
+    <button id="duplicate-button" class="btn btn-primary btn-lg" style="background-color:#CF9FFF;">Duplicate Job</button>
       <!-- The Second Popup -->
       <div id="DuplicateJobPopup" class="popup">
         <div class="popup-content">

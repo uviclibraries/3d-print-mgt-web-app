@@ -146,23 +146,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   }
 
+  elseif($_POST["job_type"] == "large_format_print"){
+    // Use extracted id to insert job information to the
+
+    $stmt = $conn->prepare("INSERT INTO large_format_print_job (large_format_print_id, model_name, copies, width_inches, height_inches, comments) VALUES (:large_format_print_id, :model_name, :copies, :width_inches, :height_inches, :comments)");
+    $stmt->bindParam('large_format_print_id', $curr_id);
+    $stmt->bindParam(':model_name', $hash_name);
+    $stmt->bindParam(':copies', $large_print_copies);
+    $stmt->bindParam(':width_inches', $_POST["width_inches"]);
+    $stmt->bindParam(':height_inches', $_POST["height_inches"]);
+    $stmt->bindParam(':comments', $_POST["comments"]);
+    $stmt->execute();
+  }
+
   else{
     // Invalid job type
     $job_type = $_POST["job_type"];
     die("$job_type invalid job type");
   }
 
-  $jobType="";
-  //email dynamically changes job type in email subject line and body text
-  if(isset($_POST["job_type"])){
-    $jobType = $_POST["job_type"] == "laser_cut" ? "laser cut" : "3d print";
-  } 
+//Set job type string and link to FAQ page-->
+  $jobType = "";
+  $direct_link ="";
+  if (isset($_POST["job_type"])) {
+      switch ($_POST["job_type"]) {
+          case "laser_cut":
+              $jobType = "laser cut";
+              $direct_link ="https://onlineacademiccommunity.uvic.ca/dsc/how-to-laser-cut/";
+              break;
+          case "3d_print":
+              $jobType = "3d print";
+              $direct_link ="https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/";
+              break;
+          case "large_format_print":
+              $jobType = "large format print";
+              $direct_link = "https://onlineacademiccommunity.uvic.ca/dsc/tools-tech/large-format-printer-and-scanner/";
+              break;
+          default:
+              $jobType = "unknown";
+      }
+  }
 
-  $direct_link_3d = "https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/";
-  $direct_link_laser = "https://onlineacademiccommunity.uvic.ca/dsc/how-to-laser-cut/";
-  $direct_link="";
-  $direct_link = $jobType == "laser_cut"?$direct_link_laser:$direct_link_3d;
-
+//Send customer submission email
   $msg = "
   <html>
   <head>
@@ -184,6 +209,7 @@ header("location: customer-dashboard.php");
 ?>
 
 
+<!--FRONT END-->
 <!doctype html>
 <html lang="en">
   <head>
@@ -192,7 +218,7 @@ header("location: customer-dashboard.php");
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Jekyll v4.0.1">
-    <title>New 3D print request</title>
+    <title>New job request</title>
 
     <!--javascript-->
     <!-- <script src="customer-new-job.js" async></script> -->
@@ -262,19 +288,16 @@ header("location: customer-dashboard.php");
       <h3 class="mb-2">Job Type</h3>
       <div class="d-block my-3">
         <div class="custom-control custom-radio">
-          <input id="3d_print" name="job_type" value="3D Print" type="radio" class="custom-control-input" onclick="showPrintInfo()" required>
+          <input id="3d_print" name="job_type" value="3D Print" type="radio" class="custom-control-input" onclick="showPrintInfo('3d_print')" required>
           <label class="custom-control-label" for="3d_print">3D Print</label>
         </div>
         <div class="custom-control custom-radio">
-          <input id="laser_cut" name="job_type" value="laser_cut" type="radio" class="custom-control-input" onclick="showLaserInfo()" required disabled>
-          <label class="custom-control-label" for="laser_cut">Laser Cut <strong style="color: red;">Temporarily Unavailable</strong></label>
-          <span class="popup">
-                &#9432
-                <span class="popuptext" id="myPopup">
-                  <p>Due to technical difficulties, laser cutting is temporarely unavailable. We are working to bring back the service as soon as possible, thank you for your understanding. If you have any questions, please email: <a href="mailto:dscommons@uvic.ca">dscommons@uvic.ca</a>.</p>
-                  <span class="close-btn">x</span>
-                </span>
-              </span> <!-- popup box for temporarily unavailable job-->
+          <input id="laser_cut" name="job_type" value="laser_cut" type="radio" class="custom-control-input" onclick="showPrintInfo('laser_cut')" required>
+          <label class="custom-control-label" for="laser_cut">Laser Cut</label>
+        </div>
+        <div class="custom-control custom-radio">
+          <input id="large_format_print" name="job_type" value="large_format_print" type="radio" class="custom-control-input" onclick="showPrintInfo('large_format')" required>
+          <label class="custom-control-label" for="large_format_print">Large Format Print</label>
         </div>
 
         <script type ="text/JavaScript">
@@ -282,12 +305,14 @@ header("location: customer-dashboard.php");
         //At page load, hide submission details specific to 3D print and laser cut jobs, and submission button
           var print_div = document.getElementById("3d_specs");
           var laser_div = document.getElementById("laser_specs");
+          var large_format_div = document.getElementById("large_format_specs");
           var submit = document.getElementById("submit_section");
           // var academiccode_div = document.getElementById("academiccode_textbox");
           // var academicdeadline_div = document.getElementById("academicdeadline_textbox");
 
           print_div.style.display = "none"; //hides 3D print specs
           laser_div.style.display = "none"; //hides laser cut jobs
+          large_format_div.style.display = "none";
           submit.style.display = "none"; //hides submit button
           // academiccode_div.style.display = "none"; //hides course code field
           // academicdeadline_div.style.display = "none";//hides project deadline as per course
@@ -297,37 +322,39 @@ header("location: customer-dashboard.php");
       </script> <!--setPageInfo()-->
 
       <script type="text/JavaScript">
-        function showPrintInfo() {
+        function showPrintInfo(jobType) {
         //When job_type "3d Print" radio button selected, show 3D print submission details and submit button
-          document.getElementById("header-job-type").innerText="3D Print";
           var print_div = document.getElementById("3d_specs");
           var laser_div = document.getElementById("laser_specs");
+          var large_format_div = document.getElementById("large_format_specs");
           var submit = document.getElementById("submit_section");
-          //alert("Print info displayed");
-          if (print_div.style.display == "none") {
-            print_div.style.display = "block";
-            laser_div.style.display = "none";
-            submit.style.display = "block";
-          }
-        }
-      </script><!--setPrintInfo()-->
+          // Hide all divs initially
 
-      <script type="text/JavaScript">
-        function showLaserInfo() {
-        //When job_type "laser cut" radio button selected, show laser cut submission details and submit button
-          document.getElementById("header-job-type").innerText="Laser Cut";
-          var print_div = document.getElementById("3d_specs");
-          var laser_div = document.getElementById("laser_specs");
-          var submit = document.getElementById("submit_section");
-          //alert("Laser info displayed");
-          if (laser_div.style.display == "none") {
-            print_div.style.display = "none";        
-            laser_div.style.display = "block";
-            submit.style.display = "block";
+          print_div.style.display = "none";
+          laser_div.style.display = "none";
+          large_format_div.style.display = "none";
+
+          // Show the selected div
+          switch(jobType) {
+            case "3d_print":
+              document.getElementById("header-job-type").innerText = "3D Print";
+              print_div.style.display = "block";
+              break;
+            case "laser_cut":
+              document.getElementById("header-job-type").innerText = "Laser Cut";
+              laser_div.style.display = "block";
+              break;
+            case "large_format":
+              document.getElementById("header-job-type").innerText = "Large Format";
+              large_format_div.style.display = "block";
+              break;
           }
+
+          submit.style.display = "block";
         }
-      </script><!--setLaserInfo()-->
-      <br>
+      </script><!--setPrintInfo() sets div to display based on job type selected-->
+
+      
       
       <hr class="mb-6">
 
@@ -494,7 +521,7 @@ header("location: customer-dashboard.php");
       });
       </script><!--Handles invalid file type uploads-->
 
-
+    <!-- 3d print block start-->
     <div id="3d_specs" class="col-md-12 order-md-1">
       <h3 class="mb-3">3D Print Specifications</h3>
         <div class="row">
@@ -722,11 +749,9 @@ header("location: customer-dashboard.php");
               <small class="text-muted"> - Elaborate in Additional Comments section</small>
           </div>
         </div>
-    </div>
+    </div><!-- script for 3D print block -->
 
-    <!-- script for first block -->
-
-    <!-- new block start-->
+    <!-- Laser Cut  block start-->
     <div id="laser_specs" class="col-md-12 order-md-1">
       <!--change link to a future laser cut FAQ page-->
       <div>
@@ -834,17 +859,106 @@ header("location: customer-dashboard.php");
           </div>
         </div>
     </div>
+    <!-- Laser Cut block end-->
 
+    <script>
+      function validateMeasurements() {
+        var unit = document.getElementById('unit_selector').value;
+        var width = document.getElementById('width_input').value;
+        var length = document.getElementById('length_input').value;
+
+        var maxDimension = unit === 'cm' ? 91.44 : 36; // 36 inches in cm
+
+        width = unit === 'cm' ? convertToInches(width) : parseFloat(width);
+        length = unit === 'cm' ? convertToInches(length) : parseFloat(length);
+
+        // Check if both measurements exceed the max dimension
+        if (width > maxDimension && length > maxDimension) {
+          // Update and show warning message
+          document.getElementById('measurement_warning').innerHTML = 
+            `Both width and length cannot exceed ${maxDimension} ${unit}. Please decrease one of the measurements.`;
+          document.getElementById('measurement_warning').style.display = 'block';
+        } else {
+          // Hide warning message
+          document.getElementById('measurement_warning').style.display = 'none';
+        }
+      }
+
+      function convertToInches(cm) {
+        return cm ? parseFloat(cm) / 2.54 : 0;  // 1 cm = 0.393701 inches
+      }
+
+      function convertToCentimeters(inches) {
+        return inches ? parseFloat(inches) * 2.54 : 0;  // 1 inch = 2.54 cm
+      }
+    </script>
+
+
+    <!-- Large Format Print block start-->
+    <div id="large_format_specs" class="col-md-12 order-md-1">
+      <h3 class="mb-3">Large Format Print Specifications</h3>
+      <p>Dimensions
+        <span class="popup">
+          &#9432
+          <span class="popuptext" id="myPopup">
+            <p></p>
+          <span class="close-btn">x</span>
+        </span>
+      </span>
+      </p>
+      <div class="row"> 
+        <div class="col-md-3 mb-3">
+          <label for="length">Length</label>
+          <input type="text" id="length_input" placeholder="Length" oninput="validateMeasurements()" style="width: 200px;" required >
+        </div>
+
+        <div class="col-md-3 mb-3">
+          <label for="width">Width</label>
+          <input type="text" id="width_input" placeholder="Width" oninput="validateMeasurements()" style="width: 200px;" required>
+          <div class="invalid-feedback">
+            Please select a unit of measurement.
+          </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+          <label for="scale">Unit</label><br>
+          <select id="unit_selector" style="width: 100px;"> <!-- Adjust the width as needed -->
+            <option value="in">in</option>
+            <option value="cm">cm</option>
+          </select>
+          <div class="invalid-feedback">
+            Please select a unit of measurement.
+          </div>
+        </div>
+      </div>
+      <div id="measurement_warning" style="display: none;">
+      </div>
+
+      <div>
+        <hr class="mb-4">
+        <div class="col-md-3 mb-3">
+          <label for="copies">Copies</label>
+          <input type="number" class="form-control" name="copies" min="1" max="100" step="1" id="copies" value = "1" required />
+
+          <div class="invalid-feedback">
+            Please provide a valid response.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Large Format Print block end-->
+    
     <div id="submit_section" class="col-md-12 order-md-1"> 
       <hr class="mb-4">
-          <h3 class="mb-2">Additional Comments</h3>
-              <div class="input-group">
-                  <textarea rows="5" cols="50" class="form-control" name="comments" aria-label="additional-comments"></textarea>
-              </div>
-              <div class="invalid-feedback">
-                Please enter additional comments.
-              </div>
-          
+        <h3 class="mb-2">Additional Comments</h3>
+          <div class="input-group">
+              <textarea rows="5" cols="50" class="form-control" name="comments" aria-label="additional-comments"></textarea>
+          </div>
+          <div class="invalid-feedback">
+            Please enter additional comments.
+          </div>
+        
 
           <hr class="mb-4">
           <center>
@@ -853,7 +967,7 @@ header("location: customer-dashboard.php");
               </form>
           </center>
       </div>
-    <!-- new block end-->
+    
     </form>
   </div>
 
