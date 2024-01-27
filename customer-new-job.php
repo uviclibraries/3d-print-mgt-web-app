@@ -84,6 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $support_bind = intval($_POST["supports"]);
   $copies_bind = intval($_POST["copies"]);
   $laser_copies = intval($_POST["laser_copies"]);
+  $large_format_copies = intval($_POST["large_format_copies"]);
   $good_statement = True;
   $stmt = $conn->prepare("INSERT INTO web_job (netlink_id, job_name, job_purpose, academic_code, course_due_date, submission_date, status) VALUES (:netlink_id, :job_name, :job_purpose, :academic_code, :course_due_date,:submission_date, :job_status)");
   $stmt->bindParam(':netlink_id', $user);
@@ -147,14 +148,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   elseif($_POST["job_type"] == "large_format_print"){
-    // Use extracted id to insert job information to the
+    // Use extracted id to insert job information to the large_format_print_jobs db
+
+    function convertToInches($cm) {
+      return floatval($cm) / 2.54; // 1 cm = 0.393701 inches
+    }
+
+    // Check if the unit of measurement is 'cm' and convert if necessary
+    $widthInches = ($_POST["unit_measurement"] == 'cm') ? convertToInches($_POST["width_input"]) : $_POST["width_input"];
+    $lengthInches = ($_POST["unit_measurement"] == 'cm') ? convertToInches($_POST["length_input"]) : $_POST["length_input"];
 
     $stmt = $conn->prepare("INSERT INTO large_format_print_job (large_format_print_id, model_name, copies, width_inches, height_inches, comments) VALUES (:large_format_print_id, :model_name, :copies, :width_inches, :height_inches, :comments)");
     $stmt->bindParam('large_format_print_id', $curr_id);
     $stmt->bindParam(':model_name', $hash_name);
-    $stmt->bindParam(':copies', $large_print_copies);
-    $stmt->bindParam(':width_inches', $_POST["width_inches"]);
-    $stmt->bindParam(':height_inches', $_POST["height_inches"]);
+    $stmt->bindParam(':copies', $large_format_copies);
+    $stmt->bindParam(':width_inches', $widthInches);
+    $stmt->bindParam(':height_inches', $lengthInches);
     $stmt->bindParam(':comments', $_POST["comments"]);
     $stmt->execute();
   }
@@ -868,10 +877,12 @@ header("location: customer-dashboard.php");
         var length = document.getElementById('length_input').value;
 
         var maxDimension = unit === 'cm' ? 91.44 : 36; // 36 inches in cm
+        console.log("unit: " + unit + "; length: " + length + ";width" + width);
 
-        width = unit === 'cm' ? convertToInches(width) : parseFloat(width);
-        length = unit === 'cm' ? convertToInches(length) : parseFloat(length);
-
+        //width = unit === 'cm' ? convertToInches(width) : parseFloat(width);
+        //length = unit === 'cm' ? convertToInches(length) : parseFloat(length);
+        //console.log("converted length: " + length + "; width" + width);
+ 
         // Check if both measurements exceed the max dimension
         if (width > maxDimension && length > maxDimension) {
           // Update and show warning message
@@ -888,9 +899,9 @@ header("location: customer-dashboard.php");
         return cm ? parseFloat(cm) / 2.54 : 0;  // 1 cm = 0.393701 inches
       }
 
-      function convertToCentimeters(inches) {
-        return inches ? parseFloat(inches) * 2.54 : 0;  // 1 inch = 2.54 cm
-      }
+      // function convertToCentimeters(inches) {
+      //   return inches ? parseFloat(inches) * 2.54 : 0;  // 1 inch = 2.54 cm
+      // }
     </script>
 
 
@@ -909,12 +920,12 @@ header("location: customer-dashboard.php");
       <div class="row"> 
         <div class="col-md-3 mb-3">
           <label for="length">Length</label>
-          <input type="text" id="length_input" placeholder="Length" oninput="validateMeasurements()" style="width: 200px;" required >
+          <input type="text" id="length_input" name="length_input" placeholder="Length" oninput="validateMeasurements()" style="width: 200px;" required >
         </div>
 
         <div class="col-md-3 mb-3">
           <label for="width">Width</label>
-          <input type="text" id="width_input" placeholder="Width" oninput="validateMeasurements()" style="width: 200px;" required>
+          <input type="text" id="width_input" name="width_input" placeholder="Width" oninput="validateMeasurements()" style="width: 200px;" required>
           <div class="invalid-feedback">
             Please select a unit of measurement.
           </div>
@@ -922,7 +933,7 @@ header("location: customer-dashboard.php");
 
         <div class="col-md-3 mb-3">
           <label for="scale">Unit</label><br>
-          <select id="unit_selector" style="width: 100px;"> <!-- Adjust the width as needed -->
+          <select id="unit_selector" name="unit_measurement" style="width: 100px;" onchange="validateMeasurements()"> <!-- Adjust the width as needed -->
             <option value="in">in</option>
             <option value="cm">cm</option>
           </select>
@@ -938,7 +949,7 @@ header("location: customer-dashboard.php");
         <hr class="mb-4">
         <div class="col-md-3 mb-3">
           <label for="copies">Copies</label>
-          <input type="number" class="form-control" name="copies" min="1" max="100" step="1" id="copies" value = "1" required />
+          <input type="number" class="form-control" name="large_format_copies" min="1" max="100" step="1" id="copies" value = "1" required />
 
           <div class="invalid-feedback">
             Please provide a valid response.
