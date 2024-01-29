@@ -68,6 +68,12 @@ foreach ($all_users as $row) {
   $sum += $row["charge_total"];
 }
 
+$duration = 0;
+foreach ($all_users as $row){
+  // $duration +=$row["duration"];
+  $duration = 0;
+}
+
 $get_line = array();
 //Seach button clicked$_SERVER['REQUEST_METHOD'] === 'POST'
 if(isset($_POST["Search"])){
@@ -91,7 +97,7 @@ if (isset($_POST["getCSV"])) {
   header("Content-Disposition: attachment; filename=".$filename);
 
   $fp = fopen("php://output", "w");
-  $column = array("Order ID", "Netlink ID", "Full Name", "Date", "Time", "Message", "Transaction Num", "Cardholder", "Charge", "Card", "Bank Approval Code", "Bank Transaction ID", "INVOICE", "ISSCONF", "ISSNAME", "ISO Code", "AVS Response Code", "CAVV Result Code",);
+  $column = array("Order ID", "Netlink ID", "Full Name", "Date", "Duration", "Time", "Message", "Transaction Num", "Cardholder", "Charge", "Card", "Bank Approval Code", "Bank Transaction ID", "INVOICE", "ISSCONF", "ISSNAME", "ISO Code", "AVS Response Code", "CAVV Result Code",);
   $fix = array("Response Code", "Result", "Trans Name", "f4l4");
   $column = array_merge($column, $fix);
   fputcsv($fp, $column);
@@ -207,6 +213,7 @@ if (isset($_POST["getCSV"])) {
   <div class="row">
     <div class="col align-self-start">
     <p><?php echo $dateline . " Sum: "?><b><?php echo "$" . number_format((float)$sum, 2, '.',''); ?></b></p>
+    <p><?php echo $dateline . " Duration: "?><b><?php echo "$" . number_format((float)$sum, 2, '.',''); ?></b></p>
     </div>
     <div class="col-md-4 align-self-end">
       <input type="submit" name="getCSV" value="Download CSV" class="btn btn-md btn-danger btn-">
@@ -224,6 +231,7 @@ if (isset($_POST["getCSV"])) {
             <th>Full Name</th>
             <th>Date</th>
             <th>Time</th>
+            <th>Duration</th>
             <th>Message</th>
             <th>TRXN Num</th>
             <th>Cardholder</th>
@@ -252,6 +260,7 @@ if (isset($_POST["getCSV"])) {
           <td><?php echo $row["full_name"]; ?></td>
           <td><?php echo $row["date_stamp"]; ?></td>
           <td><?php echo $row["time_stamp"]; ?></td>
+          <td><?php echo "0"; ?></td>
           <td><?php echo $row["message"]; ?></td>
           <td><?php echo $row["txn_num"]; ?></td>
           <td><?php echo $row["cardholder"]; ?></td>

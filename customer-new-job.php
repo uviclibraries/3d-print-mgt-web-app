@@ -49,9 +49,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       $explode_len = count($file_array);
       //invalid file types should already be handled in form via js script with exhaustive list of permitted file types. This exception is a safeguard, containing a non-exhaustive array of prohibited file types.
-      if (!in_array(strtolower($ext), ["stl", "STL", "obj", "3mf", "gcode","svg", "SVG", "pdf", "PDF", "png","PNG","txt", "doc", "docx", "jpg","JPG", "JPEG", "JPG"])) {
-          throw new RuntimeException('Invalid file format.');
+      if (email_job_type == "large_format_print"){
+        if(!in_array(strtolower($ext), ["svg", "SVG", "pdf", "PDF", "png","PNG","txt", "doc", "docx", "jpg","JPG", "JPEG", "JPG"]))
+          {throw new RuntimeException('Invalid file format.');}
       }
+        
+      else if(!in_array(strtolower($ext), ["stl", "STL", "obj", "3mf", "gcode","svg", "SVG", "pdf", "PDF", "png","PNG","txt", "doc", "docx", "jpg","JPG", "JPEG", "JPG"]))
+        {throw new RuntimeException('Invalid file format.');}
+      
+      
 
       // You should name it uniquely.
       // DO NOT USE $_FILES["3d_model"]['name'] WITHOUT ANY VALIDATION !!
@@ -343,19 +349,28 @@ header("location: customer-dashboard.php");
           laser_div.style.display = "none";
           large_format_div.style.display = "none";
 
+          allowedExtensions_3d_laser = ".stl, .svg, .obj, .pdf (Max 200M)";
+          allowedExtensions_large_format = ".stl, .svg, .pdf (Max 200M)";
+
           // Show the selected div
           switch(jobType) {
             case "3d_print":
               document.getElementById("header-job-type").innerText = "3D Print";
               print_div.style.display = "block";
+              document.getElementById("allowedExtensions").innerText = allowedExtensions_3d_laser;
+              document.getElementById("allowedExtensions_invalid").innerText = allowedExtensions_3d_laser;
               break;
             case "laser_cut":
               document.getElementById("header-job-type").innerText = "Laser Cut";
               laser_div.style.display = "block";
+              document.getElementById("allowedExtensions").innerText = allowedExtensions_3d_laser;
+              document.getElementById("allowedExtensions_invalid").innerText = allowedExtensions_3d_laser;
               break;
             case "large_format":
               document.getElementById("header-job-type").innerText = "Large Format";
               large_format_div.style.display = "block";
+              document.getElementById("allowedExtensions").innerText = allowedExtensions_large_format;
+              document.getElementById("allowedExtensions_invalid").innerText = allowedExtensions_large_format;
               break;
           }
 
@@ -498,19 +513,20 @@ header("location: customer-dashboard.php");
 
 
       <h3 class="mb-3">Upload Model or Graphic</h3>
-      <small class="text-muted">Accepted file types: .stl, .svg, .obj, .pdf (Max 200M)</small>
+      <small class="text-muted">Accepted file types: <span id="allowedExtensions"></span></small>
       <br>    
         <input type="file" id="myFile" name="3d_model" required>
       <br>
       <!--Invalid files handled by following script-->
-      <div id="invalid-file-extension" style="display: none;">
-        <br>Please select a file with a valid extension: .stl, .svg, .obj, .pdf.
+      <div id="invalid-file-extension" style="display: none; color:red;">
+        <br>Please select a file with a valid extension: <span id="allowedExtensions_invalid"></span>
       </div>
       <hr class="mb-6">
       
       <script>
       document.getElementById('myFile').addEventListener('change', function() {
-        var allowedExtensions = ['stl', 'svg', 'obj', 'pdf','STL', 'SVG', 'OBJ', 'PDF']; 
+        var job_type = document.getElementById('large_format_print').checked ? "large_format" : "laser_3d" ;
+        var allowedExtensions = document.getElementById('large_format_print').checked ? ['stl', 'svg','pdf','STL', 'SVG', 'PDF'] : ['stl', 'svg', 'obj', 'pdf','STL', 'SVG', 'OBJ', 'PDF'];
         var fileName = this.value;
         var extension = fileName.split('.').pop().toLowerCase();
         var isValidFile = allowedExtensions.includes(extension);
@@ -870,42 +886,12 @@ header("location: customer-dashboard.php");
     </div>
     <!-- Laser Cut block end-->
 
-    <script>
-      function validateMeasurements() {
-        var unit = document.getElementById('unit_selector').value;
-        var width = document.getElementById('width_input').value;
-        var length = document.getElementById('length_input').value;
 
-        var maxDimension = unit === 'cm' ? 91.44 : 36; // 36 inches in cm
-        console.log("unit: " + unit + "; length: " + length + ";width" + width);
-
-        //width = unit === 'cm' ? convertToInches(width) : parseFloat(width);
-        //length = unit === 'cm' ? convertToInches(length) : parseFloat(length);
-        //console.log("converted length: " + length + "; width" + width);
- 
-        // Check if both measurements exceed the max dimension
-        if (width > maxDimension && length > maxDimension) {
-          // Update and show warning message
-          document.getElementById('measurement_warning').innerHTML = 
-            `Both width and length cannot exceed ${maxDimension} ${unit}. Please decrease one of the measurements.`;
-          document.getElementById('measurement_warning').style.display = 'block';
-        } else {
-          // Hide warning message
-          document.getElementById('measurement_warning').style.display = 'none';
-        }
-      }
-
-      function convertToInches(cm) {
-        return cm ? parseFloat(cm) / 2.54 : 0;  // 1 cm = 0.393701 inches
-      }
-
-      // function convertToCentimeters(inches) {
-      //   return inches ? parseFloat(inches) * 2.54 : 0;  // 1 inch = 2.54 cm
-      // }
-    </script>
 
 
     <!-- Large Format Print block start-->
+
+
     <div id="large_format_specs" class="col-md-12 order-md-1">
       <h3 class="mb-3">Large Format Print Specifications</h3>
       <p>Dimensions
@@ -919,21 +905,24 @@ header("location: customer-dashboard.php");
       </p>
       <div class="row"> 
         <div class="col-md-3 mb-3">
-          <label for="length">Length</label>
-          <input type="text" id="length_input" name="length_input" placeholder="Length" oninput="validateMeasurements()" style="width: 200px;" required >
-        </div>
-
-        <div class="col-md-3 mb-3">
-          <label for="width">Width</label>
-          <input type="text" id="width_input" name="width_input" placeholder="Width" oninput="validateMeasurements()" style="width: 200px;" required>
+          <label for="length_input">Length <span class="error"></span></label>
+          <input type="number" step="0.01" id="length_input" name="length_input" oninput="validateDimensions()" placeholder="Length" style="width: 200px;" required >
           <div class="invalid-feedback">
-            Please select a unit of measurement.
+            Please enter the desired length.
           </div>
         </div>
 
         <div class="col-md-3 mb-3">
-          <label for="scale">Unit</label><br>
-          <select id="unit_selector" name="unit_measurement" style="width: 100px;" onchange="validateMeasurements()"> <!-- Adjust the width as needed -->
+          <label for="width_input">Width</label>
+          <input type="number" step="0.01" id="width_input" name="width_input" oninput="validateDimensions()" placeholder="Width" style="width: 200px;" required>
+          <div class="invalid-feedback">
+            Please enter the desired width.
+          </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+          <label for="unit_selector">Unit</label><br>
+          <select id="unit_selector" name="unit_measurement" onchange="validateDimensions()" style="width: 100px;"> <!-- Adjust the width as needed -->
             <option value="in">in</option>
             <option value="cm">cm</option>
           </select>
@@ -942,8 +931,35 @@ header("location: customer-dashboard.php");
           </div>
         </div>
       </div>
-      <div id="measurement_warning" style="display: none;">
+      <div><span id="dimension_warning"></span>
       </div>
+
+      <script>
+        function validateDimensions(){
+          console.log('validating dimensions');
+          var unit = document.getElementById('unit_selector').value;
+          var width = document.getElementById('width_input').value;
+          var length = document.getElementById('length_input').value;
+          var dimension_warning = document.getElementById("dimension_warning");
+
+          var maxDimension = unit === 'cm' ? 91.44 : 36; // 36 inches in cm
+          console.log("unit: " + unit + "; length: " + length + ";width" + width);
+
+          if (width > maxDimension && length > maxDimension) {
+            console.log('too large');
+            dimension_warning.textContent = `Both width and length cannot exceed ${maxDimension} ${unit}. Please decrease one of the measurements.`;
+            document.getElementById('length_input').value = "";
+            document.getElementById('width_input').value = "";
+            // if(event.type === "submit") {
+            //     event.preventDefault(); // Prevent form submission
+            // }
+          }
+          else{
+            console.log("not too large");
+            dimension_warning.textContent = "";
+          }
+        }
+        </script><!--Prevent oversize prints-->
 
       <div>
         <hr class="mb-4">
@@ -958,6 +974,7 @@ header("location: customer-dashboard.php");
       </div>
     </div>
 
+    
     <!-- Large Format Print block end-->
     
     <div id="submit_section" class="col-md-12 order-md-1"> 
@@ -973,7 +990,7 @@ header("location: customer-dashboard.php");
 
           <hr class="mb-4">
           <center>
-              <form action="customer-dashboard.php">
+              <form id="new_job_form" action="customer-dashboard.php">
                   <button class="btn btn-primary btn-lg" type="submit">Submit</button>
               </form>
           </center>
