@@ -84,6 +84,45 @@ foreach ($data as $job) {
 }
 
 
+$stm = $conn->query("SELECT id, job_name, status, submission_date, priced_date, paid_date, printing_date, completed_date, cancelled_date, hold_date, delivered_date FROM web_job INNER JOIN large_format_print_job ON id=large_format_print_id WHERE netlink_id = '$user' ORDER BY id DESC");
+$data = $stm->fetchAll();
+//split results by Status
+$lf_submitted=[];
+$lf_pending_payment = [];
+$lf_onhold=[];
+$lf_paid = [];
+$lf_inprogress_completed =[];
+$lf_delivered=[];
+$lf_cancelled = [];
+$lf_archived=[];
+
+foreach ($data as $job) {
+  if($job['status']=="submitted"){
+    $lf_submitted[] = $job;
+  }
+  elseif ($job['status'] == "pending payment") {
+    $lf_pending_payment[] = $job;
+  }
+  elseif ($job['status'] == "on hold") {
+    $lf_onhold[] = $job;
+  }
+  elseif ($job['status'] == "paid") {
+    $lf_paid[] = $job;
+  }
+  elseif ($job['status'] == "completed" || $job['status'] == "printing") {
+    $lf_inprogress_completed[] = $job;
+  }
+  elseif ($job['status'] == "delivered"){
+    $lf_delivered[] = $job;
+  } 
+  elseif($job['status']=="cancelled"){
+    $lf_cancelled[] = $job;
+  }
+  elseif($job['status']=="archived"){
+    $lf_archived[] = $job;
+  }
+}
+
 ?>
 <!doctype html>
 <html lang="en">
@@ -152,14 +191,10 @@ foreach ($data as $job) {
     <p><b><p><b>If you encounter a problem or have questions, contact: <a href=“mailto:dscommons@uvic.ca”>dscommons@uvic.ca</a></b></p>
   </div>
 
-  <div class="row">
-    <div class="col-md-4 order-md-2 mb-4">
-      <h4 class="d-flex justify-content-between align-items-center mb-3">
-    </div>
-
+  <!-- <div class="row" style="border:solid;"> -->
+   
     <div class="col-md-12 order-md-1">
       <div class="py-5 text-center">
-
         <div class="row">
           <div class="btn-auto mr-auto">
           <a href="customer-new-job.php">
@@ -167,33 +202,49 @@ foreach ($data as $job) {
           </a>
           </div>
 
-        <div class="btn-auto mr-auto">
-          <a href="https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/">
-            <button class="btn btn-primary btn-lg" type="submit" style="background-color:#5e8669;">3D Print FAQ</button>
-          </a>
+          <div class="btn-auto mr-auto">
+            <?php if ($user_type == 0){ ?>
+              <a href="admin-dashboard.php">
+                <button class="btn btn-primary btn-lg" type="submit">Admin Dashboard</button>
+              </a>
+            <?php } else{ ?>
+              <a href=" mailto:dscommons@uvic.ca?subject=3DAppFeedback">
+                <button class="btn btn-primary btn-lg" type="submit">Feedback</button>
+              </a>
+            <?php }  ?>
+          </div>
         </div>
-
-        <div class="btn-auto mr-auto">
-          <a href="https://onlineacademiccommunity.uvic.ca/dsc/how-to-laser-cut/">
-            <button class="btn btn-primary btn-lg" type="submit" style="background-color:#5e8669;">Laser Cut FAQ</button>
-          </a>
-        </div>
-
-        <div class="btn-auto mr-auto">
-          <?php if ($user_type == 0){ ?>
-            <a href="admin-dashboard.php">
-              <button class="btn btn-primary btn-lg" type="submit">Admin Dashboard</button>
-            </a>
-          <?php } else{ ?>
-            <a href=" mailto:dscommons@uvic.ca?subject=3DAppFeedback">
-              <button class="btn btn-primary btn-lg" type="submit">Feedback</button>
-            </a>
-          <?php }  ?>
-        </div>
-        
       </div>
-
     </div>
+  <!-- </div> -->
+
+  <!-- <div class="row" style="border:solid;"> -->
+    <div class="col-md-12 order-md-1">
+
+      <div class="py-5 text-center">
+        <div class="row">
+          <div class="btn-auto mr-auto">
+            <a href="https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/">
+              <button class="btn btn-primary btn-lg" type="submit" style="background-color:#5e8669;">3D Print FAQ</button>
+            </a>
+          </div>
+
+          <div class="btn-auto mr-auto">
+            <a href="https://onlineacademiccommunity.uvic.ca/dsc/how-to-laser-cut/">
+              <button class="btn btn-primary btn-lg" type="submit" style="background-color:#5e8669;">Laser Cut FAQ</button>
+            </a>
+          </div>
+
+          <div class="btn-auto mr-auto">
+            <a href="https://onlineacademiccommunity.uvic.ca/dsc/tools-tech/large-format-printer-and-scanner/">
+              <button class="btn btn-primary btn-lg" type="submit" style="background-color:#5e8669;">Large Format Print FAQ</button>
+            </a>
+          </div>
+        </div>
+    </div>
+  </div>
+
+
 <hr class="mb-12">
 
       <!-- 3d print table -->
@@ -452,6 +503,135 @@ foreach ($data as $job) {
         </table>
       </div>
         <hr class="mb-12">
+
+
+    <h2>Large Format Print Jobs</h2>
+      <div class="table-responsive">
+        <table class="table table-striped table-md">
+        <tbody>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Last Updated</th>
+              </tr>
+            </thead>
+
+            <!--submitted jobs-->
+            <?php if (!empty($lf_submitted)) {
+               foreach ($lf_submitted as $row) {
+            ?>
+            <tr>
+              <td><a href="customer-large-format-print-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+              <td><?php echo $row["status"]; ?></td>
+              <td><?php echo $row["submission_date"]; ?></td>
+            </tr>
+            <?php
+            }
+            }
+
+            //pending payment jobs
+            if (!empty($lf_pending_payment)) {
+               foreach ($lf_pending_payment as $row) {
+            ?>
+            <tr>
+              <td><a href="customer-large-format-print-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+              <td><?php echo $row["status"]; ?></td>
+              <td><?php echo $row["priced_date"]; ?></td>
+            </tr>
+            <?php
+            }
+            }
+
+            //pending payment jobs
+            if (!empty($lf_onhold)) {
+               foreach ($lf_onhold as $row) {
+            ?>
+            <tr>
+              <td><a href="customer-large-format-print-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+              <td><?php echo $row["status"]; ?></td>
+              <td><?php echo $row["hold_date"]; ?></td>
+            </tr>
+            <?php
+            }
+            }
+
+            //Paid jobs
+            if (!empty($lf_paid)) {
+               foreach ($lf_paid as $row) {
+              ?>
+              <tr>
+                <td><a href="customer-large-format-print-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+                <td><?php echo $row["status"]; ?></td>
+                <td><?php echo $row["paid_date"]; ?></td>
+              </tr>
+              <?php
+              }
+            }
+            
+            //In Progress (printing and completed) jobs
+            if (!empty($lf_inprogress_completed)) {
+               foreach ($lf_inprogress_completed as $row) {
+              ?>
+              <tr>
+                <td><a href="customer-large-format-print-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+                <td>in progress</td>
+                
+                <?php if ($row["status"] == "printing") { ?>
+                <td><?php echo $row["printing_date"]; ?></td>
+              <?php } else { ?>
+                <td><?php echo $row["completed_date"]; ?></td>
+              <?php } ?>
+              </tr>
+              <?php
+              }
+            }
+
+            //Delivered jobs
+            if (!empty($lf_delivered)) {
+              foreach ($lf_delivered as $row) {
+              ?>
+              <tr>
+                <td><a href="customer-large-format-print-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+                <td>ready for pickup</td>
+                <td><?php echo $row["delivered_date"]; ?></td>
+              </tr>
+              <?php
+              }
+            }
+
+            //Cancelled jobs
+            if (!empty($lf_cancelled)) {
+               foreach ($lf_cancelled as $row) {
+              ?>
+              <tr>
+                <td><a href="customer-large-format-print-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+                <td><?php echo $row["status"]; ?></td>
+                <td><?php echo $row["cancelled_date"]; ?></td>
+              </tr>
+              <?php
+              }
+            }
+
+            //archived jobs
+            if (!empty($lf_archived)) {
+               foreach ($lf_archived as $row) {
+              ?>
+              <tr>
+                <td><a href="customer-large-format-print-job-information.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+                <td><?php echo $row["status"]; ?></td>
+                <td><?php echo $row["delivered_date"]; ?></td>
+              </tr>
+              <?php
+              }
+            }
+          ?>
+           </tbody>
+        </table>
+      </div>
+        <hr class="mb-12">
+
+
 
         <a class="btn btn-md btn-block" href="?logout=" role="button">Log Out</a>
 
