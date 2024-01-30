@@ -22,7 +22,7 @@ $status = "submitted"; //declaring value that the job will take when the submiss
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $final_file_name = $job['model_name']; // Default to existing file name
-  $secondary_file_name = 'NA';
+  // $secondary_file_name = 'NA';
   try {
 
       // Undefined | Multiple Files | $_FILES Corruption Attack
@@ -38,7 +38,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           case UPLOAD_ERR_OK:
             // You should also check filesize here.
             if ($_FILES["3d_model"]['size'] > 200000000) {
-
                 throw new RuntimeException('Exceeded filesize limit.');
             }
 
@@ -56,10 +55,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // DO NOT USE $_FILES["3d_model"]['name'] WITHOUT ANY VALIDATION !!
             // On this example, obtain safe unique name from its binary data.
             $date = new DateTime();
-            $hash_name = sprintf("%s-%s.%s", sha1_file($_FILES["3d_model"]['tmp_name']),
-            $date->getTimestamp(),
-            $ext);
-            $savefilename = sprintf('./uploads/%s', $hash_name,);
+            $final_file_name = sprintf("%s-%s.%s", sha1_file($_FILES["3d_model"]['tmp_name']),
+            $date->getTimestamp(),$ext);
+            $savefilename = sprintf('./uploads/%s', $final_file_name,);
             if (!move_uploaded_file(
                 $_FILES["3d_model"]['tmp_name'],
                 $savefilename
@@ -69,14 +67,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             echo 'File is uploaded successfully.';
             break;
+
           case UPLOAD_ERR_NO_FILE:
               //Copy over the modified art file if the user didn't upload new art.
-              if (strcasecmp(trim($final_file_name), trim($job['model_name'])) == 0) {
-                $secondary_file_name = $job['model_name_2'];
+              if (!empty(trim($job['model_name_2']))) {
+                  $final_file_name = trim($job['model_name_2']);
+              } else {
+                  // Optionally, handle the case when $job['model_name_2'] is empty
+                  // For example, set $final_file_name to a default value or keep it as it is
               }
-              echo "Final: '{$final_file_name}' <br>Job: '{$job['model_name']}' <br>";
-              echo $final_file_name .'<br>';
-              echo 'File is uploaded successfully.';
+
+              // echo "Final: '{$final_file_name}' <br>Job: '{$job['model_name']}' <br>";
+              // echo $final_file_name .'<br>';
+              // echo 'File is uploaded successfully.';
               break;
           case UPLOAD_ERR_INI_SIZE:
           case UPLOAD_ERR_FORM_SIZE:

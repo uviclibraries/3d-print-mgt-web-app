@@ -49,13 +49,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       $explode_len = count($file_array);
       //invalid file types should already be handled in form via js script with exhaustive list of permitted file types. This exception is a safeguard, containing a non-exhaustive array of prohibited file types.
-      if (email_job_type == "large_format_print"){
+      if ($email_job_type == "large_format_print"){
+        // echo $_POST['job_type'];;
         if(!in_array(strtolower($ext), ["svg", "SVG", "pdf", "PDF", "png","PNG","txt", "doc", "docx", "jpg","JPG", "JPEG", "JPG"]))
           {throw new RuntimeException('Invalid file format.');}
       }
         
-      else if(!in_array(strtolower($ext), ["stl", "STL", "obj", "3mf", "gcode","svg", "SVG", "pdf", "PDF", "png","PNG","txt", "doc", "docx", "jpg","JPG", "JPEG", "JPG"]))
-        {throw new RuntimeException('Invalid file format.');}
+      else {
+        if(!in_array(strtolower($ext), ["stl", "STL", "obj", "3mf", "gcode","svg", "SVG", "pdf", "PDF", "png","PNG","txt", "doc", "docx", "jpg","JPG", "JPEG", "JPG"]))
+        {
+          // echo $_POST['job_type'];;
+          throw new RuntimeException('Invalid file format.');}
+      }
       
       
 
@@ -123,7 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     die('No web job entry for username {$user}');
   }
 
-  if($_POST["job_type"] == "3D Print"){
+  if($_POST["job_type"] == "3d_print"){
     // Use the extracted id to insert job information to the 3d print table
 
     $stmt = $conn->prepare("INSERT INTO 3d_print_job (3d_print_id, model_name, infill, scale, layer_height, supports, copies, material_type, comments) VALUES (:3d_print_id, :model_name, :infill, :scale, :layer_height, :supports, :copies, :material_type, :comments)");
@@ -161,6 +166,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Check if the unit of measurement is 'cm' and convert if necessary
+    echo 'try to convert large format print';
     $widthInches = ($_POST["unit_measurement"] == 'cm') ? convertToInches($_POST["width_input"]) : $_POST["width_input"];
     $lengthInches = ($_POST["unit_measurement"] == 'cm') ? convertToInches($_POST["length_input"]) : $_POST["length_input"];
 
@@ -303,7 +309,7 @@ header("location: customer-dashboard.php");
       <h3 class="mb-2">Job Type</h3>
       <div class="d-block my-3">
         <div class="custom-control custom-radio">
-          <input id="3d_print" name="job_type" value="3D Print" type="radio" class="custom-control-input" onclick="showPrintInfo('3d_print')" required>
+          <input id="3d_print" name="job_type" value="3d_print" type="radio" class="custom-control-input" onclick="showPrintInfo('3d_print')" required>
           <label class="custom-control-label" for="3d_print">3D Print</label>
         </div>
         <div class="custom-control custom-radio">
@@ -345,6 +351,10 @@ header("location: customer-dashboard.php");
           var submit = document.getElementById("submit_section");
           // Hide all divs initially
 
+          
+          var lengthInput = document.getElementById('length_input');
+          var widthInput = document.getElementById('width_input');
+
           print_div.style.display = "none";
           laser_div.style.display = "none";
           large_format_div.style.display = "none";
@@ -359,18 +369,27 @@ header("location: customer-dashboard.php");
               print_div.style.display = "block";
               document.getElementById("allowedExtensions").innerText = allowedExtensions_3d_laser;
               document.getElementById("allowedExtensions_invalid").innerText = allowedExtensions_3d_laser;
+
+              lengthInput.removeAttribute('required');
+              widthInput.removeAttribute('required');
               break;
             case "laser_cut":
               document.getElementById("header-job-type").innerText = "Laser Cut";
               laser_div.style.display = "block";
               document.getElementById("allowedExtensions").innerText = allowedExtensions_3d_laser;
               document.getElementById("allowedExtensions_invalid").innerText = allowedExtensions_3d_laser;
+
+              lengthInput.removeAttribute('required');
+              widthInput.removeAttribute('required');
               break;
             case "large_format":
               document.getElementById("header-job-type").innerText = "Large Format";
               large_format_div.style.display = "block";
               document.getElementById("allowedExtensions").innerText = allowedExtensions_large_format;
               document.getElementById("allowedExtensions_invalid").innerText = allowedExtensions_large_format;
+
+              lengthInput.setAttribute('required', '');
+              widthInput.setAttribute('required', '');
               break;
           }
 
@@ -943,10 +962,10 @@ header("location: customer-dashboard.php");
           var dimension_warning = document.getElementById("dimension_warning");
 
           var maxDimension = unit === 'cm' ? 91.44 : 36; // 36 inches in cm
-          console.log("unit: " + unit + "; length: " + length + ";width" + width);
+          // console.log("unit: " + unit + "; length: " + length + ";width" + width);
 
           if (width > maxDimension && length > maxDimension) {
-            console.log('too large');
+            // console.log('too large');
             dimension_warning.textContent = `Both width and length cannot exceed ${maxDimension} ${unit}. Please decrease one of the measurements.`;
             document.getElementById('length_input').value = "";
             document.getElementById('width_input').value = "";
@@ -955,7 +974,7 @@ header("location: customer-dashboard.php");
             // }
           }
           else{
-            console.log("not too large");
+            // console.log("not too large");
             dimension_warning.textContent = "";
           }
         }
@@ -990,7 +1009,7 @@ header("location: customer-dashboard.php");
 
           <hr class="mb-4">
           <center>
-              <form id="new_job_form" action="customer-dashboard.php">
+              <form action="customer-dashboard.php">
                   <button class="btn btn-primary btn-lg" type="submit">Submit</button>
               </form>
           </center>
@@ -1056,6 +1075,7 @@ header("location: customer-dashboard.php");
       }
     });
   </script>
+
 
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
       <script>window.jQuery || document.write('<script src="/docs/4.5/assets/js/vendor/jquery.slim.min.js"><\/script>')</script><script src="/docs/4.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-1CmrxMRARb6aLqgBO7yyAxTOQE2AKb9GfXnEo760AUcUmFx3ibVJJAzGytlQcNXd" crossorigin="anonymous"></script>
