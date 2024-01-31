@@ -57,6 +57,30 @@ $stm = $conn->query("SELECT web_job.id AS id, web_job.job_name AS job_name, web_
 $laser_job7 = $stm->fetchAll();
 
 
+//pull only large format strings from web_job
+
+$stm = $conn->query("SELECT web_job.id AS id, web_job.job_name AS job_name, web_job.status AS status, web_job.submission_date AS submission_date, web_job.job_purpose AS job_purpose, users.name AS name FROM web_job INNER JOIN users ON web_job.netlink_id=users.netlink_id INNER JOIN large_format_print_job ON web_job.id=large_format_print_job.large_format_print_id WHERE web_job.status = 'submitted' ORDER BY web_job.submission_date ASC;");
+$largeformat_job1 = $stm->fetchAll();
+
+$stm = $conn->query("SELECT web_job.id AS id, web_job.job_name AS job_name, web_job.status AS status, web_job.hold_date AS hold_date, web_job.job_purpose AS job_purpose, users.name AS name FROM web_job INNER JOIN users ON web_job.netlink_id=users.netlink_id INNER JOIN large_format_print_job ON web_job.id=large_format_print_job.large_format_print_id WHERE web_job.status = 'on hold' ORDER BY web_job.hold_date ASC;");
+$largeformat_job6 = $stm->fetchAll();
+
+$stm = $conn->query("SELECT web_job.id AS id, web_job.job_name AS job_name, web_job.status AS status, web_job.priced_date AS priced_date, web_job.job_purpose AS job_purpose, users.name AS name FROM web_job INNER JOIN users ON web_job.netlink_id = users.netlink_id INNER JOIN large_format_print_job ON web_job.id=large_format_print_job.large_format_print_id WHERE web_job.status = 'pending payment' ORDER BY web_job.priced_date ASC");
+$largeformat_job2 = $stm->fetchAll();
+
+$stm = $conn->query("SELECT web_job.id AS id, web_job.job_name AS job_name, web_job.status AS status, web_job.paid_date AS paid_date, web_job.job_purpose AS job_purpose, users.name AS name FROM web_job INNER JOIN users ON web_job.netlink_id = users.netlink_id INNER JOIN large_format_print_job ON web_job.id=large_format_print_job.large_format_print_id WHERE web_job.status = 'paid' ORDER BY web_job.paid_date ASC");
+$largeformat_job3 = $stm->fetchAll();
+
+$stm = $conn->query("SELECT web_job.id AS id, web_job.job_name AS job_name, web_job.status AS status, web_job.printing_date AS printing_date, web_job.job_purpose AS job_purpose, users.name AS name FROM web_job INNER JOIN users ON web_job.netlink_id = users.netlink_id INNER JOIN large_format_print_job ON web_job.id=large_format_print_job.large_format_print_id WHERE web_job.status = 'printing' ORDER BY web_job.printing_date ASC");
+$largeformat_job4 = $stm->fetchAll();
+
+$stm = $conn->query("SELECT web_job.id AS id, web_job.job_name AS job_name, web_job.status AS status, web_job.completed_date AS completed_date, web_job.job_purpose AS job_purpose, users.name AS name FROM web_job INNER JOIN users ON web_job.netlink_id = users.netlink_id INNER JOIN large_format_print_job ON web_job.id=large_format_print_job.large_format_print_id WHERE web_job.status = 'completed' ORDER BY web_job.completed_date ASC");
+$largeformat_job5 = $stm->fetchAll();
+
+$stm = $conn->query("SELECT web_job.id AS id, web_job.job_name AS job_name, web_job.status AS status, web_job.delivered_date AS delivered_date, web_job.job_purpose AS job_purpose, users.name AS name FROM web_job INNER JOIN users ON web_job.netlink_id = users.netlink_id INNER JOIN large_format_print_job ON web_job.id=large_format_print_job.large_format_print_id WHERE web_job.status = 'delivered' ORDER BY web_job.delivered_date ASC");
+$largeformat_job7 = $stm->fetchAll();
+
+
 
 //3d_printing jobs
 
@@ -92,6 +116,7 @@ foreach ($print_job7 as $job) {
 }
 
 
+//laser jobs
 $l_not_priced = [];
 $l_on_hold = [];
 $l_pending_payment = [];
@@ -121,6 +146,38 @@ foreach ($laser_job5 as $job) {
 }
 foreach ($laser_job7 as $job) {
   $l_delivered[] = $job;
+}
+
+//Large Format Print jobs
+$lf_not_priced = [];
+$lf_on_hold = [];
+$lf_pending_payment = [];
+$lf_paid = [];
+$lf_printing = [];
+$lf_completed = [];
+$lf_delivered = [];
+
+
+foreach ($largeformat_job1 as $job) {
+  $lf_not_priced[] = $job;
+}
+foreach ($largeformat_job6 as $job) {
+  $lf_on_hold[] = $job;
+}
+foreach ($largeformat_job2 as $job) {
+  $lf_pending_payment[] = $job;
+}
+foreach ($largeformat_job3 as $job) {
+  $lf_paid[] = $job;
+}
+foreach ($largeformat_job4 as $job) {
+  $lf_printing[] = $job;
+}
+foreach ($largeformat_job5 as $job) {
+  $lf_completed[] = $job;
+}
+foreach ($largeformat_job7 as $job) {
+  $lf_delivered[] = $job;
 }
 
 ?>
@@ -274,6 +331,7 @@ foreach ($laser_job7 as $job) {
 
 <h2 id="3d-print-jobs">3D Print Jobs</h2>
   <p><a href="#laser-cut-jobs" >(Jump to Laser Cut jobs)</a></p>
+  <p><a href="#large-format-print-jobs" >(Jump to Large Format Print jobs)</a></p>
   <button class="accordion active">Submitted</button>
     <div class="panel" style="display:block;">
       <div class="table-responsive">
@@ -508,7 +566,7 @@ foreach ($laser_job7 as $job) {
 
 <h2><br><br><h2 id="laser-cut-jobs">Laser Cut Jobs</h2>
   <p><a href="#3d-print-jobs" >(Jump to 3D Print jobs)</a></p>
-
+  <p><a href="#large-format-print-jobs" >(Jump to Large Format Print jobs)</a></p>
   <button class="accordion active">Submitted</button>
     <div class="panel" style="display:block;">
       <div class="table-responsive">
@@ -754,8 +812,247 @@ foreach ($laser_job7 as $job) {
       </div>
     </div>
 
-        <hr class="mb-12">
-        <a class="btn btn-md btn-block" href="?logout=" role="button">Log Out</a>
+<!--Large Format Print jobs-->
+  <h2 id="large-format-print-jobs">Large Format Print Jobs</h2>
+  <p><a href="#3d-print-jobs" >(Jump to 3D Print jobs)</a></p>
+  <p><a href="#laser-cut-jobs" >(Jump to Laser Cut jobs)</a></p>
+  <button class="accordion active">Submitted</button>
+    <div class="panel" style="display:block;">
+      <div class="table-responsive">
+        <table id='d_not_priced' class="table table-striped table-md">
+          <thead>
+            <tr>
+              <!-- table header-->
+              <th style="width:95px;">Name</th>
+              <th style="width:95px;">Job</th>
+              <th style="width:95px;">Submission Date</th>
+              <th style="width:95px;">Status</th>
+              <th style="width:20px;">Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+          <?php
+          //Grab each item from each array
+          foreach($lf_not_priced as $row){
+          ?>
+          <tr>
+            <td style="width:95px;"><?php echo $row["name"]; ?></td>
+            <td style="width:95px;"><a href="admin-large-format-print-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+            <td style="width:95px;"><?php echo $row["submission_date"]; ?></td>
+            <td style="width:95px;"><?php echo $row["status"]; ?></td>
+            <td style="width:20px;"><?php echo $row["job_purpose"]; ?></td>
+          </tr>
+          <?php
+          } ?>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <button class="accordion active">On Hold</button>
+    <div class="panel" style="display:block;">
+      <div class="table-responsive">
+        <table id='d_on_hold' class="table table-striped table-md">
+          <thead>
+            <tr>
+              <!-- table header-->
+              <th style="width:95px;">Name</th>
+              <th style="width:95px;">Job</th>
+              <th style="width:95px;">Hold Date</th>
+              <th style="width:95px;">Status</th>
+              <th style="width:20px;">Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+          <?php
+          //Grab each item from each array
+          foreach($lf_on_hold as $row){
+          ?>
+          <tr>
+            <td style="width:95px;"><?php echo $row["name"]; ?></td>
+            <td style="width:95px;"><a href="admin-large-format-print-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+            <td style="width:95px;"><?php echo $row["hold_date"]; ?></td>
+            <td style="width:95px;"><?php echo $row["status"]; ?></td>
+            <td style="width:20px;"><?php echo $row["job_purpose"]; ?></td>
+          </tr>
+          <?php
+          } ?>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  
+  
+  <button class="accordion">Pending Payment</button>
+    <div class="panel">
+      <div class="table-responsive">
+        <table id='lf_pending_payment' class="table table-striped table-md">
+          <thead>
+            <tr>
+              <!-- table header-->
+              <th style="width:95px;">Name</th>
+              <th style="width:95px;">Job</th>
+              <th style="width:95px;">Priced Date</th>
+              <th style="width:95px;">Status</th>
+              <th style="width:20px;">Purpose</th>
+              <!--  -->
+            </tr>
+          </thead>
+          <tbody>
+            <?php foreach ($lf_pending_payment as $row) {
+            ?>
+            <tr>
+              <td style="width:95px;"><?php echo $row["name"]; ?></td>
+              <td style="width:95px;"><a href="admin-large-format-print-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+              <td style="width:95px;"><?php echo $row["priced_date"]; ?></td>
+              <td style="width:95px;"><?php echo $row["status"]; ?></td>
+              <td style="width:20px;"><?php echo $row["job_purpose"]; ?></td>
+
+            </tr>
+            <?php
+            }?>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  
+  <button class="accordion active">Paid</button>
+    <div class="panel" style="display:block;">
+      <div class="table-responsive">
+        <table id='lf_paid' class="table table-striped table-md">
+          <thead>
+            <tr>
+              <!-- table header-->
+              <th style="width:95px;">Name</th>
+              <th style="width:95px;">Job</th>
+              <th style="width:95px;">Payment Date</th>
+              <th style="width:95px;">Status</th>
+              <th style="width:20px;">Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php foreach ($lf_paid as $row) {
+            ?>
+            <tr>
+              <td style="width:95px;"><?php echo $row["name"]; ?></td>
+                <td><a href="admin-large-format-print-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+              <td style="width:95px;"><?php echo $row["paid_date"]; ?></td>
+              <td style="width:95px;"><?php echo $row["status"]; ?></td>
+              <td style="width:20px;"><?php echo $row["job_purpose"]; ?></td>
+              
+            </tr>
+            <?php
+            }?>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  
+  <button class="accordion active">Printing</button>
+    <div class="panel" style="display:block;">
+      <div class="table-responsive">
+        <table id='lf_printing' class="table table-striped table-md">
+          <thead>
+            <tr>
+              <!-- table header-->
+              <th style="width:95px;">Name</th>
+              <th style="width:95px;">Job</th>
+              <th style="width:95px;">Print Start Date</th>
+              <th style="width:95px;">Status</th>
+              <th style="width:20px;">Purpose</th>
+              
+            </tr>
+          </thead>
+          <tbody>
+            <?php foreach ($lf_printing as $row) {
+              ?>
+              <tr>
+                <td style="width:95px;"><?php echo $row["name"]; ?></td>
+                <td style="width:95px;"><a href="admin-large-format-print-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+                <td style="width:95px;"><?php echo $row["printing_date"]; ?></td>
+                <td style="width:95px;"><?php echo $row["status"]; ?></td>
+                <td style="width:20px;"><?php echo $row["job_purpose"]; ?></td>
+              </tr>
+              <?php
+            }?>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    
+  <button class="accordion active">Completed Print</button>
+    <div class="panel" style="display:block;">
+      <div class="table-responsive">
+        <table id='lf_completed' class="table table-striped table-md">
+          <thead>
+            <tr>
+              <!-- table header-->
+              <th style="width:95px;">Name</th>
+              <th style="width:95px;">Job</th>
+              <th style="width:95px;">Print Start Date</th>
+              <th style="width:95px;">Status</th>
+              <th style="width:20px;">Purpose</th>
+              
+            </tr>
+          </thead>
+          <tbody>
+            <?php foreach ($lf_completed as $row) {
+              ?>
+              <tr>
+                <td style="width:95px;"><?php echo $row["name"]; ?></td>
+                <td style="width:95px;"><a href="admin-large-format-print-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+                <td style="width:95px;"><?php echo $row["completed_date"]; ?></td>
+                <td style="width:95px;"><?php echo $row["status"]; ?></td>
+                <td style="width:20px;"><?php echo $row["job_purpose"]; ?></td>
+              </tr>
+              <?php
+            }?>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  
+  <button class="accordion">Ready for pickup</button>
+    <div class="panel">
+      <div class="table-responsive">
+        <table id='lf_delivered' class="table table-striped table-md">
+        <thead>
+          <tr>
+            <!-- table header-->
+            <th style="width:95px;">Name</th>
+            <th style="width:95px;">Job</th>
+            <th style="width:95px;">Completion Date</th>
+            <th style="width:95px;">Status</th>
+            <th style="width:20px;">Purpose</th>
+            
+          </tr>
+        </thead>
+        <tbody>
+          <?php foreach ($lf_delivered as $row) {
+          ?>
+          <tr>
+            <td style="width:95px;"><?php echo $row["name"]; ?></td>
+            <td style="width:95px;"><a href="admin-large-format-print-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>
+            <td style="width:95px;"><?php echo $row["delivered_date"]; ?></td>
+            <td style="width:95px;"><?php echo $row["status"]; ?></td>
+            <td style="width:20px;"><?php echo $row["job_purpose"]; ?></td>
+          </tr>
+          <?php
+          }
+          ?>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    
+
+
+
+
+      <hr class="mb-12">
+      <a class="btn btn-md btn-block" href="?logout=" role="button">Log Out</a>
     </div>
   </div>
 

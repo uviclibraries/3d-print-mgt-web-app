@@ -172,7 +172,7 @@ if ($user != $job["netlink_id"] && $user_type == 1) {
       <h3 class="mb-3">Large Format Print Specifications</h3>
       <div class="row"> 
         <div class="col-md-3 mb-3">
-            <label for="username">Length</label>
+            <label for="length">Length</label>
             <div class="input-group">
               <div class="input-group mb-3">
                 <input type="number" step="0.01" class="form-control" placeholder="100" value="<?php echo $job["height_inches"]; ?>" aria-label="100" aria-describedby="basic-addon2" readonly>
@@ -184,7 +184,7 @@ if ($user != $job["netlink_id"] && $user_type == 1) {
         </div>
 
         <div class="col-md-3 mb-3">
-            <label for="username">Width</label>
+            <label for="width">Width</label>
             <div class="input-group">
               <div class="input-group mb-3">
                 <input type="number" step="0.01" class="form-control" placeholder="100" value="<?php echo $job["width_inches"]; ?>" aria-label="100" aria-describedby="basic-addon2" readonly>

@@ -91,6 +91,40 @@ else{
 //SQL results
 $l_history = $stm->fetchAll();
 
+
+//LARGE FORMAT PRINT JOBS
+//execute query if parameters are empty 
+// if ($getcheck[0]==FALSE && $getcheck[1]==FALSE && $getcheck[2]==FALSE && $getcheck[3]==FALSE) {
+if (!array_filter($getcheck)){
+  $stm = $conn->query("SELECT web_job.id, web_job.job_name, web_job.netlink_id, web_job.status, web_job.completed_date, web_job.delivered_date, web_job.submission_date, web_job.cancelled_date, users.name FROM web_job INNER JOIN `large_format_print_job` ON web_job.id=`large_format_print_job`.`large_format_print_id` INNER JOIN users ON web_job.netlink_id=`users`.`netlink_id` WHERE (web_job.status IN ('completed', 'archived', 'cancelled')) ORDER BY web_job.completed_date DESC");
+
+}
+
+//find out what parameters are being searched for
+else{
+  //build sql query line based on search parameters
+  $searchline = "SELECT web_job.id, web_job.job_name, web_job.netlink_id, web_job.status, web_job.completed_date, web_job.delivered_date, web_job.submission_date, web_job.cancelled_date, users.name FROM web_job INNER JOIN `large_format_print_job` ON web_job.id=`large_format_print_job`.`large_format_print_id` INNER JOIN users ON web_job.netlink_id=`users`.`netlink_id` WHERE (web_job.status IN ('completed', 'archived', 'cancelled')) AND " . implode(" AND ", $sql_line) . " ORDER BY web_job.completed_date DESC";
+  $stm = $conn->prepare($searchline);
+  //echo $searchline . "\n";
+
+  //Bind search parameters
+  if ($getcheck[0] == TRUE) {
+    $stm->bindParam(':searchdate_start', $_GET['searchdate_start'], PDO::PARAM_STR);
+  }if ($getcheck[1] == TRUE) {
+    $stm->bindParam(':searchdate_end', $_GET['searchdate_end'], PDO::PARAM_STR);
+  }if ($getcheck[2] == TRUE) {
+    $temp = $_GET['search_id']."%";
+    $stm->bindParam(':search_id', $temp, PDO::PARAM_STR);
+  }
+  
+  
+  $stm->execute();
+  // print_r($stm);
+  }
+//SQL results
+$lf_history = $stm->fetchAll();
+
+
 $get_line = array();
 //Seach button clicked
 if($_SERVER['REQUEST_METHOD'] === 'POST'){
@@ -252,7 +286,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
   </div>
 
   <div>
-    <p id = "3dSection"><a href="#laserSection">(Jump to Laser Cut jobs)</a></p>
+    <p id = "3dSection"><a href="#laserSection">(Jump to Laser Cut jobs)</a><br><a href="#largeFormatSection">(Jump to Large Format Print jobs)</a></p>
   </div>
   <button class="accordion active">3D Print Jobs</button>
     <div class="panel" style="display:block;">
@@ -287,9 +321,11 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
       </tbody>
     </table>
   </div>
-  </div>
+  </div><!--End of 3D jobs-->
+
   <div>
-    <p id = "laserSection"><a href="#3dSection">(Jump to 3D Print jobs)</a></p>
+    <p id = "laserSection"><a href="#3dSection">(Jump to 3D Print jobs)</a><br><a href="#largeFormatSection">(Jump to Large Format Print jobs)</a></p>
+    largeFormatSection
   </div>
   <button class="accordion active">Laser Cut Jobs</button>
     <div class="panel" style="display:block;">
@@ -325,7 +361,49 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
           </tbody>
         </table>
       </div>
-    </div>
+    </div><!--End of laser jobs-->
+
+<!--LARGE FORMAT PRINT JOBS-->
+    <div>
+    <p id="largeFormatSection"><a href="#3dSection">(Jump to 3D Print jobs)</a><br><a href="#laserSection">(Jump to Laser Cut jobs)</a></p>
+
+  </div>
+  <button class="accordion active">Large Format Print Jobs</button>
+    <div class="panel" style="display:block;">
+  <div class="py-3"></div>
+  <div class="table-responsive">
+    <table class="table table-striped table-md">
+      <thead>
+        <tr>
+          <!-- table header-->
+          <th>Job id</th>
+          <th>Username</th>
+          <th>Name</th>
+          <th>Completion Date</th>
+          <th>Status</th>
+        </tr>
+        </thead>
+      <tbody>
+        <?php foreach ($lf_history as $row) {
+        ?>
+        <tr>
+          <td style="width:95px;"><?php echo $row["id"]; ?></td>
+          <td style="width:95px;"><?php echo $row["netlink_id"]; ?></td>
+            <!--CHANGE TO UNEDITABLE SCREEN -->
+            <!-- Conditional link based on job_type -->
+            <td style="width:95px;"><a href="admin-large-format-print-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>   
+            <td style="width:95px;"><?php echo $row["completed_date"]; ?></td>
+          <td style="width:95px;"><?php echo $row["status"]; ?></td>
+        </tr>
+        <?php
+        }
+        ?>
+      </tbody>
+    </table>
+  </div>
+  </div>
+
+
   <div>
     <p><a href="#topOfPage">(Jump to Top)</a></p>
   </div>

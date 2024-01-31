@@ -4,7 +4,6 @@ CREATE TABLE `large_format_print_job`(
 `model_name_2` varchar(250) DEFAULT NULL,
 `copies` int(11) NOT NULL,
 `width_inches` float(7) NOT NULL,
-`height_inches` float(7) NOT NULL,
-`comments` text,
-`staff_notes` text
+`length_inches` float(7) NOT NULL,
+`comments` text
 ) DEFAULT CHARSET=utf8

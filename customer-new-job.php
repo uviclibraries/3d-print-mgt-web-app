@@ -924,7 +924,7 @@ header("location: customer-dashboard.php");
       </p>
       <div class="row"> 
         <div class="col-md-3 mb-3">
-          <label for="length_input">Length <span class="error"></span></label>
+          <label for="length_input">Length<span class="error"></span></label>
           <input type="number" step="0.01" id="length_input" name="length_input" oninput="validateDimensions()" placeholder="Length" style="width: 200px;" required >
           <div class="invalid-feedback">
             Please enter the desired length.

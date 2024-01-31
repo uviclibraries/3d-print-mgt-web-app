@@ -8,7 +8,7 @@ if ($user_type == 1) {
   die();
 }
 
-$stm = $conn->prepare("SELECT * FROM web_job INNER JOIN 3d_print_job ON id=3d_print_id WHERE id=?");
+$stm = $conn->prepare("SELECT * FROM web_job INNER JOIN large_format_print_job ON id=large_format_print_id WHERE id=?");
 $stm->execute([$_GET["job_id"]]);
 $job=$stm->fetch();
 
@@ -19,7 +19,7 @@ $userSQL->execute();
 $job_owner = $userSQL->fetch();
 
 //get list of active jobs associated with the job's owner
-$stm = $conn->prepare("SELECT web_job.id AS id, web_job.job_name AS name, web_job.status AS status, web_job.submission_date AS submission_date, web_job.priced_date AS priced_date, web_job.paid_date AS paid_date,web_job.printing_date AS printing_date,web_job.completed_date AS completed_date,web_job.delivered_date AS delivered_date,web_job.hold_date AS hold_date,web_job.hold_signer AS hold_signer,web_job.cancelled_signer AS cancelled_signer,  web_job.priced_signer AS priced_signer, web_job.paid_signer AS paid_signer, web_job.printing_signer AS printing_signer, web_job.completed_signer AS completed_signer, web_job.delivered_signer AS delivered_signer, web_job.job_purpose AS job_purpose, web_job.academic_code AS academic_code, web_job.course_due_date AS course_due_date, 3d_print_job.duration AS duration FROM web_job INNER JOIN 3d_print_job ON web_job.id=3d_print_job.3d_print_id WHERE web_job.status NOT IN ('delivered', 'archived', 'cancelled') AND web_job.netlink_id = :netlink_id");
+$stm = $conn->prepare("SELECT web_job.id AS id, web_job.job_name AS name, web_job.status AS status, web_job.submission_date AS submission_date, web_job.priced_date AS priced_date, web_job.paid_date AS paid_date,web_job.printing_date AS printing_date,web_job.completed_date AS completed_date,web_job.delivered_date AS delivered_date,web_job.hold_date AS hold_date,web_job.hold_signer AS hold_signer,web_job.cancelled_signer AS cancelled_signer,  web_job.priced_signer AS priced_signer, web_job.paid_signer AS paid_signer, web_job.printing_signer AS printing_signer, web_job.completed_signer AS completed_signer, web_job.delivered_signer AS delivered_signer, web_job.job_purpose AS job_purpose, web_job.academic_code AS academic_code, web_job.course_due_date AS course_due_date FROM web_job INNER JOIN large_format_print_job ON web_job.id=large_format_print_job.large_format_print_id WHERE web_job.status NOT IN ('delivered', 'archived', 'cancelled') AND web_job.netlink_id = :netlink_id");
 
   $stm->bindParam(':netlink_id', $job['netlink_id']);
   $stm->execute();
@@ -62,26 +62,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
   }
 
-  // change to source from web job and 3d_print_job
-  $stmt = $conn->prepare("UPDATE web_job INNER JOIN 3d_print_job ON id=3d_print_id SET price = :price, infill = :infill, scale = :scale, layer_height = :layer_height, supports = :supports, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, cancelled_date = :cancelled_date, delivered_date = :delivered_date, priced_signer =:priced_signer,  paid_signer= :paid_signer, printing_signer=:printing_signer, completed_signer=:completed_signer, delivered_signer=:delivered_signer, hold_date = :hold_date, hold_signer= :hold_signer,cancelled_signer= :cancelled_signer, model_name_2 =:model_name_2, duration = :duration WHERE id = :job_id;");
+  // change to source from web job and large_format_print_job
+  $stmt = $conn->prepare("UPDATE web_job INNER JOIN large_format_print_job ON id=large_format_print_id SET price = :price, width_inches = :width_inches, length_inches = :length_inches, staff_notes = :staff_notes, status = :status, priced_date = :priced_date, paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, cancelled_date = :cancelled_date, delivered_date = :delivered_date, priced_signer =:priced_signer,  paid_signer= :paid_signer, printing_signer=:printing_signer, completed_signer=:completed_signer, delivered_signer=:delivered_signer, hold_date = :hold_date, hold_signer= :hold_signer,cancelled_signer= :cancelled_signer, model_name_2 =:model_name_2 WHERE id = :job_id;");
   
   $current_date = date("Y-m-d");
 
   $stmt->bindParam(':job_id', $job['id']);
   $price = floatval(number_format((float)$_POST["price"], 2, '.',''));
   $stmt->bindParam(':price', $price);
-  $infill = intval($_POST["infill"]);
-  $stmt->bindParam(':infill', $infill, PDO::PARAM_INT);
-  $scale = intval($_POST["scale"]);
-  $stmt->bindParam(':scale', $scale, PDO::PARAM_INT);
-  $stmt->bindParam(':layer_height', $_POST["layer_height"], PDO::PARAM_STR);
-  $supports = intval($_POST["supports"]) ;
-  $stmt->bindParam(':supports', $supports , PDO::PARAM_INT);
+  $length_inches = intval($_POST["length_inches"]);
+  $stmt->bindParam(':length_inches', $length_inches, PDO::PARAM_INT);
+  $width_inches = intval($_POST["width_inches"]);
+  $stmt->bindParam(':width_inches', $width_inches, PDO::PARAM_INT);
+  
   // $copies = intval($_POST["copies"]);
   // $stmt->bindParam(':copies', $copies , PDO::PARAM_INT);
-  $duration = intval($_POST["duration"]);
-  $stmt->bindParam(':duration',$duration, PDO::PARAM_INT);
-  $stmt->bindParam(':material_type', $_POST["material_type"]);
+  // $duration = intval($_POST["duration"]);
+  // $stmt->bindParam(':duration',$duration, PDO::PARAM_INT);
   $stmt->bindParam(':staff_notes', $_POST["staff_notes"]);
   $stmt->bindParam(':status', $_POST["status"]);
   $stmt->bindParam(':model_name_2', $modify_value);
@@ -132,8 +129,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $userSQL->execute();
       $job_owner = $userSQL->fetch();
 
-      $direct_link = "https://webapp.library.uvic.ca/3dprint/customer-3d-job-information.php?job_id=". $job['id'];
-      $direct_link2 = "https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/";
+      $direct_link = "https://webapp.library.uvic.ca/3dprint/customer-large-format-print-job-information?job_id=". $job['id'];
+      $direct_link2 = "https://onlineacademiccommunity.uvic.ca/dsc/tools-tech/large-format-printer-and-scanner/";
       $msg = "
       <html>
       <head>
@@ -141,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </head>
       <body>
       <p> Hello, ". $job_owner['name'] .". This is an automated email from the DSC. </p>
-      <p> Your 3D print job; " . $job['job_name'] . " has been evaluated at a cost of $" . (number_format((float)$_POST["price"], 2, '.','')) . " </p>
+      <p> Your large format print job; " . $job['job_name'] . " has been evaluated at a cost of $" . (number_format((float)$_POST["price"], 2, '.','')) . " </p>
       <p> Please make your payment <a href=". $direct_link .">here</a> for it to be placed in our printing queue.</p>
       <p>If you have any questions please review our <a href=". $direct_link2 .">FAQ</a> or email us at dscommons@uvic.ca.</p>
       </body>
@@ -149,7 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $headers = "MIME-Version: 1.0" . "\r\n";
       $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
       $headers .= "From: dscommons@uvic.ca" . "\r\n";
-      mail($job_owner['email'],"Your 3D Print is ready for payment",$msg,$headers);
+      mail($job_owner['email'],"Your Large Format Print is ready for payment",$msg,$headers);
     }
   } elseif($_POST['status'] == "paid"){
     //this is done automatically when payment is received.
@@ -186,14 +183,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </head>
       <body>
       <p>Hello, ". $job_owner['name'] .". This is an automated email from the DSC. </p>
-      <p> Your 3D print job; " . $job['job_name'] . " has been printed. You can pick it up from the front desk at the McPherson Library.</p>
+      <p> Your large format print job; " . $job['job_name'] . " has been printed. You can pick it up from the front desk at the McPherson Library.</p>
       <p>Please check up to date library hours and safety guidelines by checking the library website <a href=". $direct_link .">here</a></p>
       </body>
       </html>";
       $headers = "MIME-Version: 1.0" . "\r\n";
       $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
       $headers .= "From: dscommons@uvic.ca" . "\r\n";
-      mail($job_owner['email'], "Your 3D Print is ready for collection",$msg,$headers);
+      mail($job_owner['email'], "Your Large Format Print is ready for collection",$msg,$headers);
     }
   } elseif($_POST['status'] == "archived"){
     $d4 = $current_date;
@@ -227,7 +224,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $checkedIDs_sql = implode(',', $checked_jobs);//to create comma separated list for update query
       // echo $checkedIDs_sql;
 
-      $stm = $conn->prepare("UPDATE web_job INNER JOIN 3d_print_job ON id=3d_print_id SET status = :status, priced_date = :priced_date, paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, delivered_date = :delivered_date, priced_signer=:priced_signer,  paid_signer= :paid_signer, printing_signer=:printing_signer, completed_signer=:completed_signer, delivered_signer=:delivered_signer, hold_date = :hold_date, hold_signer= :hold_signer, cancelled_date=:cancelled_date, cancelled_signer = :cancelled_signer WHERE id IN ($checkedIDs_sql)");
+      $stm = $conn->prepare("UPDATE web_job INNER JOIN large_format_print_job ON id=large_format_print_id SET status = :status, priced_date = :priced_date, paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, delivered_date = :delivered_date, priced_signer=:priced_signer,  paid_signer= :paid_signer, printing_signer=:printing_signer, completed_signer=:completed_signer, delivered_signer=:delivered_signer, hold_date = :hold_date, hold_signer= :hold_signer, cancelled_date=:cancelled_date, cancelled_signer = :cancelled_signer WHERE id IN ($checkedIDs_sql)");
 
       $stm->bindParam(':status', $_POST["status"]);
 
@@ -516,7 +513,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <h4 class="mb-3">Status</h4>
       <div class="row">
         <div class="col-md-3 mb-3">
-          <select class="custom-select d-block w-100" name="status" id="layer-height">
+          <select class="custom-select d-block w-100" name="status" id="status-dropdown">
             <?php 
               if ($job["status"] == "cancelled") {?> 
                 <option value="cancelled" selected readonly>cancelled</option> 
@@ -633,19 +630,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                   </div>
                 </div>
               </div>
-
-              <div class="col-md-3 mb-3">
-                <div class="input-group">
-                  <input type="text" name="duration" autocomplete="off" class="form-control" value="<?php echo $job["duration"]; ?>">
-                </div>
-                <small class="text-muted">Number of minutes the machines were running to complete the project.</small>
-              </div>
-            </div>
+            </div> <!--End price row-->
           </div>
 
     <hr class="mb-6">
 
-    <h3 class="mb-3">3D Model</h3>
+    <h3 class="mb-3">Large Format Print File</h3>
         <?php
         if (is_file(("uploads/" . $job['model_name']))) {
             ?>
@@ -653,7 +643,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <a href="<?php echo "uploads/" . $job['model_name']; ?>" download="<?php
                 $filetype = explode(".", $job['model_name']);
                 echo $job['job_name'] . "." . $filetype[1]; ?>">
-                Download 3D file
+                Download print file
             </a>
         <?php
         }
@@ -663,11 +653,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <br>
       <hr class="mb-6">
 
-      <h3 class="mb-3">Modified 3D Model</h3>
+      <h3 class="mb-3">Large Format Print File</h3>
 
     <?php //checks if there is a modify file
     if ($job['model_name_2'] != NULL && is_file(("uploads/" . $job['model_name_2']))) { ?>
-      <a href="<?php echo "uploads/" . $job['model_name_2']; ?>" download>Download Modify 3D file</a>
+      <a href="<?php echo "uploads/" . $job['model_name_2']; ?>" download>Download Modified large format job file</a>
     <?php } ?>
     <br/>
       <small class="text-muted">(Max 200MB)</small>
@@ -689,83 +679,76 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <hr class="mb-6">
 
     <div class="col-md-12 order-md-1">
-      <h4 class="mb-3">Specifications</h4>
-        <div class="row">
-            <div class="col-md-3 mb-3">
-                <label for="username">Infill</label>
-                <div class="input-group">
-                  <div class="input-group mb-3">
-                    <input type="text" name="infill" class="form-control" value="<?php echo $job["infill"]; ?>" placeholder="100" aria-label="100" aria-describedby="basic-addon2">
-                    <div class="input-group-append">
-                    <span class="input-group-text" id="basic-addon2">%</span>
-                    </div>
-                </div>
-                <div class="invalid-feedback" style="width: 100%;">
-                Infill is required.
-                </div>
+      <h4 class="mb-3">Dimensions</h4>
+
+      <div class="row">
+        <div class="col-md-3 mb-3">
+            <label for="length_input">Length<span class="error"></span></label>
+            <div class="input-group">
+              <div class="input-group mb-3">
+                <input type="number" step="0.01" name="length_inches" class="form-control" value="<?php echo $job["length_inches"]; ?>" placeholder="100" aria-label="100" aria-describedby="basic-addon2" oninput="validateDimensions()" style="width: 200px;">
             </div>
+            <div class="invalid-feedback" style="width: 100%;">
+            Please enter the desired length.
             </div>
-            <div class="col-md-3 mb-3">
-                <label for="username">Scale</label>
-                <div class="input-group">
-                <div class="input-group mb-3">
-                    <input type="text" class="form-control" name="scale" value="<?php echo $job["scale"]; ?>" placeholder="100" aria-label="100" aria-describedby="basic-addon2">
-                    <div class="input-group-append">
-                        <span class="input-group-text" id="basic-addon2">%</span>
-                    </div>
-                    </div>
-                <div class="invalid-feedback" style="width: 100%;">
-                    Scale is required.
-                </div>
-                </div>
             </div>
         </div>
 
-        <div class="row">
-          <div class="col-md-3 mb-3">
-            <label for="layer-height">Layer Height</label>
-            <select class="custom-select d-block w-100" name="layer_height" id="layer-height">
-              <option <?php if ($job["layer_height"]== 0.2){echo "selected";} ?>>0.2</option>
-              <option <?php if ($job["layer_height"]== 0.15){echo "selected";} ?>>0.15</option>
-              <option <?php if ($job["layer_height"]== 0.1){echo "selected";} ?>>0.1</option>
-              <option <?php if ($job["layer_height"]== 0.06){echo "selected";} ?>>0.06</option>
-            </select>
-          </div>
-          <div class="col-md-3 mb-3">
-            <label for="supports">Supports</label>
-            <select class="custom-select d-block w-100" name="supports" id="supports">
-              <option value = 1  <?php if ($job["supports"]== 1){echo "selected";} ?>>Yes</option>
-              <option value = 0 <?php if ($job["supports"]== 0){echo "selected";} ?>>No</option>
-            </select>
-          </div>
+        <div class="col-md-3 mb-3">
+            <label for="length">Width</label>
+            <div class="input-group">
+            <div class="input-group mb-3">
+                <input type="number" step="0.01" class="form-control" name="width_inches" value="<?php echo $job["width_inches"]; ?>" placeholder="Width" aria-label="100" aria-describedby="basic-addon2" oninput="validateDimensions()" style="width: 200px;">
+            </div>
+            <div class="invalid-feedback" style="width: 100%;">
+                Please enter the desired width.
+            </div>
+            </div>
         </div>
 
-
-        <hr class="mb-4">
-        <h5 class="mb-2">Material Type</h5>
-        <div class="d-block my-3">
-          <div class="custom-control custom-radio">
-            <input id="pla" name="material_type" value="PLA" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "PLA"){echo "checked";} ?>>
-            <label class="custom-control-label" for="pla">PLA</label>
-          </div>
-          <div class="custom-control custom-radio">
-            <input id="pla-pva" name="material_type" value="PLA + PVA" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "PLA + PVA"){echo "checked";} ?>>
-            <label class="custom-control-label" for="pla-pva">PLA + PVA</label>
-          </div>
-          <div class="custom-control custom-radio">
-            <input id="petg" name="material_type" value="PETG" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "PETG"){echo "checked";} ?>>
-            <label class="custom-control-label" for="petg">PETG</label>
-          </div>
-          <div class="custom-control custom-radio">
-            <input id="tpu95" name="material_type" value="TPU95" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "TPU95"){echo "checked";} ?>>
-            <label class="custom-control-label" for="tpu95">TPU95</label>
-          </div>
-          <div class="custom-control custom-radio">
-            <input id="other" name="material_type" value="Other" type="radio" class="custom-control-input" <?php if ($job["material_type"]== "Other"){echo "checked";} ?>>
-            <label class="custom-control-label" for="other">Other</label>
-            <small class="text-muted"> - Elaborate in Additional Comments section</small>
+        <div class="col-md-3 mb-3">
+          <label for="unit_selector">Unit</label><br>
+          <select id="unit_selector" name="unit_measurement" onchange="validateDimensions()" style="width: 100px;"> <!-- Adjust the width as needed -->
+            <option value="in">in</option>
+            <option value="cm">cm</option>
+          </select>
+          <div class="invalid-feedback">
+            Please select a unit of measurement.
           </div>
         </div>
+      </div>
+      <div>
+        <span id="dimension_warning"></span>
+      </div>
+
+
+        <script>
+        function validateDimensions(){
+          console.log('validating dimensions');
+          var unit = document.getElementById('unit_selector').value;
+          var width = document.getElementById('width_input').value;
+          var length = document.getElementById('length_input').value;
+          var dimension_warning = document.getElementById("dimension_warning");
+
+          var maxDimension = unit === 'cm' ? 91.44 : 36; // 36 inches in cm
+          // console.log("unit: " + unit + "; length: " + length + ";width" + width);
+
+          if (width > maxDimension && length > maxDimension) {
+            // console.log('too large');
+            dimension_warning.textContent = `Both width and length cannot exceed ${maxDimension} ${unit}. Please decrease one of the measurements.`;
+            document.getElementById('length_input').value = "";
+            document.getElementById('width_input').value = "";
+            // if(event.type === "submit") {
+            //     event.preventDefault(); // Prevent form submission
+            // }
+          }
+          else{
+            // console.log("not too large");
+            dimension_warning.textContent = "";
+          }
+        }
+        </script><!--Prevent oversize prints-->
+
 
         <hr class="mb-4">
         <h5 class="mb-2">Additional Comments</h5>
@@ -775,13 +758,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <hr class="mb-4">
         <h5 class="mb-2">Staff Notes</h5>
-        <div class="input-group">
-            <textarea rows="5" cols="50" class="form-control" name="staff_notes" aria-label="additional-comments"><?php echo $job["staff_notes"]; ?></textarea>
+            <div class="input-group">
+                <textarea rows="5" cols="50" class="form-control" name="staff_notes" aria-label="additional-comments"><?php echo $job["staff_notes"]; ?></textarea>
+            </div>
+            <div class="invalid-feedback">
+            Please enter additional comments.
+            </div>
         </div>
-        <div class="invalid-feedback">
-        Please enter additional comments.
-        </div>
-    </div>
 
 
         <hr class="mb-4">
