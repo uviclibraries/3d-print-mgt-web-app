@@ -150,7 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $userSQL->execute();
   $job_owner = $userSQL->fetch();
 
-
+  $jobName =$_POST["job_name"];
   $direct_link = "https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/";
   $msg = "
   <html>
@@ -159,7 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </head>
   <body>
   <p>Hello, ".$job_owner['name'].". This is an automated message from the DSC.</p>
-  <p>Thank you for submitting your 3D print request to the DSC at McPherson Library. We will evaluate the cost of the 3D print and you'll be notified by email when it is ready for payment. If you have any questions about the process or the status of your 3D print, please review our <a href=". $direct_link .">FAQ</a> or email us at DSCommons@uvic.ca.</p>
+  <p>Thank you for submitting your 3D print request (".$jobName.") to the DSC at McPherson Library. We will evaluate the cost of the 3D print and you'll be notified by email when it is ready for payment. If you have any questions about the process or the status of your 3D print, please review our <a href=". $direct_link .">FAQ</a> or email us at DSCommons@uvic.ca.</p>
   </body>
   </html>";
   $headers = "MIME-Version: 1.0" . "\r\n";

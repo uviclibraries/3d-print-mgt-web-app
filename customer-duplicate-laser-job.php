@@ -144,6 +144,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $userSQL->execute();
   $job_owner = $userSQL->fetch();
 
+  $jobName =$_POST["job_name"];
   $direct_link = "https://onlineacademiccommunity.uvic.ca/dsc/how-to-laser-cut/";
   $msg = "
   <html>
@@ -152,7 +153,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </head>
   <body>
   <p>Hello, ".$job_owner['name'].". This is an automated message from the DSC.</p>
-  <p>Thank you for submitting your laser cut request to the DSC at McPherson Library. We will evaluate the cost of the laser cut and you'll be notified by email when it is ready for payment. If you have any questions about the process or the status of your laser cut, please review our <a href=". $direct_link .">FAQ</a> or email us at DSCommons@uvic.ca.</p>
+  <p>Thank you for submitting your laser cut request (".$jobName.") to the DSC at McPherson Library. We will evaluate the cost of the laser cut and you'll be notified by email when it is ready for payment. If you have any questions about the process or the status of your laser cut, please review our <a href=". $direct_link .">FAQ</a> or email us at DSCommons@uvic.ca.</p>
   </body>
   </html>";
   $headers = "MIME-Version: 1.0" . "\r\n";

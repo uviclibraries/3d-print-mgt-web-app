@@ -365,8 +365,8 @@ foreach ($largeformat_job7 as $job) {
       </div>
     </div>
     
-    <button class="accordion active">On Hold</button>
-    <div class="panel" style="display:block;">
+    <button class="accordion">On Hold</button>
+    <div class="panel">
       <div class="table-responsive">
         <table id='d_on_hold' class="table table-striped table-md">
           <thead>
@@ -602,8 +602,8 @@ foreach ($largeformat_job7 as $job) {
       </div>
     </div>
 
-  <button class="accordion active">On Hold</button>
-      <div class="panel" style="display:block;">
+  <button class="accordion">On Hold</button>
+      <div class="panel">
         <div class="table-responsive">
           <table id='l_on_hold' class="table table-striped table-md">
             <thead>
@@ -849,8 +849,8 @@ foreach ($largeformat_job7 as $job) {
       </div>
     </div>
     
-    <button class="accordion active">On Hold</button>
-    <div class="panel" style="display:block;">
+    <button class="accordion">On Hold</button>
+    <div class="panel">
       <div class="table-responsive">
         <table id='d_on_hold' class="table table-striped table-md">
           <thead>
@@ -1048,10 +1048,7 @@ foreach ($largeformat_job7 as $job) {
 
     
 
-
-
-
-      <hr class="mb-12">
+    <hr class="mb-12">
       <a class="btn btn-md btn-block" href="?logout=" role="button">Log Out</a>
     </div>
   </div>
@@ -1075,42 +1072,6 @@ foreach ($largeformat_job7 as $job) {
 
 <script>
 
-// function sortTablePurpose(tableId) {
-//   var table, rows, switching, i, x, x2, y, y2, shouldSwitch;
-//   table = document.getElementById(tableId);
-
-//   //Start by saying: no switching is done:
-//   switching = true;
-  
-//   //Loop to continue until switching done: 
-//   while (switching) {
-//     switching = false;
-//     rows = table.rows;
-//     //Loop through all table rows (except the first, which contains table headers): 
-//         for (i = 1; i < (rows.length - 1); i++) {
-//       shouldSwitch = false;
-
-//       //Get the two elements to compare, one from current row and one from the next: 
-//       // Compare first by 'purpose' column i=4, then by 'date' column i=3
-//       x = rows[i].getElementsByTagName("TD")[4];
-//       y = rows[i + 1].getElementsByTagName("TD")[4];
-//       x2 = rows[i].getElementsByTagName("TD")[2];
-//       y2 = rows[i + 1].getElementsByTagName("TD")[2];
-
-//       //Check if the two rows should switch place:-->
-//       if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
-//         shouldSwitch = true;
-//         break;
-//       }
-//     }
-
-//     if (shouldSwitch) {
-//     //If a switch has been marked, make the switch and mark that a switch has been done: 
-//       rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-//       switching = true;
-//     }
-//   }
-// }
 
 function sortTable(tableId) {
   var table, rows, switching, i, shouldSwitch;

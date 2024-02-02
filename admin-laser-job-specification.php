@@ -67,15 +67,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
 
-  $stmt = $conn->prepare("UPDATE web_job INNER JOIN laser_cut_job ON id=laser_cut_id SET price = :price, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date,cancelled_date = :cancelled_date, delivered_date = :delivered_date, priced_signer=:priced_signer,  paid_signer= :paid_signer, printing_signer=:printing_signer, completed_signer=:completed_signer, delivered_signer=:delivered_signer,hold_date = :hold_date, hold_signer= :hold_signer, cancelled_signer = :cancelled_signer, model_name_2 =:model_name_2, duration =:duration WHERE id = :job_id");
+  $stmt = $conn->prepare("UPDATE web_job INNER JOIN laser_cut_job ON id=laser_cut_id SET price = :price, material_type = :material_type, staff_notes = :staff_notes, status = :status, copies=:copies, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date,cancelled_date = :cancelled_date, delivered_date = :delivered_date, priced_signer=:priced_signer,  paid_signer= :paid_signer, printing_signer=:printing_signer, completed_signer=:completed_signer, delivered_signer=:delivered_signer,hold_date = :hold_date, hold_signer= :hold_signer, cancelled_signer = :cancelled_signer, model_name_2 =:model_name_2, duration =:duration WHERE id = :job_id");
   
   $current_date = date("Y-m-d");
 
   $stmt->bindParam(':job_id', $job['id']);
   $price = floatval(number_format((float)$_POST["price"], 2, '.',''));
   $stmt->bindParam(':price', $price);
-  // $copies = intval($_POST["copies"]);
-  // $stmt->bindParam(':copies', $copies , PDO::PARAM_INT);
+  $copies = intval($_POST["copies"]);
+  $stmt->bindParam(':copies', $copies , PDO::PARAM_INT);
   $duration = intval($_POST["duration"]);
   $stmt->bindParam(':duration', $duration , PDO::PARAM_INT);
   $stmt->bindParam(':material_type', $_POST["material_type"]);
@@ -138,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </head>
       <body>
       <p> Hello, ". $job_owner['name'] .". This is an automated email from the DSC. </p>
-      <p> Your laser cutting job; " . $job['job_name'] . " has been evaluated at a cost of $" . (number_format((float)$_POST["price"], 2, '.','')) . " </p>
+      <p> Your laser cutting job (".$job['job_name']. ") has been evaluated at a cost of $" . (number_format((float)$_POST["price"], 2, '.','')) . " </p>
       <p> Please make your payment <a href=". $direct_link .">here</a> for it to be placed in our printing queue.</p>
       <p>If you have any questions please review our <a href=". $direct_link2 .">FAQ</a> or email us at dscommons@uvic.ca.</p>
       </body>
@@ -177,8 +177,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </head>
       <body>
       <p>Hello, ". $job_owner['name'] .". This is an automated email from the DSC. </p>
-      <p> Your laser cutting job; " . $job['job_name'] . " has been completed. You can pick it up from the front desk at the McPherson Library.</p>
-      <p>Please check up to date library hours and safety guidelines by checking the library website <a href=". $direct_link .">here</a></p>
+      <p> Your laser cutting job (".$job['job_name']. ") has been completed. You can pick it up from the front desk at the McPherson Library.</p>
+      <p>Please check up to date library hours by checking the library website <a href=". $direct_link .">here</a></p>
       </body>
       </html>";
       $headers = "MIME-Version: 1.0" . "\r\n";
@@ -692,7 +692,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <!-- <h5 class="mb-2">Copies</h5> -->
       <div class="col-md-3 mb-3">
         <label for="copies">Copies</label>
-        <input type="text" class="form-control" value="<?php if ($job["copies"]!= ""){echo "{$job["copies"]}";} else{"Enter # of copies";}?>" readonly>
+        <input type="number" class="form-control" value="<?php echo $job["copies"];?>">
         <!-- <input type="number" class="form-control" name="copies" min="1" max="100" step="1" value="1" id="supports" placeholder=""> -->
         <!-- <div class="invalid-feedback">
           Please provide a valid response.

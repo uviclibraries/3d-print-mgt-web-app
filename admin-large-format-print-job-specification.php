@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   // change to source from web job and large_format_print_job
-  $stmt = $conn->prepare("UPDATE web_job INNER JOIN large_format_print_job ON id=large_format_print_id SET price = :price, width_inches = :width_inches, length_inches = :length_inches, staff_notes = :staff_notes, status = :status, priced_date = :priced_date, paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, cancelled_date = :cancelled_date, delivered_date = :delivered_date, priced_signer =:priced_signer,  paid_signer= :paid_signer, printing_signer=:printing_signer, completed_signer=:completed_signer, delivered_signer=:delivered_signer, hold_date = :hold_date, hold_signer= :hold_signer,cancelled_signer= :cancelled_signer, model_name_2 =:model_name_2 WHERE id = :job_id;");
+  $stmt = $conn->prepare("UPDATE web_job INNER JOIN large_format_print_job ON id=large_format_print_id SET price = :price, width_inches = :width_inches, copies =:copies, length_inches = :length_inches, staff_notes = :staff_notes, status = :status, priced_date = :priced_date, paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, cancelled_date = :cancelled_date, delivered_date = :delivered_date, priced_signer =:priced_signer,  paid_signer= :paid_signer, printing_signer=:printing_signer, completed_signer=:completed_signer, delivered_signer=:delivered_signer, hold_date = :hold_date, hold_signer= :hold_signer,cancelled_signer= :cancelled_signer, model_name_2 =:model_name_2 WHERE id = :job_id;");
   
   $current_date = date("Y-m-d");
 
@@ -75,8 +75,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $width_inches = intval($_POST["width_inches"]);
   $stmt->bindParam(':width_inches', $width_inches, PDO::PARAM_INT);
   
-  // $copies = intval($_POST["copies"]);
-  // $stmt->bindParam(':copies', $copies , PDO::PARAM_INT);
+  $copies = intval($_POST["copies"]);
+  $stmt->bindParam(':copies', $copies , PDO::PARAM_INT);
   // $duration = intval($_POST["duration"]);
   // $stmt->bindParam(':duration',$duration, PDO::PARAM_INT);
   $stmt->bindParam(':staff_notes', $_POST["staff_notes"]);
@@ -138,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </head>
       <body>
       <p> Hello, ". $job_owner['name'] .". This is an automated email from the DSC. </p>
-      <p> Your large format print job; " . $job['job_name'] . " has been evaluated at a cost of $" . (number_format((float)$_POST["price"], 2, '.','')) . " </p>
+      <p> Your large format print job (".$job['job_name']. ") has been evaluated at a cost of $" . (number_format((float)$_POST["price"], 2, '.','')) . " </p>
       <p> Please make your payment <a href=". $direct_link .">here</a> for it to be placed in our printing queue.</p>
       <p>If you have any questions please review our <a href=". $direct_link2 .">FAQ</a> or email us at dscommons@uvic.ca.</p>
       </body>
@@ -183,8 +183,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </head>
       <body>
       <p>Hello, ". $job_owner['name'] .". This is an automated email from the DSC. </p>
-      <p> Your large format print job; " . $job['job_name'] . " has been printed. You can pick it up from the front desk at the McPherson Library.</p>
-      <p>Please check up to date library hours and safety guidelines by checking the library website <a href=". $direct_link .">here</a></p>
+      <p> Your large format print job (".$job['job_name']. ") has been printed. You can pick it up from the front desk at the McPherson Library.</p>
+      <p>Please check up to date library hours by checking the library website <a href=". $direct_link .">here</a></p>
       </body>
       </html>";
       $headers = "MIME-Version: 1.0" . "\r\n";
@@ -618,7 +618,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                       <!-- ** catch non floatable input-->
                       <span class="input-group-text">$</span>
                       <input type="text" name="price" autocomplete="off" class="form-control" value="<?php echo number_format((float)$job["price"], 2, '.',''); ?>"
-                      <?php if ($job["status"] != "submitted" && $job["status"] != "pending payment"): ?>
+                      <?php if ($job["status"] != "submitted" && $job["status"] != "pending payment" && $job["status"] != "on hold"): ?>
                         readonly
                       <?php endif; ?>
                       >
@@ -643,7 +643,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <a href="<?php echo "uploads/" . $job['model_name']; ?>" download="<?php
                 $filetype = explode(".", $job['model_name']);
                 echo $job['job_name'] . "." . $filetype[1]; ?>">
-                Download print file
+                Download large format print file
             </a>
         <?php
         }
@@ -653,11 +653,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <br>
       <hr class="mb-6">
 
-      <h3 class="mb-3">Large Format Print File</h3>
+      <h3 class="mb-3">Modified Large Format Print File</h3>
 
     <?php //checks if there is a modify file
     if ($job['model_name_2'] != NULL && is_file(("uploads/" . $job['model_name_2']))) { ?>
-      <a href="<?php echo "uploads/" . $job['model_name_2']; ?>" download>Download Modified large format job file</a>
+      <a href="<?php echo "uploads/" . $job['model_name_2']; ?>" download>Download Modified large format print file</a>
     <?php } ?>
     <br/>
       <small class="text-muted">(Max 200MB)</small>
@@ -669,7 +669,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- <h5 class="mb-2">Copies</h5> -->
     <div class="col-md-3 mb-3">
         <label for="copies">Copies</label>
-        <input type="text" class="form-control" value="<?php if ($job["copies"]!= ""){echo "{$job["copies"]}";} else{"Enter # of copies";}?>" readonly>
+        <input type="number" class="form-control" name="copies" value="<?php echo $job["copies"];?>" >
         <!-- <input type="number" class="form-control" name="copies" min="1" max="100" step="1" value="1" id="supports" placeholder=""> -->
         <!-- <div class="invalid-feedback">
           Please provide a valid response.
