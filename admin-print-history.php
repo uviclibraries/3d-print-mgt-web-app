@@ -34,14 +34,14 @@ if (isset($_GET['search_id']) && ($_GET['search_id'] != "" && $_GET['search_id']
 //execute query if parameters are empty 
 // if ($getcheck[0]==FALSE && $getcheck[1]==FALSE && $getcheck[2]==FALSE && $getcheck[3]==FALSE) {
 if (!array_filter($getcheck)){
-  $stm = $conn->query("SELECT web_job.id, web_job.job_name, web_job.netlink_id, web_job.status, web_job.completed_date, web_job.delivered_date, web_job.submission_date, web_job.cancelled_date, users.name FROM web_job INNER JOIN `3d_print_job` ON web_job.id=`3d_print_job`.`3d_print_id` INNER JOIN users ON web_job.netlink_id=`users`.`netlink_id` WHERE (web_job.status IN ('completed', 'archived', 'cancelled')) ORDER BY web_job.completed_date DESC");
+  $stm = $conn->query("SELECT web_job.id, web_job.job_name, web_job.netlink_id, web_job.job_purpose, web_job.status, web_job.price, web_job.completed_date, web_job.delivered_date, web_job.submission_date, web_job.cancelled_date, users.name, 3d_print_job.duration, 3d_print_job.material_type FROM web_job INNER JOIN `3d_print_job` ON web_job.id=`3d_print_job`.`3d_print_id` INNER JOIN users ON web_job.netlink_id=`users`.`netlink_id` WHERE (web_job.status IN ('delivered', 'archived', 'cancelled')) ORDER BY web_job.completed_date DESC");
 
 }
 
 //find out what parameters are being searched for
 else{
   //build sql query line based on search parameters
-  $searchline = "SELECT web_job.id, web_job.job_name, web_job.netlink_id, web_job.status, web_job.completed_date, web_job.delivered_date, web_job.submission_date, web_job.cancelled_date, users.name FROM web_job INNER JOIN `3d_print_job` ON web_job.id=`3d_print_job`.`3d_print_id` INNER JOIN users ON web_job.netlink_id=`users`.`netlink_id` WHERE (web_job.status IN ('completed', 'archived', 'cancelled')) AND " . implode(" AND ", $sql_line) . " ORDER BY web_job.completed_date DESC";
+  $searchline = "SELECT web_job.id, web_job.job_name, web_job.netlink_id, web_job.job_purpose, web_job.status, web_job.price, web_job.completed_date, web_job.delivered_date, web_job.submission_date, web_job.cancelled_date, users.name, 3d_print_job.duration, 3d_print_job.material_type FROM web_job INNER JOIN `3d_print_job` ON web_job.id=`3d_print_job`.`3d_print_id` INNER JOIN users ON web_job.netlink_id=`users`.`netlink_id` WHERE (web_job.status IN ('delivered', 'archived', 'cancelled')) AND " . implode(" AND ", $sql_line) . " ORDER BY web_job.completed_date DESC";
   $stm = $conn->prepare($searchline);
   //echo $searchline . "\n";
 
@@ -62,16 +62,22 @@ else{
 //SQL results
 $d_history = $stm->fetchAll();
 
+//Get duration (in minutes) of all delivered, archived, or cancelled 3D Print jobs, as filtered by user
+$d_duration = 0;
+foreach ($d_history as $row) {
+  $d_duration += $row["duration"];
+}
+
 //LASER CUT JOBS
 //Check if parameters are empty 
 // if ($getcheck[0]==FALSE && $getcheck[1]==FALSE && $getcheck[2]==FALSE && $getcheck[3]==FALSE) {
 if (!array_filter($getcheck)){
-  $stm = $conn->query("SELECT web_job.id, web_job.job_name, web_job.netlink_id, web_job.status, web_job.completed_date, web_job.delivered_date, web_job.submission_date, web_job.cancelled_date, users.name FROM web_job INNER JOIN `laser_cut_job` ON web_job.id=`laser_cut_job`.`laser_cut_id` INNER JOIN users ON web_job.netlink_id=`users`.`netlink_id` WHERE web_job.status IN ('completed', 'archived', 'cancelled') ORDER BY web_job.completed_date DESC");
+  $stm = $conn->query("SELECT web_job.id, web_job.job_name, web_job.netlink_id, web_job.job_purpose, web_job.status, web_job.price, web_job.completed_date, web_job.delivered_date, web_job.submission_date, web_job.cancelled_date, users.name, laser_cut_job.duration, laser_cut_job.material_type FROM web_job INNER JOIN `laser_cut_job` ON web_job.id=`laser_cut_job`.`laser_cut_id` INNER JOIN users ON web_job.netlink_id=`users`.`netlink_id` WHERE web_job.status IN ('delivered', 'archived', 'cancelled') ORDER BY web_job.completed_date DESC");
 }
 //find out what parameters are being searched for
 else{
   //build sql query line based on search parameters
-  $searchline = "SELECT web_job.id, web_job.job_name, web_job.netlink_id, web_job.status, web_job.completed_date, web_job.delivered_date, web_job.submission_date, web_job.cancelled_date, users.name FROM web_job INNER JOIN `laser_cut_job` ON web_job.id=`laser_cut_job`.`laser_cut_id` INNER JOIN users ON web_job.netlink_id=`users`.`netlink_id` WHERE (web_job.status IN ('completed', 'archived', 'cancelled')) AND " . implode(" AND ", $sql_line) . " ORDER BY web_job.completed_date DESC";
+  $searchline = "SELECT web_job.id, web_job.job_name, web_job.netlink_id, web_job.job_purpose, web_job.status, web_job.price, web_job.completed_date, web_job.delivered_date, web_job.submission_date, web_job.cancelled_date, users.name, laser_cut_job.duration, laser_cut_job.material_type FROM web_job INNER JOIN `laser_cut_job` ON web_job.id=`laser_cut_job`.`laser_cut_id` INNER JOIN users ON web_job.netlink_id=`users`.`netlink_id` WHERE (web_job.status IN ('delivered', 'archived', 'cancelled')) AND " . implode(" AND ", $sql_line) . " ORDER BY web_job.completed_date DESC";
   $stm = $conn->prepare($searchline);
   //echo $searchline . "\n";
 
@@ -91,19 +97,24 @@ else{
 //SQL results
 $l_history = $stm->fetchAll();
 
+//Get duration (in minutes) of all delivered, archived, or cancelled Laser cut jobs, as filtered by user
+$l_duration = 0;
+foreach ($l_history as $row) {
+  $l_duration += $row["duration"];
+}
 
 //LARGE FORMAT PRINT JOBS
 //execute query if parameters are empty 
 // if ($getcheck[0]==FALSE && $getcheck[1]==FALSE && $getcheck[2]==FALSE && $getcheck[3]==FALSE) {
 if (!array_filter($getcheck)){
-  $stm = $conn->query("SELECT web_job.id, web_job.job_name, web_job.netlink_id, web_job.status, web_job.completed_date, web_job.delivered_date, web_job.submission_date, web_job.cancelled_date, users.name FROM web_job INNER JOIN `large_format_print_job` ON web_job.id=`large_format_print_job`.`large_format_print_id` INNER JOIN users ON web_job.netlink_id=`users`.`netlink_id` WHERE (web_job.status IN ('completed', 'archived', 'cancelled')) ORDER BY web_job.completed_date DESC");
+  $stm = $conn->query("SELECT web_job.id, web_job.job_name, web_job.netlink_id, web_job.job_purpose, web_job.status, web_job.price, web_job.completed_date, web_job.delivered_date, web_job.submission_date, web_job.cancelled_date, users.name FROM web_job INNER JOIN `large_format_print_job` ON web_job.id=`large_format_print_job`.`large_format_print_id` INNER JOIN users ON web_job.netlink_id=`users`.`netlink_id` WHERE (web_job.status IN ('delivered', 'archived', 'cancelled')) ORDER BY web_job.completed_date DESC");
 
 }
 
 //find out what parameters are being searched for
 else{
   //build sql query line based on search parameters
-  $searchline = "SELECT web_job.id, web_job.job_name, web_job.netlink_id, web_job.status, web_job.completed_date, web_job.delivered_date, web_job.submission_date, web_job.cancelled_date, users.name FROM web_job INNER JOIN `large_format_print_job` ON web_job.id=`large_format_print_job`.`large_format_print_id` INNER JOIN users ON web_job.netlink_id=`users`.`netlink_id` WHERE (web_job.status IN ('completed', 'archived', 'cancelled')) AND " . implode(" AND ", $sql_line) . " ORDER BY web_job.completed_date DESC";
+  $searchline = "SELECT web_job.id, web_job.job_name, web_job.netlink_id, web_job.job_purpose, web_job.status, web_job.price, web_job.completed_date, web_job.delivered_date, web_job.submission_date, web_job.cancelled_date, users.name FROM web_job INNER JOIN `large_format_print_job` ON web_job.id=`large_format_print_job`.`large_format_print_id` INNER JOIN users ON web_job.netlink_id=`users`.`netlink_id` WHERE (web_job.status IN ('delivered', 'archived', 'cancelled')) AND " . implode(" AND ", $sql_line) . " ORDER BY web_job.completed_date DESC";
   $stm = $conn->prepare($searchline);
   //echo $searchline . "\n";
 
@@ -125,9 +136,11 @@ else{
 $lf_history = $stm->fetchAll();
 
 
+
 $get_line = array();
 //Seach button clicked
-if($_SERVER['REQUEST_METHOD'] === 'POST'){
+if(isset($_POST["Search"])){
+// if($_SERVER['REQUEST_METHOD'] === 'POST'){
   if (isset($_POST["searchdate_start"])) {
     $get_line[] = "searchdate_start=" . $_POST["searchdate_start"];
   }
@@ -141,23 +154,92 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 }
 
 
-//If clicked download CSV
-if (isset($_POST["getCSV"])) {
-  $filename = "order-history.csv";
-  header("Content-Type: text/csv;");
+//3D Print Jobs REPORT
+//If clicked download CSV (input name="get3DCSV")
+if (isset($_POST["get3DCSV"])) {
+  $filename = "3d-job-history.csv";
+  header("Content-Type: text/csv; charset=utf-8;");
   header("Content-Disposition: attachment; filename=".$filename);
 
+
   $fp = fopen("php://output", "w");
-  $column = array("Order ID", "Netlink ID", "Full Name", "Date", "Duration", "Time", "Message", "Transaction Num", "Cardholder", "Charge", "Card", "Bank Approval Code", "Bank Transaction ID", "INVOICE", "ISSCONF", "ISSNAME", "ISO Code", "AVS Response Code", "CAVV Result Code",);
-  $fix = array("Response Code", "Result", "Trans Name", "f4l4");
-  $column = array_merge($column, $fix);
-  fputcsv($fp, $column);
-  foreach ($all_users as $row) {
-    fputcsv($fp, $row);
+  $d_column = array("Job_ID", "Job_Name", "Netlink_ID", "Job_Purpose", "Status", "Price", "Duration", "Material_Type", "Delivered_Date",);
+  fputcsv($fp, $d_column);
+  foreach ($d_history as $row) {
+    $d_reportColumns = [
+        'Job_ID' => $row['id'],
+        'Job_Name' => $row['job_name'],
+        'Netlink_ID' => $row['netlink_id'],
+        'Job_Purpose' => $row['job_purpose'],
+        'Status' => $row['status'],
+        'Price' => $row['price'],
+        'Duration' => $row['duration'],
+        'Material_Type' => $row['material_type'],
+        'Delivered_Date' => $row['status'] == 'cancelled' ? $row['cancelled_date'] : $row['delivered_date'],
+    ];
+    fputcsv($fp, $d_reportColumns);
   }
   fclose($fp);
   exit();
 }
+
+//Laser Cut Jobs REPORT
+//If clicked download CSV (input name="getLaserCSV")
+if (isset($_POST["getLaserCSV"])) {
+  
+  $filename = "laser-cut-job-history.csv";
+  header("Content-Type: text/csv; charset=utf-8;");
+  header("Content-Disposition: attachment; filename=".$filename);
+
+  $fp = fopen("php://output", "w");
+  $lc_column = array("Job_ID", "Job_Name", "Netlink_ID", "Job_Purpose", "Status", "Price", "Duration", "Material_Type", "Delivered_Date",);
+  fputcsv($fp, $lc_column);
+  foreach ($l_history as $row) {
+    $lc_reportColumns = [
+        'Job_ID' => $row['id'],
+        'Job_Name' => $row['job_name'],
+        'Netlink_ID' => $row['netlink_id'],
+        'Job_Purpose' => $row['job_purpose'],
+        'Status' => $row['status'],
+        'Price' => $row['price'],
+        'Duration' => $row['duration'],
+        'Material_Type' => $row['material_type'],
+        'Delivered_Date' => $row['status'] == 'cancelled' ? $row['cancelled_date'] : $row['delivered_date'],
+    ];
+    fputcsv($fp, $lc_reportColumns);
+  }
+  fclose($fp);
+  exit();
+}
+
+//Large Format Print Jobs REPORT
+//If clicked download CSV (input name="getLargeFormatCSV")
+if (isset($_POST["getLargeFormatCSV"])) {
+
+  $filename = "large-format-print-job-history.csv";
+  header("Content-Type: text/csv; charset=utf-8;");
+  header("Content-Disposition: attachment; filename=".$filename);
+
+
+  $fp = fopen("php://output", "w");
+  $lf_column = array("Job_ID", "Job_Name", "Netlink_ID", "Job_Purpose", "Status", "Price", "Delivered_Date",);
+  fputcsv($fp, $lf_column);
+  foreach ($lf_history as $row) {
+    $lf_reportColumns = [
+        'Job_ID' => $row['id'],
+        'Job_Name' => $row['job_name'],
+        'Netlink_ID' => $row['netlink_id'],
+        'Job_Purpose' => $row['job_purpose'],
+        'Status' => $row['status'],
+        'Price' => $row['price'],
+        'Delivered_Date' => $row['status'] == 'cancelled' ? $row['cancelled_date'] : $row['delivered_date'],
+    ];
+    fputcsv($fp, $lf_reportColumns);
+  }
+  fclose($fp);
+  exit();
+}
+
 ?>
 
 <!doctype html>
@@ -176,17 +258,17 @@ if (isset($_POST["getCSV"])) {
     <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/checkout/">
 
     <!-- Bootstrap core CSS -->
-<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
 
-    <!-- Favicons -->
-<link rel="apple-touch-icon" href="/docs/4.5/assets/img/favicons/apple-touch-icon.png" sizes="180x180">
-<link rel="icon" href="/docs/4.5/assets/img/favicons/favicon-32x32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/docs/4.5/assets/img/favicons/favicon-16x16.png" sizes="16x16" type="image/png">
-<link rel="manifest" href="/docs/4.5/assets/img/favicons/manifest.json">
-<link rel="mask-icon" href="/docs/4.5/assets/img/favicons/safari-pinned-tab.svg" color="#563d7c">
-<link rel="icon" href="/docs/4.5/assets/img/favicons/favicon.ico">
-<meta name="msapplication-config" content="/docs/4.5/assets/img/favicons/browserconfig.xml">
-<meta name="theme-color" content="#563d7c">
+        <!-- Favicons -->
+    <link rel="apple-touch-icon" href="/docs/4.5/assets/img/favicons/apple-touch-icon.png" sizes="180x180">
+    <link rel="icon" href="/docs/4.5/assets/img/favicons/favicon-32x32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/docs/4.5/assets/img/favicons/favicon-16x16.png" sizes="16x16" type="image/png">
+    <link rel="manifest" href="/docs/4.5/assets/img/favicons/manifest.json">
+    <link rel="mask-icon" href="/docs/4.5/assets/img/favicons/safari-pinned-tab.svg" color="#563d7c">
+    <link rel="icon" href="/docs/4.5/assets/img/favicons/favicon.ico">
+    <meta name="msapplication-config" content="/docs/4.5/assets/img/favicons/browserconfig.xml">
+    <meta name="theme-color" content="#563d7c">
 
     <style>
       .bd-placeholder-img {
@@ -242,204 +324,221 @@ if (isset($_POST["getCSV"])) {
 
     </style>
     <!-- Custom styles for this template -->
-
   </head>
-  <!--Header-->
-  <div id="custom_header"><div class="wrapper" style="min-height: 6em;" id="banner">
-   <div style="position:absolute; left: 5px; top: 26px;">
-    <a href="http://www.uvic.ca/" id="logo"><span>University of Victoria</span></a>
-   </div>
-   <div style="position:absolute; left: 176px; top: 26px;">
-    <a href="http://www.uvic.ca/library/" id="unit"><span>Libraries</span></a>
-   </div>
-   <div class="edge" style="position:absolute; margin: 0px;right: 0px; top: 0px; height: 96px; width:200px;">&nbsp;</div>
-  </div>
-  <!--Header end-->
+
   <body class="bg-light">
+    <div id="custom_header">
+      <div class="wrapper" style="min-height: 6em;" id="banner">
+        <div style="position:absolute; left: 5px; top: 26px;">
+          <a href="http://www.uvic.ca/" id="logo"><span>University of Victoria</span></a>
+        </div>
+        <div style="position:absolute; left: 176px; top: 26px;">
+          <a href="http://www.uvic.ca/library/" id="unit"><span>Libraries</span></a>
+        </div>
+        <div class="edge" style="position:absolute; margin: 0px;right: 0px; top: 0px; height: 96px; width:200px;">&nbsp;</div>
+      </div><!--Header end-->
 
     <div class="text-center">
       <h1>Print History</h1>
     </div>
 
-  <div class="row">
-
-  <div class="container">
-  <div class="py-5 text-left">
-
-  <h3 id="topOfPage">Completed, Archived &amp; Cancelled Jobs</h3>
-  <br>
-
-  <!--Search bar-->
-  <div class="row">
-  <form method="POST">
     <div class="row">
-      <div class="mb-2">
-        <label for = "searchdate_start">Start date:</label>
-        <input type="date" id= "searchdate_start" name="searchdate_start" style='width:150px;' value="<?php echo isset($_GET['searchdate_start']) ? $_GET['searchdate_start'] : $_POST['searchdate_start']; ?>">
-      </div>
-      <div class="mb-2">
-        <label for = "searchdate_end">End date:</label>
-        <input type="date" id= "searchdate_end" name="searchdate_end" style='width:150px;' value="<?php echo isset($_GET['searchdate_end']) ? $_GET['searchdate_end'] : $_POST['searchdate_end']; ?>">
-      </div>
-  </div>
-  <div class="row">
-    <div class="mb-2">
-      <label for = "search_id">Name or netlink id:</label>
-        <input type="text" id="search_id" name="search_id" style='width:250px;' value="<?php echo isset($_GET['search_id']) ? $_GET['search_id'] : '';?>">
-    </div>
+      <div class="container">
+        <div class="py-5 px-5 text-left">
+          <h3 id="topOfPage">Delivered, Archived &amp; Cancelled Jobs</h3>
+           <br>
+          <!--Search bar-->
+          <div class="row">
+          <form method="POST">
+            <div class="row">
+              <div class="mb-2">
+                <label for = "searchdate_start">Start date:</label>
+                <input type="date" id= "searchdate_start" name="searchdate_start" style='width:150px;' value="<?php echo isset($_GET['searchdate_start']) ? $_GET['searchdate_start'] : $_POST['searchdate_start']; ?>">
+              </div>
+              <div class="mb-2">
+                <label for = "searchdate_end">End date:</label>
+                <input type="date" id= "searchdate_end" name="searchdate_end" style='width:150px;' value="<?php echo isset($_GET['searchdate_end']) ? $_GET['searchdate_end'] : $_POST['searchdate_end']; ?>">
+              </div>
+            </div>
+            <div class="row">
+              <div class="mb-2">
+                <label for = "search_id">Name or netlink id:</label>
+                  <input type="text" id="search_id" name="search_id" style='width:250px;' value="<?php echo isset($_GET['search_id']) ? $_GET['search_id'] : '';?>">
+              </div>
+            </div>
+            <input type="submit" name="Search" value="Search">
+          </div>
 
-  </div>
-    <!-- extra search criteria
-    <div class="">
-      <label for = "approved">Only Approved: </label>
-      <input type="checkbox" id= "approved" name="approved">
-    </div>
-  -->
-    <input type="submit" name="Search" value="Search">
-  </form>
-    </div>
-    <div class="col-md-4 offset-md-4">
-      <a class="btn btn-md btn-primary btn-" href="admin-dashboard.php" role="button">Back to Dashboard</a>
-    </div>   
+          <hr class="mb-6">
 
-    <div class="col-md-4 align-self-end">
-      <input type="submit" name="getCSV" value="Download CSV" class="btn btn-md btn-danger btn-">
-    </div>
-  </div>
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <input type="submit" name="get3DCSV" value="Download 3D Print CSV" class="btn btn-warning">
+            </div>
+            <div class="col-md-4 mb-3">
+              <input type="submit" name="getLaserCSV" value="Download Laser Cut CSV" class="btn btn-warning">
+            </div>
+            <div class="col-md-4 mb-3">
+              <input type="submit" name="getLargeFormatCSV" value="Download Large Format Print CSV" class="btn btn-warning">
+            </div>
+          </div>
+          </form>
+        <div class="col-md-4 offset-md-4">
+          <a class="btn btn-md btn-primary btn-" href="admin-dashboard.php" role="button">Back to Dashboard</a>
+        </div>   
 
-  <div>
-    <p id = "3dSection"><a href="#laserSection">(Jump to Laser Cut jobs)</a><br><a href="#largeFormatSection">(Jump to Large Format Print jobs)</a></p>
-  </div>
-  <button class="accordion active">3D Print Jobs</button>
-    <div class="panel" style="display:block;">
-  <div class="py-3"></div>
-  <div class="table-responsive">
-    <table class="table table-striped table-md">
-      <thead>
-        <tr>
-          <!-- table header-->
-          <th>Job id</th>
-          <th>Username</th>
-          <th>Name</th>
-          <th>Completion Date</th>
-          <th>Status</th>
-        </tr>
-        </thead>
-      <tbody>
-        <?php foreach ($d_history as $row) {
-        ?>
-        <tr>
-          <td style="width:95px;"><?php echo $row["id"]; ?></td>
-          <td style="width:95px;"><?php echo $row["netlink_id"]; ?></td>
-            <!--CHANGE TO UNEDITABLE SCREEN -->
-            <!-- Conditional link based on job_type -->
-            <td style="width:95px;"><a href="admin-3d-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>   
-            <td style="width:95px;"><?php echo $row["completed_date"]; ?></td>
-          <td style="width:95px;"><?php echo $row["status"]; ?></td>
-        </tr>
-        <?php
-        }
-        ?>
-      </tbody>
-    </table>
-  </div>
-  </div><!--End of 3D jobs-->
+        <hr class="mb-12">
 
-  <div>
-    <p id = "laserSection"><a href="#3dSection">(Jump to 3D Print jobs)</a><br><a href="#largeFormatSection">(Jump to Large Format Print jobs)</a></p>
-    largeFormatSection
-  </div>
-  <button class="accordion active">Laser Cut Jobs</button>
-    <div class="panel" style="display:block;">
-    <div class="py-3"></div>
-      <div class="table-responsive">
-        <table class="table table-striped table-md">
-          <thead>
-          <tr>
-            <!-- table header-->
-            <th>Job id</th>
-            <th>Username</th>
-            <th>Name</th>
-            <th>Completion Date</th>
-            <th>Status</th>
-          </tr>
-          </thead>
-          <tbody>
+        <div style="text-align: right;">
+          <p id = "3dSection"><a href="#laserSection">(Jump to Laser Cut jobs)</a><br><a href="#largeFormatSection">(Jump to Large Format Print jobs)</a></p>
+        </div>
+        
+        <button class="accordion active">3D Print Jobs</button>
+        
+        <div class="panel" style="display:block;">
+          <div style="text-align: right;">
+            <p><b><?php echo "Total print duration of jobs displayed (minutes): ". $d_duration; ?></b></p>
+          </div>
+          <div class="py-3"></div>
+            <div class="table-responsive">
+              <table class="table table-striped table-md">
+                <thead>
+                  <tr>
+                    <!-- table header-->
+                    <th>Job id</th>
+                    <th>Username</th>
+                    <th>Name</th>
+                    <th>Completion Date</th>
+                    <th>Status</th>
+                  </tr>
+                  </thead>
+                <tbody>
+                  <?php foreach ($d_history as $row) {
+                  ?>
+                  <tr>
+                    <td style="width:95px;"><?php echo $row["id"]; ?></td>
+                    <td style="width:95px;"><?php echo $row["netlink_id"]; ?></td>
+                      <!--CHANGE TO UNEDITABLE SCREEN -->
+                      <!-- Conditional link based on job_type -->
+                      <td style="width:95px;"><a href="admin-3d-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>   
+                      <td style="width:95px;"><?php echo $row['status'] == 'cancelled' ? $row['cancelled_date'] : $row['delivered_date']; ?></td>
+                    <td style="width:95px;"><?php echo $row["status"]; ?></td>
+                  </tr>
+                  <?php
+                  }
+                  ?>
+                </tbody>
+              </table>
+            </div>
+        </div><!--End of 3D jobs-->
 
-          <?php foreach ($l_history as $row) {
-          ?>
-          <tr>
-            <td style="width:95px;"><?php echo $row["id"]; ?></td>
-            <td style="width:95px;"><?php echo $row["netlink_id"]; ?></td>
-              <!--CHANGE TO UNEDITABLE SCREEN -->
-              <!-- Conditional link based on job_type -->
-              <td style="width:95px;"><a href="admin-laser-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>   
-              <td style="width:95px;"><?php echo $row["completed_date"]; ?></td>
-            <td style="width:95px;"><?php echo $row["status"]; ?></td>
-          </tr>
-          <?php
-          }
-          ?>
-          </tbody>
-        </table>
-      </div>
-    </div><!--End of laser jobs-->
-
-<!--LARGE FORMAT PRINT JOBS-->
-    <div>
-    <p id="largeFormatSection"><a href="#3dSection">(Jump to 3D Print jobs)</a><br><a href="#laserSection">(Jump to Laser Cut jobs)</a></p>
-
-  </div>
-  <button class="accordion active">Large Format Print Jobs</button>
-    <div class="panel" style="display:block;">
-  <div class="py-3"></div>
-  <div class="table-responsive">
-    <table class="table table-striped table-md">
-      <thead>
-        <tr>
-          <!-- table header-->
-          <th>Job id</th>
-          <th>Username</th>
-          <th>Name</th>
-          <th>Completion Date</th>
-          <th>Status</th>
-        </tr>
-        </thead>
-      <tbody>
-        <?php foreach ($lf_history as $row) {
-        ?>
-        <tr>
-          <td style="width:95px;"><?php echo $row["id"]; ?></td>
-          <td style="width:95px;"><?php echo $row["netlink_id"]; ?></td>
-            <!--CHANGE TO UNEDITABLE SCREEN -->
-            <!-- Conditional link based on job_type -->
-            <td style="width:95px;"><a href="admin-large-format-print-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>   
-            <td style="width:95px;"><?php echo $row["completed_date"]; ?></td>
-          <td style="width:95px;"><?php echo $row["status"]; ?></td>
-        </tr>
-        <?php
-        }
-        ?>
-      </tbody>
-    </table>
-  </div>
-  </div>
+        <hr class="mb-12">
 
 
-  <div>
-    <p><a href="#topOfPage">(Jump to Top)</a></p>
-  </div>
+        <div style="text-align: right;">
+          <p id = "laserSection"><a href="#3dSection">(Jump to 3D Print jobs)</a><br><a href="#largeFormatSection">(Jump to Large Format Print jobs)</a></p>
+        </div>
+        
+        <button class="accordion active">Laser Cut Jobs</button>
+        
+        <div class="panel" style="display:block;">
+          <div style="text-align: right;">
+            <p><b><?php echo "Total cut duration of jobs displayed (minutes): ". $l_duration; ?></b></p>
+          </div>  
+          <div class="py-3"></div>
+          <div class="table-responsive">
+            <table class="table table-striped table-md">
+              <thead>
+                <tr>
+                  <!-- table header-->
+                  <th>Job id</th>
+                  <th>Username</th>
+                  <th>Name</th>
+                  <th>Completion Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              
+              <tbody>
+              <?php foreach ($l_history as $row) {
+              ?>
+                <tr>
+                  <td style="width:95px;"><?php echo $row["id"]; ?></td>
+                  <td style="width:95px;"><?php echo $row["netlink_id"]; ?></td>
+                    <!--CHANGE TO UNEDITABLE SCREEN -->
+                    <!-- Conditional link based on job_type -->
+                    <td style="width:95px;"><a href="admin-laser-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>   
+                    <td style="width:95px;"><?php echo $row['status'] == 'cancelled' ? $row['cancelled_date'] : $row['delivered_date']; ?></td>
+                  <td style="width:95px;"><?php echo $row["status"]; ?></td>
+                </tr>
+              <?php
+              }
+              ?>
+              </tbody>
+            </table>
+          </div>
+        </div><!--End of laser jobs-->
+        
+        <hr class="mb-12">
 
-  <hr class="mb-12">
+
+    <!--LARGE FORMAT PRINT JOBS-->
+        <div style="text-align: right;">
+          <p id="largeFormatSection"><a href="#3dSection">(Jump to 3D Print jobs)</a><br><a href="#laserSection">(Jump to Laser Cut jobs)</a></p>
+        </div>
+  
+        <button class="accordion active">Large Format Print Jobs</button>
+        
+        <div class="panel" style="display:block;">
+          <div class="py-3"></div>
+          <div class="table-responsive">
+            <table class="table table-striped table-md">
+              <thead>
+                <tr>
+                  <!-- table header-->
+                  <th>Job id</th>
+                  <th>Username</th>
+                  <th>Name</th>
+                  <th>Completion Date</th>
+                  <th>Status</th>
+                </tr>
+                </thead>
+              <tbody>
+                <?php foreach ($lf_history as $row) {
+                ?>
+                <tr>
+                  <td style="width:95px;"><?php echo $row["id"]; ?></td>
+                  <td style="width:95px;"><?php echo $row["netlink_id"]; ?></td>
+                    <!--CHANGE TO UNEDITABLE SCREEN -->
+                    <!-- Conditional link based on job_type -->
+                    <td style="width:95px;"><a href="admin-large-format-print-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row["job_name"]; ?></a></td>   
+                    <td style="width:95px;"><?php echo $row['status'] == 'cancelled' ? $row['cancelled_date'] : $row['delivered_date']; ?></td>
+                  <td style="width:95px;"><?php echo $row["status"]; ?></td>
+                </tr>
+                <?php
+                }
+                ?>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+
+        <div>
+          <p><a href="#topOfPage">(Jump to Top)</a></p>
+        </div>
+
+        <hr class="mb-12">
 
   <!--<a class="btn btn-md btn-block" href="login.php" role="button">Log Out</a>
   -->
+        </div>
+      </div>
+    </div>
+  <div class="text-center">
+    <a class="btn btn-md btn-primary btn-lg py-5" href="admin-dashboard.php" role="button">Back to Dashboard</a>
   </div>
-  </div>
-  </div>
-<div class="text-center">
-  <a class="btn btn-md btn-primary btn-lg" href="admin-dashboard.php" role="button">Back to Dashboard</a>
-</div>
+
 <script>
   var acc = document.getElementsByClassName("accordion");
   var i;

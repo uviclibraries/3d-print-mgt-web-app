@@ -63,16 +63,6 @@ else{
 }
 $all_users = $stm->fetchAll(PDO::FETCH_ASSOC);
 
-$sum = 0;
-foreach ($all_users as $row) {
-  $sum += $row["charge_total"];
-}
-
-$duration = 0;
-foreach ($all_users as $row){
-  // $duration +=$row["duration"];
-  $duration = 0;
-}
 
 $get_line = array();
 //Seach button clicked$_SERVER['REQUEST_METHOD'] === 'POST'
@@ -213,7 +203,6 @@ if (isset($_POST["getCSV"])) {
   <div class="row">
     <div class="col align-self-start">
     <p><?php echo $dateline . " Sum: "?><b><?php echo "$" . number_format((float)$sum, 2, '.',''); ?></b></p>
-    <p><?php echo $dateline . " Duration: "?><b><?php echo "$" . number_format((float)$sum, 2, '.',''); ?></b></p>
     </div>
     <div class="col-md-4 align-self-end">
       <input type="submit" name="getCSV" value="Download CSV" class="btn btn-md btn-danger btn-">

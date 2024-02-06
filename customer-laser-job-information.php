@@ -180,7 +180,7 @@ if ($user != $job["netlink_id"] && $user_type == 1) {
     <div class="col-md-12 order-md-1">
       <h4 class="mb-3">Specifications</h4>
       <form class="needs-validation" novalidate>
-
+        <div class="row">
           <div class="col-md-3 mb-3">
                 <label for="username">Copies</label>
                 <div class="input-group">
@@ -225,7 +225,7 @@ if ($user != $job["netlink_id"] && $user_type == 1) {
       </form>
     </div>
   </div>
-
+</div>
 
 <!-- CANCEL AND DUPLICATE JOB BUTTONS-->
 
