@@ -19,16 +19,30 @@ $userSQL->execute();
 $job_owner = $userSQL->fetch();
 
 //get list of active jobs associated with the job's owner
-$stm = $conn->prepare("SELECT web_job.id AS id, web_job.job_name AS name, web_job.status AS status, web_job.submission_date AS submission_date, web_job.priced_date AS priced_date, web_job.paid_date AS paid_date,web_job.printing_date AS printing_date,web_job.completed_date AS completed_date,web_job.delivered_date AS delivered_date,web_job.hold_date AS hold_date,web_job.hold_signer AS hold_signer,web_job.cancelled_signer AS cancelled_signer,  web_job.priced_signer AS priced_signer, web_job.paid_signer AS paid_signer, web_job.printing_signer AS printing_signer, web_job.completed_signer AS completed_signer, web_job.delivered_signer AS delivered_signer, web_job.job_purpose AS job_purpose, web_job.academic_code AS academic_code, web_job.course_due_date AS course_due_date, 3d_print_job.duration AS duration FROM web_job INNER JOIN 3d_print_job ON web_job.id=3d_print_job.3d_print_id WHERE web_job.status NOT IN ('delivered', 'archived', 'cancelled') AND web_job.netlink_id = :netlink_id");
+$stm = $conn->prepare("SELECT web_job.id AS id, web_job.job_name AS name, web_job.status AS status, web_job.submission_date AS submission_date, web_job.priced_date AS priced_date, web_job.paid_date AS paid_date,web_job.printing_date AS printing_date,web_job.completed_date AS completed_date,web_job.delivered_date AS delivered_date,web_job.hold_date AS hold_date,web_job.hold_signer AS hold_signer,web_job.cancelled_signer AS cancelled_signer,  web_job.priced_signer AS priced_signer, web_job.paid_signer AS paid_signer, web_job.printing_signer AS printing_signer, web_job.completed_signer AS completed_signer, web_job.delivered_signer AS delivered_signer, web_job.job_purpose AS job_purpose, web_job.academic_code AS academic_code, web_job.course_due_date AS course_due_date, 3d_print_job.duration AS duration, web_job.parent_job_id AS parent_id FROM web_job INNER JOIN 3d_print_job ON web_job.id=3d_print_job.3d_print_id WHERE web_job.status NOT IN ('delivered', 'archived', 'cancelled') AND web_job.netlink_id = :netlink_id");
 
   $stm->bindParam(':netlink_id', $job['netlink_id']);
   $stm->execute();
   $user_web_jobs = $stm->fetchAll();
 
+  $is_parent=false;
+  $parent=null;
+
   $active_user_jobs = [];
   foreach ($user_web_jobs as $related_job) {
-    $active_user_jobs[] = $related_job;
+    if($related_job['id'] != $job['id']){
+      $active_user_jobs[] = $related_job;
+      if($related_job['parent_id'] == $job['id'])
+      {
+        $is_parent=true;
+      }
+      if($related_job['id'] === $job['parent_job_id']){
+        $parent = $related_job;
+      }
+    }
   }
+  $bundled = $active_user_jobs ? true : false;
+  echo 'has siblings' . $bundled . '; is parent: ' . $is_parent . '; parent: ' . $parent['id'];
 /*
 $stm = $conn->prepare("SELECT * FROM print_job WHERE id=?");
 $stm->execute([$_GET["job_id"]]);
@@ -63,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   // change to source from web job and 3d_print_job
-  $stmt = $conn->prepare("UPDATE web_job INNER JOIN 3d_print_job ON id=3d_print_id SET price = :price, infill = :infill, scale = :scale, layer_height = :layer_height, copies=:copies,supports = :supports, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, cancelled_date = :cancelled_date, delivered_date = :delivered_date, priced_signer =:priced_signer,  paid_signer= :paid_signer, printing_signer=:printing_signer, completed_signer=:completed_signer, delivered_signer=:delivered_signer, hold_date = :hold_date, hold_signer= :hold_signer,cancelled_signer= :cancelled_signer, model_name_2 =:model_name_2, duration = :duration WHERE id = :job_id;");
+  $stmt = $conn->prepare("UPDATE web_job INNER JOIN 3d_print_job ON id=3d_print_id SET price = :price, infill = :infill, scale = :scale, layer_height = :layer_height, copies=:copies,supports = :supports, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, cancelled_date = :cancelled_date, delivered_date = :delivered_date, priced_signer =:priced_signer,  paid_signer= :paid_signer, printing_signer=:printing_signer, completed_signer=:completed_signer, delivered_signer=:delivered_signer, hold_date = :hold_date, hold_signer= :hold_signer,cancelled_signer= :cancelled_signer, model_name_2 =:model_name_2, duration = :duration, parent_job_id =:parent_job_id WHERE id = :job_id;");
   
   $current_date = date("Y-m-d");
 
@@ -85,6 +99,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $stmt->bindParam(':staff_notes', $_POST["staff_notes"]);
   $stmt->bindParam(':status', $_POST["status"]);
   $stmt->bindParam(':model_name_2', $modify_value);
+  $new_parent= intval($_POST["select_parent"]);
+  $stmt->bindParam(':parent_job_id', $new_parent, PDO::PARAM_INT);
   /*
   should dates be removed if steps are reverted: eg printing->paid
   */
@@ -474,6 +490,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <div class="container">
     <form method="POST" enctype="multipart/form-data">
+      <script>
+        // Listen for keypress events on the form
+        document.getElementById('myForm').addEventListener('keypress', function(event) {
+          // Check if the pressed key is the Enter key
+          if (event.key === 'Enter') {
+              // Prevent the default action to stop form submission
+              event.preventDefault();
+          }
+        });
+      </script>
+
     <div class="py-5 text-center">
       <h1><?php echo " Job name: " . $job["job_name"];?></h1>
       <h2><?php echo "Customer: " . $job_owner["name"];?></h2>
@@ -485,7 +512,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="input-group">
           <div class="input-group">
             <input type="text" class="form-control" value="<?php echo $job["submission_date"]; ?>" readonly>
-            </div>
+          </div>
         </div>
         <div class="invalid-feedback" style="width: 100%;">
         Status is required.
@@ -541,55 +568,162 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <p><?php echo "Status changed by: <br>" . $status_signer; ?></p>
         </div>
       </div>
-<!-- container with a 4-column list of the user's active web jobs. Used for batch status changes -->
-        <script type="text/javascript">
-          function checkAll() {
-            var checkboxes = document.querySelectorAll('.job-checkbox');
-            checkboxes.forEach(function(checkbox) {
-              checkbox.checked = true;
-            });
+      <hr class="mb-6">
+
+      <!-- JOB PARENT SELECTION-->
+      <div id="linked_jobs" class="col-md-12 order-md-1">
+        <h2>Active Customer Jobs</h2>
+        <div class="row">
+          <?php if($parent) {?>
+            <div class="col-md-4 mb-3">
+               <p>Current parent: <?php echo $parent['id'];?></p>
+            </div>
+            
+            <div class="col-md-4 mb-3">
+              <label for="select_parent">Select new parent:</label>
+            </div>
+          <?php }
+          else{?>
+            <div class="col-md-4 mb-3">
+              <label for="select_parent">Assign parent:</label>
+            </div>
+          <?php }?>
+          
+
+          <div class="col-md-4 mb-3">
+            <!--set which item in the dropdown will be set as the default value-->
+            <?php $parent=$job['parent_job_id'];
+            $default_set=false;
+
+            // populating from $activeUserJobs PHP array
+            // Create the select element
+
+            echo '<select name="select_parent" style="width:300px;">';
+                // Loop through the array and create an option element for each item
+                foreach ($active_user_jobs as $active_user_job) {
+                    // Check if this item is the default item
+                    if ($active_user_job['parent_job_id'] === $parent && !$default_set) {
+                      echo '<option value="' . htmlspecialchars($active_user_job['id']) . '" selected>' . htmlspecialchars($active_user_job['id']) . ' - ' . htmlspecialchars($active_user_job['name']) . '</option>';
+                      $default_set = true; // Mark that the default has been set
+                    } else {
+                        echo '<option value="' . htmlspecialchars($active_user_job['id']) . '" >' . htmlspecialchars($active_user_job['id']) . ' - ' . htmlspecialchars($active_user_job['name']) . '</option>';
+                    }
+
+                    // Echo the option element with the selected attribute if it's the default item
+                    // echo '<option value="' . htmlspecialchars($active_user_job['id']) . '"' . $selected . ' name="selectParent">' . htmlspecialchars($active_user_job['id']) . '</option>';
+                  
+                }
+                echo 'console.log("selected")';
+                if(!default_set){
+                  echo '<option value='.null.' selected>--</option>';
+                  $default_set=true;
+                }
+                else{echo '<option value='.null.' >--</option>';
+              }
+            // Close the select element
+            echo '</select>';
+            ?> 
+          </div>
+        </div>
+      </div>
+
+
+      <!--Tab table of active jobs for the current customer-->
+
+      <style>
+        /*STYLES FOR USER ACTIVE JOBS STATUS TABS*/
+
+        body {font-family: Arial;}
+        /* Style for each checkbox */
+        .job-checkbox {
+          display: inline-block;
+          margin: 3px;
+        }
+
+        .job-item {
+          flex: 1 1 calc(33.333% - 10px); 
+          box-sizing: border-box;
+        }
+        
+        /* Style the tab */
+        .tab {
+          overflow: hidden;
+          border: 1px solid #ccc;
+          background-color: #f1f1f1;
+        }
+
+        /* Style the buttons inside the tab */
+        .tab button {
+          background-color: inherit;
+          float: left;
+          border: none;
+          outline: none;
+          cursor: pointer;
+          padding: 14px 16px;
+          transition: 0.3s;
+          font-size: 17px;
+        }
+
+        /* Change background color of buttons on hover */
+        .tab button:hover {
+          background-color: #ddd;
+        }
+
+        /* Create an active/current tablink class */
+        .tab button.active {
+          background-color: #ccc;
+        }
+
+        /* Style the tab content */
+        .tabcontent {
+          display: none;
+          padding: 6px 12px;
+          border: 1px solid #ccc;
+          border-top: none;
+        }
+      </style> <!--styles for tabbed linked jobs table-->
+
+      <script>
+        function openStatus(evt, status) {
+          var i, tabcontent, tablinks;
+          tabcontent = document.getElementsByClassName("tabcontent");
+          for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
           }
-
-          function uncheckAll() {
-            var checkboxes = document.querySelectorAll('.job-checkbox');
-            checkboxes.forEach(function(checkbox) {
-              checkbox.checked = false;
-            });
+          tablinks = document.getElementsByClassName("tablinks");
+          for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
           }
+          document.getElementById(status).style.display = "block";
+          evt.currentTarget.className += " active";
+        }
+      </script>  
 
-          // function populatePopup(other_job) {
-          //   const popupElement = document.querySelector('.popuptext');
+      <p>Select the different tabs to see jobs with those statuses</p>
 
-          //   // Clear existing content
-          //   popupElement.innerHTML = '';
-          //   //Fill popup with job-specific details
-          //   popupElement.innerHTML = '${other_job['name']}<br>${other_job['status']}<br>${other_job['submission_date']}';
-          // }
+      <div class="tab">
+      <!--show "linked jobs" tab if the job is either a parent (of other jobs) or has a parent that's not null-->
+      <?php if( $parent || $is_parent) {?>
+      <button type="button" class="tablinks" onclick="openStatus(event, 'Linked')" id="linked_tab">Linked</button>
+      <?php }?>
+        <button class="tablinks" onclick="event.preventDefault();openStatus(event, 'NotPriced')" id="notpriced_tab">Not Priced</button>
+        <button class="tablinks" onclick="event.preventDefault();openStatus(event, 'PendingPayment')" id="pending_payment_tab">Pending Payment</button>
+        <button class="tablinks" onclick="event.preventDefault();openStatus(event, 'Paid')" id="paid_tab">Paid</button>
+        <button class="tablinks" onclick="event.preventDefault();openStatus(event, 'InProgress')" id="in_progress_tab">In Progress</button>
+        <button class="tablinks" onclick="event.preventDefault();openStatus(event, 'Completed')" id="completed_tab">Completed</button>
+        <button class="tablinks" onclick="event.preventDefault();openStatus(event, 'OnHold')" id="on_hold_tab">On Hold</button>
+      </div>
 
-        </script>    
-
-        <div class="col-md-12 order-md-1">
-          <p class="mb-3">Apply status change to related jobs</p>
-          <?php 
-          echo '<button type="button" id="selectJobsButton" onclick="checkAll()">Check All</button>';
-          echo '<button type="button" id="selectJobsButton" onclick="uncheckAll()">Uncheck All</button>'; 
-          ?>
-          <div class="user_jobs_container">
-
-          <!--text saying there's no other active jobs isnt appearing-->
-          <?php
-            try {
-                $num_jobs = count($active_user_jobs);
-                if($num_jobs == 0){?>
-                  <p><?php echo 'This customer has no other active jobs<br>';?></p>
-                <?php }
-            } catch (PDOException $e) {
-                echo "Error: " . $e->getMessage();
-            }
-
-            // Iterate through the $active_user_jobs array
-            foreach ($active_user_jobs as $other_active_job) {
-              if($job['id'] != $other_active_job['id']){
+      <?php if($parent || $is_parent){?>
+      <div id="Linked" class="tabcontent">
+        <h4>Linked</h4>
+        <p>These are the user's jobs that are linked to the job in this page. </p> 
+        
+          <?php foreach ($active_user_jobs as $other_active_job) {
+              if (isset($other_active_job['id'], $other_active_job['parent_job_id'], $job['id'], $job['parent_job_id']) &&
+                ( $other_active_job['id'] == $job['parent_job_id'] ||
+                  $job['parent_job_id'] == $other_active_job['parent_job_id'] || 
+                  $job['id'] == $other_active_job['parent_job_id'])) {
                 echo '<div class="job-item">';
                 echo '<input type="checkbox" class ="job-checkbox" id="' . $other_active_job['id'] . '" name="checked_jobs[]" value="' . $other_active_job['id'] . '">';
                 echo '<label for="' . $other_active_job['id'] . '">';
@@ -604,12 +738,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                   }
                 echo '</label>';
                 echo '</div>';
-
                 }
               }
             ?>
-          </div>
-        </div> <!--End of associated jobs list-->
+      </div>
+      <?php } ?>
+
+      <div id="NotPriced" class="tabcontent">
+        <h4>Not Priced</h4>
+        <p>These are the user's jobs that have been submitted and not processed further.</p> 
+        <input type="checkbox" class ="job-checkbox" id="1012" name="checked_jobs[]" value="1012">
+          
+      </div>
+
+      <div id="PendingPayment" class="tabcontent">
+        <h4>Pending Payment</h4>
+        <p>These are the user's jobs that have been priced and are awaiting payment by the customer.</p>
+      </div>
+      <div id="Paid" class="tabcontent">
+        <h4>Paid</h4>
+        <p>These are the jobs that have been paid for and not yet sent to the printer.</p>
+      </div>
+
+      <div id="InProgress" class="tabcontent">
+        <h4>In Progress</h4>
+        <p>These are the user's jobs that are currently on the printer.</p> 
+      </div>
+
+      <div id="Completed" class="tabcontent">
+        <h4>Completed</h4>
+        <p>These are the user's jobs that have been printed but not delivered to the front desk.</p>
+      </div>
+      <div id="OnHold" class="tabcontent">
+        <h4>On Hold</h4>
+        <p>These are the user's jobs that have been put on hold</p>
+      </div>
+
+      
+
         <hr class="mb-6">
         <div class="col-md-12 order-md-1">
           <h4 class="mb-3">Price</h4>
@@ -926,5 +1092,5 @@ window.onload = function() {
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
       <script>window.jQuery || document.write('<script src="/docs/4.5/assets/js/vendor/jquery.slim.min.js"><\/script>')</script><script src="/docs/4.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-1CmrxMRARb6aLqgBO7yyAxTOQE2AKb9GfXnEo760AUcUmFx3ibVJJAzGytlQcNXd" crossorigin="anonymous"></script>
         <script src="form-validation.js"></script>
-        </body>
+</body>
 </html>
