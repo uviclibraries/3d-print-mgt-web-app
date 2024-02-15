@@ -123,9 +123,9 @@ if ($user != $job["netlink_id"] && $user_type == 1) {
                   <div class="input-group mb-3">
                     <input type="text" class="form-control" placeholder="100" value="<?php echo $job["status"]; ?>" aria-label="100" aria-describedby="basic-addon2" readonly>
                   </div>
-                <div class="invalid-feedback" style="width: 100%;">
+                <!-- <div class="invalid-feedback" style="width: 100%;">
                 Status is required.
-                </div>
+                </div> -->
             </div>
             </div>
         </div>
@@ -167,8 +167,8 @@ if ($user != $job["netlink_id"] && $user_type == 1) {
         if ($job["status"] == "pending payment") {
           $_SESSION['price'] = strval($job["price"]);
           $_SESSION['job_id'] = $job['id'];
-          if($job["price"] == 0){?>
-            <p style="color:red">This job is priced with another job. Go to <a href="customer-3d-job-information.php?job_id=<?php echo $priced_job["id"]; ?>">this job</a> to pay.</p>
+          if($job["price"] == 0 && $job["parent_job_id"] != 0){?>
+            <p style="color:red">This job is priced with another job. Go to <a href="customer-3d-job-information.php?job_id=<?php echo $job["parent_job_id"]; ?>">this job</a> to pay.</p>
         <?php } else{?>
           <a href="moneris/customer-payment.php">
             <button type="button" class="btn btn-primary btn-lg" type="submit">
