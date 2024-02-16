@@ -19,43 +19,38 @@ $userSQL->execute();
 $job_owner = $userSQL->fetch();
 
 //get list of active jobs associated with the job's owner
-$stm = $conn->prepare("SELECT web_job.id AS id, web_job.job_name AS name, web_job.status AS status, web_job.submission_date AS submission_date, web_job.priced_date AS priced_date, web_job.paid_date AS paid_date,web_job.printing_date AS printing_date,web_job.completed_date AS completed_date,web_job.delivered_date AS delivered_date,web_job.hold_date AS hold_date,web_job.hold_signer AS hold_signer,web_job.cancelled_signer AS cancelled_signer,  web_job.priced_signer AS priced_signer, web_job.paid_signer AS paid_signer, web_job.printing_signer AS printing_signer, web_job.completed_signer AS completed_signer, web_job.delivered_signer AS delivered_signer, web_job.job_purpose AS job_purpose, web_job.academic_code AS academic_code, web_job.course_due_date AS course_due_date, 3d_print_job.duration AS duration, web_job.parent_job_id AS parent_job_id FROM web_job INNER JOIN 3d_print_job ON web_job.id=3d_print_job.3d_print_id WHERE web_job.status NOT IN ('delivered', 'archived', 'cancelled') AND web_job.netlink_id = :netlink_id");
+$stm = $conn->prepare("SELECT web_job.id AS id, web_job.job_name AS name, web_job.status AS status, web_job.submission_date AS submission_date, web_job.priced_date AS priced_date, web_job.paid_date AS paid_date,web_job.printing_date AS printing_date,web_job.completed_date AS completed_date,web_job.delivered_date AS delivered_date,web_job.hold_date AS hold_date,web_job.hold_signer AS hold_signer,web_job.cancelled_signer AS cancelled_signer,  web_job.priced_signer AS priced_signer, web_job.paid_signer AS paid_signer, web_job.printing_signer AS printing_signer, web_job.completed_signer AS completed_signer, web_job.delivered_signer AS delivered_signer, web_job.job_purpose AS job_purpose, web_job.academic_code AS academic_code, web_job.course_due_date AS course_due_date, 3d_print_job.duration AS duration, web_job.parent_job_id AS parent_job_id , web_job.is_parent AS is_parent FROM web_job INNER JOIN 3d_print_job ON web_job.id=3d_print_job.3d_print_id WHERE web_job.status NOT IN ('delivered', 'archived', 'cancelled') AND web_job.netlink_id = :netlink_id");
 
   $stm->bindParam(':netlink_id', $job['netlink_id']);
   $stm->execute();
   $user_web_jobs = $stm->fetchAll();
 
-  $is_parent=false;
   $parent=$job; //set self as parent if no other job has been assigned to this job as the parent.
-  $num_linked = 0; //count number of jobs with the same parent/siblings/parent
 
   $active_user_jobs = [];
   $linked_jobs = [];
+
   foreach ($user_web_jobs as $related_job) {
     if($related_job['id'] != $job['id']){
       array_push($active_user_jobs, $related_job);
-      if($related_job['parent_job_id'] == $job['id'] && $related_job['parent_job_id'] !=0 )
+      if($related_job['parent_job_id'] == $job['id'] && ($related_job['parent_job_id'] !=0|| $job['parent_job_id'] != 0))
       {
-        $is_parent=true; //declare true as a parent if job is the parent of another job
         array_push($linked_jobs, $related_job);
       }
+
       if($related_job['id'] == $job['parent_job_id'] && $job['parent_job_id'] != 0){
         $parent = $related_job; //sets parent if the job's parent id matches the id of another job
-        array_push($linked_jobs, $related_job);
-      }
-      if($related_job['parent_job_id'] == $job['parent_job_id'] && $job['parent_job_id'] != 0){
         array_push($linked_jobs, $related_job);
       }
     }
     else{
       if($parent == $job){
-        $parent = $related_job;
-        $is_parent = false;}
+        $parent = $related_job;}
     }
   }
 
   $bundled = $active_user_jobs ? true : false; //user has other active jobs
-  echo 'num linked' . count($linked_jobs) . '; is parent: ' . $is_parent . '; parent: ' . $parent['id'];
+  echo 'num linked' . count($linked_jobs) . ';  is parent: ' . $job['is_parent'] . '; parent: ' . $parent['id'];
 /*
 $stm = $conn->prepare("SELECT * FROM print_job WHERE id=?");
 $stm->execute([$_GET["job_id"]]);
@@ -90,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   // change to source from web job and 3d_print_job
-  $stmt = $conn->prepare("UPDATE web_job INNER JOIN 3d_print_job ON id=3d_print_id SET price = :price, infill = :infill, scale = :scale, layer_height = :layer_height, copies=:copies,supports = :supports, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, cancelled_date = :cancelled_date, delivered_date = :delivered_date, priced_signer =:priced_signer,  paid_signer= :paid_signer, printing_signer=:printing_signer, completed_signer=:completed_signer, delivered_signer=:delivered_signer, hold_date = :hold_date, hold_signer= :hold_signer,cancelled_signer= :cancelled_signer, model_name_2 =:model_name_2, duration = :duration, parent_job_id =:parent_job_id WHERE id = :job_id;");
+  $stmt = $conn->prepare("UPDATE web_job INNER JOIN 3d_print_job ON id=3d_print_id SET price = :price, infill = :infill, scale = :scale, layer_height = :layer_height, copies=:copies,supports = :supports, material_type = :material_type, staff_notes = :staff_notes, status = :status, priced_date = :priced_date,  paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, cancelled_date = :cancelled_date, delivered_date = :delivered_date, priced_signer =:priced_signer,  paid_signer= :paid_signer, printing_signer=:printing_signer, completed_signer=:completed_signer, delivered_signer=:delivered_signer, hold_date = :hold_date, hold_signer= :hold_signer,cancelled_signer= :cancelled_signer, model_name_2 =:model_name_2, duration = :duration, parent_job_id =:parent_job_id, is_parent = :is_parent WHERE id = :job_id;");
   
   $current_date = date("Y-m-d");
 
@@ -256,7 +251,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $checkedIDs_sql = implode(',', $checked_jobs);//to create comma separated list for update query
       // echo $checkedIDs_sql;
 
-      $stm = $conn->prepare("UPDATE web_job INNER JOIN 3d_print_job ON id=3d_print_id SET status = :status, priced_date = :priced_date, paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, delivered_date = :delivered_date, priced_signer=:priced_signer,  paid_signer= :paid_signer, printing_signer=:printing_signer, completed_signer=:completed_signer, delivered_signer=:delivered_signer, hold_date = :hold_date, hold_signer= :hold_signer, cancelled_date=:cancelled_date, cancelled_signer = :cancelled_signer WHERE id IN ($checkedIDs_sql)");
+      $stm = $conn->prepare("UPDATE web_job INNER JOIN 3d_print_job ON id=3d_print_id SET status = :status, priced_date = :priced_date, paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, delivered_date = :delivered_date, priced_signer=:priced_signer,  paid_signer= :paid_signer, printing_signer=:printing_signer, completed_signer=:completed_signer, delivered_signer=:delivered_signer, hold_date = :hold_date, hold_signer= :hold_signer, cancelled_date=:cancelled_date, cancelled_signer = :cancelled_signer, is_parent = :is_parent WHERE id IN ($checkedIDs_sql)");
 
       $stm->bindParam(':status', $_POST["status"]);
 
@@ -674,10 +669,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <!-- <hr class="mb-6"> -->
         <div class="col-md-12 order-md-1">
         <div id="linked_jobs">
-          <h2>Active Customer Jobs</h2>
+          <h4>Active Customer Jobs</h4>
           <div class="row">
             <!--Shows 'Current parent: #parent id - parent name if the job has a parent, and allows for reassignment-->
-            <?php if(!$is_parent && $job['parent_job_id'] != 0) { 
+            <?php if(!$job['is_parent'] && $job['parent_job_id'] != 0) { 
               $job_pointer = '<a href="admin-3d-job-specification.php?job_id=' . $parent["id"] . '">' . $parent["id"] . '</a>';
             ?>
               <div class="col-md-4 mb-3">
@@ -685,6 +680,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               </div>
             <?php } ?>
               
+              <?php if(!$job['is_parent']) { ?>
               <div class="col-md-4 mb-3">
                 <label for="select_parent">Set a new parent:</label>
               </div>
@@ -723,10 +719,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php
               echo '<p>Select the different tabs to see the customer’s active jobs with those statuses</p>';
             }?>
+        <?php } ?>
 
         <div class="tab">
           <!--show "linked jobs" tab if the job either a parent of other jobs but or has a parent thats not itself-->
-          <?php if($is_parent || $parent != $job) {?> 
+          <?php if($job['is_parent'] || $job['parent_job_id'] != 0) {?> 
             <button type="button" class="tablinks" onclick="openStatus(event, 'Linked')" id="linked_tab">Linked</button>
           <?php }?>
             <button class="tablinks" onclick="event.preventDefault();openStatus(event, 'NotPriced')" id="notpriced_tab">Not Priced</button>
@@ -960,13 +957,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div><!--show "on hold" tab if there are jobs on hold-->
       
       <?php if(count($active_user_jobs) > 0){?>  
-          </div> 
-      <?php } 
-      ?>
+      </div> 
+      <?php } ?>
+
+      <?php if($job['is_parent'] || ($job['parent_job_id'] != 0)) {?>
+            
+      <button id="set-children-button" class="btn btn-primary">Set jobs as children</button> <!--duplicate button-->
+      <!-- The Duplicate Popup -->
+      <div id="set-children-popup" class="popup">
+        <div class="popup-content">
+          <span class="close" data-popup="set-children-popup">&times;</span>
+          <p>Are you sure you want to set these jobs as children for the job: <?php echo $job['id'] . ' - ' . $job['name']?></p>
+            <a href="customer-duplicate-3d-job.php?job_id=<?php echo $job["id"]; ?>">
+                <button class="btn btn-primary">Set Children</button>
+            </a>
+        </div>
+      </div>
+
+      <?php } ?>
       <?php if(count($active_user_jobs) > 0){?>
         <!-- <hr class="mb-6"> -->
-        </div>
-        <hr class="mb-6">
+      </div>
+      <hr class="mb-6">
 
       <?php } ?>
 

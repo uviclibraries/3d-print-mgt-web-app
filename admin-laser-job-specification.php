@@ -463,7 +463,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <body class="bg-light">
 
     <!--Header-->
-    <div id="custom_header"><div class="wrapper" style="min-height: 6em;" id="banner">
+    <div id="custom_header">
+      <div class="wrapper" style="min-height: 6em;" id="banner">
      <div style="position:absolute; left: 5px; top: 26px;">
       <a href="http://www.uvic.ca/" id="logo"><span>University of Victoria</span></a>
      </div>
@@ -511,10 +512,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               ?></p>
             </div>
           </div>
-        </div>
+        </div><!-- Submission date and purpose-->
 
         <div class="col-md-12 order-md-1">
-        <h4 class="mb-3">Status</h4>
+          <h4 class="mb-3">Status</h4>
           <div class="row">
             <div class="col-md-3 mb-3">
               <select class="custom-select d-block w-100" name="status" id="layer-height">
@@ -541,9 +542,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="col-md-3 mb-3">
               <p><?php echo "Status changed by: <br>" . $status_signer;?></p>
             </div>
-          </div>
+        </div><!--Status-->
           
-          <script>
+        <script>
           function checkAll() {
             var checkboxes = document.querySelectorAll('.job-checkbox');
             console.log(checkboxes.length);
@@ -754,15 +755,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <hr class="mb-4">
         <div class="row">
-            <div class="col-md-6 mb-3">
-                <a href="url">
-                    <button class="btn btn-primary btn-lg btn-block" class="form-control" type="submit" data-inline="true">Save</button>
-                </a>
-            </div>
-            <div class="col-md-6 mb-3">
-                <a class="btn btn-primary btn-lg btn-block" href="admin-dashboard.php" role="button">Back to Dashboard</a>
+          <div class="col-md-6 mb-3">
+            <a href="url">
+               <button class="btn btn-primary btn-lg btn-block" class="form-control" type="submit" data-inline="true">Save</button>
+            </a>
+          </div>
+          <div class="col-md-6 mb-3">
+            <a class="btn btn-primary btn-lg btn-block" href="admin-dashboard.php" role="button">Back to Dashboard</a>
+          </div>
         </div>
-    </div>
     </form>
   </div>
   

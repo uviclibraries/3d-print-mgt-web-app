@@ -16,15 +16,6 @@ $job=$stm->fetch();
 $stm = $conn->prepare("SELECT * FROM web_job INNER JOIN 3d_print_job ON id=3d_print_id WHERE web_job.status = 'pending payment' AND web_job.price > 0 AND web_job.netlink_id = '{$job['netlink_id']}'");
 $stm->execute();
 $priced_job=$stm->fetch();
-// $priced_job=$priced_job;
-// $priced_jobs = [];
-//   foreach ($user_priced_jobs as $related_job) {
-//     if($related_job["id"] != $job["id"] && $related_job["price"] > 0){
-//         $priced_jobs[] = $related_job;
-//   }}
-// print_r($priced_job);
-
-//NOTE- this only shows the first job in the list of jobs pending payment with attached value > 0. It doesn't handle cases where multiple jobs pending payment have prices attached.
 
 
 //Only owner and admin can see.
@@ -32,7 +23,6 @@ if ($user != $job["netlink_id"] && $user_type == 1) {
   header("Location: customer-dashboard.php");
   die();
 }
-
 
 ?>
 
@@ -153,30 +143,31 @@ if ($user != $job["netlink_id"] && $user_type == 1) {
     <!-- if its priced/payed-->
     <?php if($job["status"] != "submitted"){?>
       <hr class="mb-6">
-
         <div class="col-md-3 mb-3">
-        <label for="username">Price</label>
+        <h3 class="mb-3">Price</h3>
+            <?php if($job["price"] > 0 && $job['parent_job_id'] == 0){?>
             <div class="input-group-prepend">
                 <span class="input-group-text">$</span>
                   <input type="text" name="price" class="form-control" value="<?php echo $job["price"]; ?>" readonly>
             </div>
+            <?php } ?>
         </div>
-
+        <?php if($job["parent_job_id"] != 0){?>
+            <p style="color:red">This job is priced with another job. Go to <a href="customer-3d-job-information.php?job_id=<?php echo $job["parent_job_id"]; ?>">this job</a> to pay.</p>
+        <?php }  ?>
         <!-- if its priced and not payed-->
         <?php
         if ($job["status"] == "pending payment") {
           $_SESSION['price'] = strval($job["price"]);
           $_SESSION['job_id'] = $job['id'];
-          if($job["price"] == 0 && $job["parent_job_id"] != 0){?>
-            <p style="color:red">This job is priced with another job. Go to <a href="customer-3d-job-information.php?job_id=<?php echo $job["parent_job_id"]; ?>">this job</a> to pay.</p>
-        <?php } else{?>
+          if($job["parent_job_id"] != 0 || $job['is_parent']){?>
           <a href="moneris/customer-payment.php">
             <button type="button" class="btn btn-primary btn-lg" type="submit">
               Payment
             </button>
           </a>
-        <?php }} ?>
-    <?php }  ?>
+            <?php }} ?>
+        <?php }  ?>
            <!-- end if(if) else -->
 
         </div>
