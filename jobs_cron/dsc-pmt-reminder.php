@@ -1,6 +1,8 @@
 <?php
 //Daily
-chdir("/usr/local/apache2/htdocs-webapp/3dprint/jobs_cron");
+// chdir("/usr/local/apache2/htdocs-webapp/3dprint/jobs_cron");
+chdir("/usr/local/apache2/htdocs-webapp/demo/3dwebapp/jobs_cron");
+
 require ('../db.php');
 
 
@@ -10,7 +12,7 @@ $today =  strtotime($today_str);
 $day = 86400;
 
 //pending_payment jobs query
-$stm = $conn->query("SELECT print_job.id AS job_id, print_job.job_name AS job_name, print_job.model_name AS model_name, print_job.model_name_2 AS model_name_2, print_job.netlink_id AS netlink_id, print_job.status AS status, print_job.priced_date AS priced_date, users.email AS email, users.name AS user_name FROM print_job INNER JOIN users on users.netlink_id = print_job.netlink_id WHERE print_job.status = 'pending payment' ORDER BY priced_date ASC");
+$stm = $conn->query("SELECT web_job.id AS job_id, web_job.job_name AS job_name, web_job.netlink_id AS netlink_id, web_job.status AS status, web_job.priced_date AS priced_date, users.email AS email, users.name AS user_name FROM web_job INNER JOIN users on users.netlink_id = web_job.netlink_id WHERE web_job.status = 'pending payment' AND web_job.netlink_id = 'chloefarr' ORDER BY priced_date ASC");
 $job_pp = $stm->fetchAll();
 
 //pending payment reminder & Cancelations
@@ -34,7 +36,12 @@ foreach ($job_pp as $job) {
     $headers = "MIME-Version: 1.0" . "\r\n";
     $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
     $headers .= "From: dscommons@uvic.ca" . "\r\n";
-    mail($job['email'],"Reminder-Your 3D Print is ready for payment",$msg,$headers);
+    // mail($job['email'],"Reminder-Your 3D Print is ready for payment",$msg,$headers);
+    print('id: '. $job['id'] . ' ; job name: ' . $job['job_name'] . '10 days have passed<br>');
   }
+  else{
+    print('id: '. $job['id'] . ' ; job name: ' . $job['job_name'] . 'failed condition<br>');
+  }
+
 
 }
