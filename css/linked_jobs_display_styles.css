@@ -1,0 +1,106 @@
+/*STYLES FOR LINKED JOBS AND ACTIVE USER JOBS ELEMENT.
+Active user jobs element contains lists (with checkboxes) of each job that's active
+and linked to the user who's job details are being displayed on the page.
+
+Element Appears in admin spec pages*/
+
+/* Style for the container div - currently obsolete
+Used to be a single table but is now a tabbed element*/
+
+.user_jobs_container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  overflow: auto;      
+  white-space: pre-wrap;
+  gap: 20px; /* Adjust the space between the items */
+  border: 2px lightgrey;
+  border-width: 0.5px;
+  border-style: solid;
+  border-radius: 5px;
+  padding: 7px;
+}
+
+/* Style for each checkbox next to the refered job*/
+.job-checkbox {
+  display: inline-block;
+  margin: 3px;
+}
+
+/* Style for each refered job*/
+.job-item {
+  flex: 1 1 calc(33.333% - 10px); 
+  box-sizing: border-box;
+}
+
+
+/* Adjust for medium screens to 2 columns */
+@media (max-width: 800px) {
+    .job-item {
+        flex: 1 1 calc(50% - 10px); /* Adjust the calc() as necessary */
+    }
+}
+
+/* Adjust for smaller screens to 1 column */
+@media (max-width: 600px) {
+  .job-item {
+      flex: 1 1 100%;
+  }
+}
+
+input[type="checkbox"] + label {
+    margin-left: 10px; /* Adjust the value to suit your needs */
+}
+
+/*Button to select all referred jobs in the element*/
+#selectJobsButton{
+  padding: 3px 7px;
+  margin: 2px;
+  background-color: white; /* white background */
+  color: black; /* black text */
+  border: solid;
+  border-color: blue; /*blue borders*/
+  border-radius: 4px; /* Rounded corners */
+  border-width: 0.5px;
+/*        cursor: pointer; /* Mouse pointer on hover */*/
+  font-size: 6px; /* Larger font size */
+}
+
+/* Tab */
+.tab {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+}
+
+/* Button inside tab (to trigger display the div with content corresponding to tab) */
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+  font-size: 17px;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current tablink class 
+Changes background color of selected tab*/
+.tab button.active {
+  background-color: #ccc;
+}
+
+/* Tab content display and shape of tab*/
+.tabcontent {
+  display: none;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+/*  border-top: none;*/
+}
+
+

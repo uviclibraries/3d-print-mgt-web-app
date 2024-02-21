@@ -1,6 +1,7 @@
 <?php
 //Daily
-chdir("/usr/local/apache2/htdocs-webapp/demo/3dwebapp/jobs_cron");
+chdir("/usr/local/apache2/htdocs-webapp/3dprint/jobs_cron");
+// Triton path: chdir("/usr/local/apache2/htdocs-webapp/demo/3dwebapp/jobs_cron");
 require ('../db.php');
 
 

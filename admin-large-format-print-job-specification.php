@@ -8,6 +8,10 @@ if ($user_type == 1) {
   die();
 }
 
+
+$jobType = "largeFormat";
+$user_view = "admin";
+
 $stm = $conn->prepare("SELECT * FROM web_job INNER JOIN large_format_print_job ON id=large_format_print_id WHERE id=?");
 $stm->execute([$_GET["job_id"]]);
 $job=$stm->fetch();
@@ -19,21 +23,38 @@ $userSQL->execute();
 $job_owner = $userSQL->fetch();
 
 //get list of active jobs associated with the job's owner
-$stm = $conn->prepare("SELECT web_job.id AS id, web_job.job_name AS name, web_job.status AS status, web_job.submission_date AS submission_date, web_job.priced_date AS priced_date, web_job.paid_date AS paid_date,web_job.printing_date AS printing_date,web_job.completed_date AS completed_date,web_job.delivered_date AS delivered_date,web_job.hold_date AS hold_date,web_job.hold_signer AS hold_signer,web_job.cancelled_signer AS cancelled_signer,  web_job.priced_signer AS priced_signer, web_job.paid_signer AS paid_signer, web_job.printing_signer AS printing_signer, web_job.completed_signer AS completed_signer, web_job.delivered_signer AS delivered_signer, web_job.job_purpose AS job_purpose, web_job.academic_code AS academic_code, web_job.course_due_date AS course_due_date FROM web_job INNER JOIN large_format_print_job ON web_job.id=large_format_print_job.large_format_print_id WHERE web_job.status NOT IN ('delivered', 'archived', 'cancelled') AND web_job.netlink_id = :netlink_id");
+$stm = $conn->prepare("SELECT web_job.id AS id, web_job.job_name AS name, web_job.status AS status, web_job.submission_date AS submission_date, web_job.priced_date AS priced_date, web_job.paid_date AS paid_date,web_job.printing_date AS printing_date,web_job.completed_date AS completed_date,web_job.delivered_date AS delivered_date,web_job.hold_date AS hold_date,web_job.hold_signer AS hold_signer,web_job.cancelled_signer AS cancelled_signer,  web_job.priced_signer AS priced_signer, web_job.paid_signer AS paid_signer, web_job.printing_signer AS printing_signer, web_job.completed_signer AS completed_signer, web_job.delivered_signer AS delivered_signer, web_job.job_purpose AS job_purpose, web_job.academic_code AS academic_code, web_job.course_due_date AS course_due_date, web_job.parent_job_id AS parent_job_id , web_job.is_parent AS is_parent FROM web_job INNER JOIN large_format_print_job ON web_job.id=large_format_print_job.large_format_print_id WHERE web_job.status NOT IN ('delivered', 'archived', 'cancelled') AND web_job.netlink_id = :netlink_id");
 
   $stm->bindParam(':netlink_id', $job['netlink_id']);
   $stm->execute();
   $user_web_jobs = $stm->fetchAll();
 
+  $parent=$job; //set self as parent if no other job has been assigned to this job as the parent.
+
   $active_user_jobs = [];
+  $linked_jobs = [];
+
   foreach ($user_web_jobs as $related_job) {
-    $active_user_jobs[] = $related_job;
+    if($related_job['id'] != $job['id']){
+      array_push($active_user_jobs, $related_job);
+      if($related_job['parent_job_id'] == $job['id'] && ($related_job['parent_job_id'] !=0|| $job['parent_job_id'] != 0))
+      {
+        array_push($linked_jobs, $related_job);
+      }
+
+      if($related_job['id'] == $job['parent_job_id'] && $job['parent_job_id'] != 0){
+        $parent = $related_job; //sets parent if the job's parent id matches the id of another job
+        array_push($linked_jobs, $related_job);
+      }
+    }
+    else{
+      if($parent == $job){
+        $parent = $related_job;}
+    }
   }
-/*
-$stm = $conn->prepare("SELECT * FROM print_job WHERE id=?");
-$stm->execute([$_GET["job_id"]]);
-$job=$stm->fetch();
-*/
+
+  $bundled = $active_user_jobs ? true : false; //user has other active jobs
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   //used if modify is not updated.
   $modify_value = $job["model_name_2"];
@@ -63,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   // change to source from web job and large_format_print_job
-  $stmt = $conn->prepare("UPDATE web_job INNER JOIN large_format_print_job ON id=large_format_print_id SET price = :price, width_inches = :width_inches, copies =:copies, length_inches = :length_inches, staff_notes = :staff_notes, status = :status, priced_date = :priced_date, paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, cancelled_date = :cancelled_date, delivered_date = :delivered_date, priced_signer =:priced_signer,  paid_signer= :paid_signer, printing_signer=:printing_signer, completed_signer=:completed_signer, delivered_signer=:delivered_signer, hold_date = :hold_date, hold_signer= :hold_signer,cancelled_signer= :cancelled_signer, model_name_2 =:model_name_2 WHERE id = :job_id;");
+  $stmt = $conn->prepare("UPDATE web_job INNER JOIN large_format_print_job ON id=large_format_print_id SET price = :price, width_inches = :width_inches, copies =:copies, length_inches = :length_inches, staff_notes = :staff_notes, status = :status, priced_date = :priced_date, paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, cancelled_date = :cancelled_date, delivered_date = :delivered_date, priced_signer =:priced_signer,  paid_signer= :paid_signer, printing_signer=:printing_signer, completed_signer=:completed_signer, delivered_signer=:delivered_signer, hold_date = :hold_date, hold_signer= :hold_signer,cancelled_signer= :cancelled_signer, model_name_2 =:model_name_2 parent_job_id =:parent_job_id WHERE id = :job_id;");
   
   $current_date = date("Y-m-d");
 
@@ -82,7 +103,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $stmt->bindParam(':staff_notes', $_POST["staff_notes"]);
   $stmt->bindParam(':status', $_POST["status"]);
   $stmt->bindParam(':model_name_2', $modify_value);
-  /*
+  $new_parent= intval($_POST["select_parent"]);
+  $stmt->bindParam(':parent_job_id', $new_parent, PDO::PARAM_INT);
+    /*
   should dates be removed if steps are reverted: eg printing->paid
   */
   $d1 = $job['priced_date'];
@@ -313,22 +336,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <!--header link-->
     <link rel="stylesheet" href="css/uvic_banner.css">
+    <link rel="stylesheet" href="css/popup_styles.css">
+    <link rel="stylesheet" href="css/linked_jobs_display_styles.css">
+    <link href="form-validation.css" rel="stylesheet">
     <link rel="icon" href="https://www.uvic.ca/assets/core-4-0/img/favicon-32.png">
     <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/checkout/">
 
     <!-- Bootstrap core CSS -->
-<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
 
-    <!-- Favicons -->
-<link rel="apple-touch-icon" href="/docs/4.5/assets/img/favicons/apple-touch-icon.png" sizes="180x180">
-<link rel="icon" href="/docs/4.5/assets/img/favicons/favicon-32x32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/docs/4.5/assets/img/favicons/favicon-16x16.png" sizes="16x16" type="image/png">
-<link rel="manifest" href="/docs/4.5/assets/img/favicons/manifest.json">
-<link rel="mask-icon" href="/docs/4.5/assets/img/favicons/safari-pinned-tab.svg" color="#563d7c">
-<link rel="icon" href="/docs/4.5/assets/img/favicons/favicon.ico">
-<meta name="msapplication-config" content="/docs/4.5/assets/img/favicons/browserconfig.xml">
-<meta name="theme-color" content="#563d7c">
-
+        <!-- Favicons -->
+    <link rel="apple-touch-icon" href="/docs/4.5/assets/img/favicons/apple-touch-icon.png" sizes="180x180">
+    <link rel="icon" href="/docs/4.5/assets/img/favicons/favicon-32x32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/docs/4.5/assets/img/favicons/favicon-16x16.png" sizes="16x16" type="image/png">
+    <link rel="manifest" href="/docs/4.5/assets/img/favicons/manifest.json">
+    <link rel="mask-icon" href="/docs/4.5/assets/img/favicons/safari-pinned-tab.svg" color="#563d7c">
+    <link rel="icon" href="/docs/4.5/assets/img/favicons/favicon.ico">
+    <meta name="msapplication-config" content="/docs/4.5/assets/img/favicons/browserconfig.xml">
+    <meta name="theme-color" content="#563d7c">
 
     <style>
       .bd-placeholder-img {
@@ -345,116 +370,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           font-size: 3.5rem;
         }
       }
-
-
-      /* Style for the container div */
-      .user_jobs_container {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        overflow: scroll;      
-        white-space: nowrap;
-        gap: 20px; /* Adjust the space between the items */
-        border: 2px lightgrey;
-        border-width: 0.5px;
-        border-style: solid;
-        border-radius: 5px;
-        padding: 7px;
-
-      }
-
-      /* Style for each checkbox */
-      .job-checkbox {
-        display: inline-block;
-        margin: 3px;
-      }
-
-      .job-item {
-        flex: 1 1 calc(33.333% - 10px); 
-        box-sizing: border-box;
-      }
-
-      .popup {
-          position: relative;
-          display: inline;  /* Unchanged */
-          cursor: pointer;
-          padding-left: 5px;
-      }
-
-      .popup .popuptext {
-          visibility: hidden;
-          width: 500px;
-          background-color: #555;
-          color: #fff;
-          text-align: center;
-          border-radius: 6px;
-          padding: 8px 0;
-          position: absolute;
-          z-index: 1;
-          top: 0;
-          left: 110%;
-          margin-left: 20px;
-      }
-
-      .popup .popuptext::after {
-          content: "";
-          position: absolute;
-          top: 50%;
-          left: 0;
-          margin-top: -5px;
-          border-width: 5px 0 5px 5px;
-          border-style: solid;
-          border-color: transparent transparent transparent #555;
-      }
-
-      
-      .popup:hover .popuptext, .popup .popuptext:hover {
-          visibility: visible; /* Show or keep the popup when hovering */
-          -webkit-animation: fadeIn 1s;
-          animation: fadeIn 1s;
-      }
-
-      
-      .popup .show {
-        visibility: visible;
-        -webkit-animation: fadeIn 1s;
-        animation: fadeIn 1s;
-      }
-
-
-      /* Adjust for medium screens to 2 columns */
-      @media (max-width: 800px) {
-          .job-item {
-              flex: 1 1 calc(50% - 10px); /* Adjust the calc() as necessary */
-          }
-      }
-
-      /* Adjust for smaller screens to 1 column */
-      @media (max-width: 600px) {
-          .job-item {
-              flex: 1 1 100%;
-          }
-        }
-
-      input[type="checkbox"] + label {
-          margin-left: 10px; /* Adjust the value to suit your needs */
-      }
-
-      #selectJobsButton{
-        padding: 3px 7px;
-        margin: 2px;
-        background-color: white; /* white background */
-        color: black; /* black text */
-        border: solid;
-        border-color: blue; /*blue borders*/
-        border-radius: 4px; /* Rounded corners */
-        border-width: 0.5px;
-/*        cursor: pointer; /* Mouse pointer on hover */*/
-        font-size: 6px; /* Larger font size */
-      }
     </style>
     <!-- Custom styles for this template -->
-    <link href="form-validation.css" rel="stylesheet">
   </head>
+
+
   <body class="bg-light">
 
     <!--Header-->
@@ -471,437 +391,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <div class="container">
     <form method="POST" enctype="multipart/form-data">
-    <div class="py-5 text-center">
-      <h1><?php echo " Job name: " . $job["job_name"];?></h1>
-      <h2><?php echo "Customer: " . $job_owner["name"];?></h2>
-    </div>
+      <!--Name of job, customer, date submited, academic/personal project, what admins updated status last-->
+      <?php include('admin_spec_php_partials/admin_broad_spec_partial.php');?>
 
-    <div class="col-md-12 order-md-1">
-    <h4 class="mb-3">Submission Date</h4>
-      <div class="col-md-3 mb-3">
-        <div class="input-group">
-          <div class="input-group">
-            <input type="text" class="form-control" value="<?php echo $job["submission_date"]; ?>" readonly>
-            </div>
-        </div>
-        <div class="invalid-feedback" style="width: 100%;">
-        Status is required.
-        </div>
-      </div>
-        <!--Job Purpose // academic vs. personal-->
-        <div class="row">
-          <div class="col-md-3 mb-3">
-          <p><?php echo "Job purpose:<br>" .$job['job_purpose'];?></p>
-        </div>
-        <!--If Academic Purpose: course code-->
-        <div class="col-md-3 mb-3">
-          <p><?php 
-            if ($job["job_purpose"] == "academic"){
-              echo "Course Code:<br>" . $job['academic_code'];}
-          ?></p>
-        </div>
-        <div class="col-md-3 mb-3">
-          <p><?php 
-            if ($job["job_purpose"] == "academic"){
-              echo "Project deadline:<br>" . $job['course_due_date'];}
-          ?></p>
-        </div>
-      </div>
-    </div>
 
-    <div class="col-md-12 order-md-1">
-      <h4 class="mb-3">Status</h4>
-      <div class="row">
-        <div class="col-md-3 mb-3">
-          <select class="custom-select d-block w-100" name="status" id="status-dropdown">
-            <?php 
-              if ($job["status"] == "cancelled") {?> 
-                <option value="cancelled" selected readonly>cancelled</option> 
-            <?php } 
-              else { ?>
-                <option value="submitted" <?php if ($job["status"]== "submitted"){echo "selected";} ?>>Not Priced</option>
-              <option value="pending payment" <?php if ($job["status"]== "pending payment"){echo "selected";} ?>>Pending Payment</option>
-              <option value="on hold" <?php if ($job["status"]== "on hold"){echo "selected";} ?>>On Hold</option>
-              <option value="paid" <?php if ($job["status"]== "paid"){echo "selected";} ?>>Paid</option>
-              <option value="printing" <?php if ($job["status"]== "printing"){echo "selected";} ?>>Printing</option>
-              <option value="completed" <?php if ($job["status"]== "completed"){echo "selected";} ?>>Completed</option>
-              <option value="delivered" <?php if ($job["status"]== "delivered"){echo "selected";} ?>>Delivered</option>
-              <option value="cancelled" <?php if ($job["status"]== "cancelled"){echo "selected";} ?>>Cancelled</option>
-              <option value="archived" <?php if ($job["status"]== "archived"){echo "selected";} ?>>Archived</option>
-            <?php } ?>
-          </select>
-        </div>
-        <div class="col-md-3 mb-3">
-          <p><?php echo "Status changed: <br>" .$status_date;?></p>
-        </div>
-        <div class="col-md-3 mb-3">
-          <p><?php echo "Status changed by: <br>" . $status_signer; ?></p>
-        </div>
-      </div>
-<!-- container with a 4-column list of the user's active web jobs. Used for batch status changes -->
-        <script type="text/javascript">
-          function checkAll() {
-            var checkboxes = document.querySelectorAll('.job-checkbox');
-            checkboxes.forEach(function(checkbox) {
-              checkbox.checked = true;
-            });
-          }
+      <!--Dropdown to set a new status-->
+      <?php include('admin_spec_php_partials/admin_status_dropdown_partial.php');?>
 
-          function uncheckAll() {
-            var checkboxes = document.querySelectorAll('.job-checkbox');
-            checkboxes.forEach(function(checkbox) {
-              checkbox.checked = false;
-            });
-          }
 
-          // function populatePopup(other_job) {
-          //   const popupElement = document.querySelector('.popuptext');
+       <!-- Select a new parent, see linked jobs, link jobs, change status of multiple jobs-->
+      <?php include('admin_spec_php_partials/admin_linked_jobs_tab_partial.php');?>
 
-          //   // Clear existing content
-          //   popupElement.innerHTML = '';
-          //   //Fill popup with job-specific details
-          //   popupElement.innerHTML = '${other_job['name']}<br>${other_job['status']}<br>${other_job['submission_date']}';
-          // }
+      <!--Element for viewing/setting job price-->
+      <?php include('admin_spec_php_partials/admin_price_partial.php');?>
+           
 
-        </script>    
+      <!--Element for uploading/downloading job model files-->
+      <?php include('general_partials/models_partial.php');?>
 
-        <div class="col-md-12 order-md-1">
-          <p class="mb-3">Apply status change to related jobs</p>
-          <?php 
-          echo '<button type="button" id="selectJobsButton" onclick="checkAll()">Check All</button>';
-          echo '<button type="button" id="selectJobsButton" onclick="uncheckAll()">Uncheck All</button>'; 
-          ?>
-          <div class="user_jobs_container">
-
-          <!--text saying there's no other active jobs isnt appearing-->
-          <?php
-            try {
-                $num_jobs = count($active_user_jobs);
-                if($num_jobs == 0){?>
-                  <p><?php echo 'This customer has no other active jobs<br>';?></p>
-                <?php }
-            } catch (PDOException $e) {
-                echo "Error: " . $e->getMessage();
-            }
-
-            // Iterate through the $active_user_jobs array
-            foreach ($active_user_jobs as $other_active_job) {
-              if($job['id'] != $other_active_job['id']){
-                echo '<div class="job-item">';
-                echo '<input type="checkbox" class ="job-checkbox" id="' . $other_active_job['id'] . '" name="checked_jobs[]" value="' . $other_active_job['id'] . '">';
-                echo '<label for="' . $other_active_job['id'] . '">';
-                if ($other_active_job['status'] == "on hold") {
-                    echo "  On hold -";
-                }
-                // Check if 'name' index is set
-                  if (isset($other_active_job['name'])) {
-                      echo "  " . $other_active_job['name'];
-                  } else {
-                      echo "No id available"; 
-                  }
-                echo '</label>';
-                echo '</div>';
-
-                }
-              }
-            ?>
-          </div>
-        </div> <!--End of associated jobs list-->
-        <hr class="mb-6">
-        <div class="col-md-12 order-md-1">
-          <h4 class="mb-3">Price</h4>
-            <div class="row">
-              <div class="col-md-3 mb-3">
-                <div class="input-group">
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <!-- ** catch non floatable input-->
-                      <span class="input-group-text">$</span>
-                      <input type="text" name="price" autocomplete="off" class="form-control" value="<?php echo number_format((float)$job["price"], 2, '.',''); ?>"
-                      <?php if ($job["status"] != "submitted" && $job["status"] != "pending payment" && $job["status"] != "on hold"): ?>
-                        readonly
-                      <?php endif; ?>
-                      >
-                    </div>
-                  </div>
-                  <small class="text-muted">Reminder: Minimum payment is $2.00.</small>
-                  <div class="invalid-feedback" style="width: 100%;">
-                  Status is required.
-                  </div>
-                </div>
-              </div>
-            </div> <!--End price row-->
-          </div>
-
-    <hr class="mb-6">
-
-    <h3 class="mb-3">Large Format Print File</h3>
-        <?php
-        if (is_file(("uploads/" . $job['model_name']))) {
-            ?>
-            <!--Grabs file and renames it to the job name when downloaded-->
-            <a href="<?php echo "uploads/" . $job['model_name']; ?>" download="<?php
-                $filetype = explode(".", $job['model_name']);
-                echo $job['job_name'] . "." . $filetype[1]; ?>">
-                Download large format print file
-            </a>
-        <?php
-        }
-        else{ ?>
-          <p>File Deleted</p>
-        <?php } ?>
-      <br>
-      <hr class="mb-6">
-
-      <h3 class="mb-3">Modified Large Format Print File</h3>
-
-    <?php //checks if there is a modify file
-    if ($job['model_name_2'] != NULL && is_file(("uploads/" . $job['model_name_2']))) { ?>
-      <a href="<?php echo "uploads/" . $job['model_name_2']; ?>" download>Download Modified large format print file</a>
-    <?php } ?>
-    <br/>
-      <small class="text-muted">(Max 200MB)</small>
-      <input type="file" id="myFile" name="modify">
-  
-    <br>
-    <hr class="mb-6">
+      <!--Element for viewing the number of copies ordered-->
+      <?php include('general_partials/copies_partial.php');?>
     
-    <!-- <h5 class="mb-2">Copies</h5> -->
-    <div class="col-md-3 mb-3">
-        <label for="copies">Copies</label>
-        <input type="number" class="form-control" name="copies" value="<?php echo $job["copies"];?>" >
-        <!-- <input type="number" class="form-control" name="copies" min="1" max="100" step="1" value="1" id="supports" placeholder=""> -->
-        <!-- <div class="invalid-feedback">
-          Please provide a valid response.
-        </div> -->
-      </div>
+      <!--Element and js for viewing and editing the specs specific to large format jobs
+        (length and width)-->
+      <?php include('admin_spec_php_partials/    admin_large_format-specific_specs_partial.php');?>
 
-    <hr class="mb-6">
-
-    <div class="col-md-12 order-md-1">
-      <h4 class="mb-3">Dimensions</h4>
-
-      <div class="row">
-        <div class="col-md-3 mb-3">
-            <label for="length_input">Length<span class="error"></span></label>
-            <div class="input-group">
-              <div class="input-group mb-3">
-                <input type="number" step="0.01" name="length_inches" class="form-control" value="<?php echo $job["length_inches"]; ?>" placeholder="100" aria-label="100" aria-describedby="basic-addon2" oninput="validateDimensions()" style="width: 200px;">
-            </div>
-            <div class="invalid-feedback" style="width: 100%;">
-            Please enter the desired length.
-            </div>
-            </div>
-        </div>
-
-        <div class="col-md-3 mb-3">
-            <label for="length">Width</label>
-            <div class="input-group">
-            <div class="input-group mb-3">
-                <input type="number" step="0.01" class="form-control" name="width_inches" value="<?php echo $job["width_inches"]; ?>" placeholder="Width" aria-label="100" aria-describedby="basic-addon2" oninput="validateDimensions()" style="width: 200px;">
-            </div>
-            <div class="invalid-feedback" style="width: 100%;">
-                Please enter the desired width.
-            </div>
-            </div>
-        </div>
-
-        <div class="col-md-3 mb-3">
-          <label for="unit_selector">Unit</label><br>
-          <select id="unit_selector" name="unit_measurement" onchange="validateDimensions()" style="width: 100px;"> <!-- Adjust the width as needed -->
-            <option value="in">in</option>
-            <option value="cm">cm</option>
-          </select>
-          <div class="invalid-feedback">
-            Please select a unit of measurement.
-          </div>
-        </div>
-      </div>
-      <div>
-        <span id="dimension_warning"></span>
-      </div>
+      <!--Element for viewing the customer comments and adding/modifying admin comments-->
+      <?php include('general_partials/comment_boxes_partial.php');?>
 
 
-        <script>
-        function validateDimensions(){
-          console.log('validating dimensions');
-          var unit = document.getElementById('unit_selector').value;
-          var width = document.getElementById('width_input').value;
-          var length = document.getElementById('length_input').value;
-          var dimension_warning = document.getElementById("dimension_warning");
-
-          var maxDimension = unit === 'cm' ? 91.44 : 36; // 36 inches in cm
-          // console.log("unit: " + unit + "; length: " + length + ";width" + width);
-
-          if (width > maxDimension && length > maxDimension) {
-            // console.log('too large');
-            dimension_warning.textContent = `Both width and length cannot exceed ${maxDimension} ${unit}. Please decrease one of the measurements.`;
-            document.getElementById('length_input').value = "";
-            document.getElementById('width_input').value = "";
-            // if(event.type === "submit") {
-            //     event.preventDefault(); // Prevent form submission
-            // }
-          }
-          else{
-            // console.log("not too large");
-            dimension_warning.textContent = "";
-          }
-        }
-        </script><!--Prevent oversize prints-->
-
-
-        <hr class="mb-4">
-        <h5 class="mb-2">Additional Comments</h5>
-            <div class="input-group">
-                <textarea rows="5" cols="50" class="form-control" aria-label="additional-comments" readonly><?php echo $job["comments"]; ?></textarea>
-            </div>
-
-        <hr class="mb-4">
-        <h5 class="mb-2">Staff Notes</h5>
-            <div class="input-group">
-                <textarea rows="5" cols="50" class="form-control" name="staff_notes" aria-label="additional-comments"><?php echo $job["staff_notes"]; ?></textarea>
-            </div>
-            <div class="invalid-feedback">
-            Please enter additional comments.
-            </div>
-        </div>
-
-
-        <hr class="mb-4">
-        <h5 class="mb-2">Enable Email</h5>
-        <div class="d-block my-3">
-          <div class="custom-control custom-checkbox">
-            <input id="en_email" name="email_enabaled" value= "enabled" type="checkbox" class="custom-control-input" <?php if ($job["status"] != "pending payment" && $job["status"] != "delivered"){echo "checked";} ?>>
-            <label class="custom-control-label" for="en_email">Send email for pending payment or delivered to desk when saved.</label>
-          </div>
-        </div>
-
-        <hr class="mb-4">
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <a href="url">
-                    <button class="btn btn-primary btn-lg btn-block" class="form-control" type="submit" data-inline="true">Save</button>
-                </a>
-            </div>
-            <div class="col-md-6 mb-3">
-                <a class="btn btn-primary btn-lg btn-block" href="admin-dashboard.php" role="button">Back to Dashboard</a>
-        </div>
-    </div>
-    </form>
-  </div>
-
-<!-- DUPLICATE JOB BUTTONS-->
-<style>
-/* Button style */
-/*#myBtn{
-    width: 50px;
-    background-color: red;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    cursor: pointer;
-    text-align: center;
-}*/
-
-/* The Popup (background) */
-.popup {
-    display: none; /* Hidden by default */
-    position: fixed;
-    z-index: 1; /* Sit on top */
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgb(0,0,0); /* Fallback color */
-    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-}
-
-/* Popup Content */
-.popup-content {
-    background-color: #fefefe;
-    margin: 15% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-}
-
-/* The Close Button */
-.close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-}
-</style>
-
-
-
-<hr class="mb-4">
-  <center>
-  <!-- Button to trigger 'Duplicate Job' confirmation popup; button background color set to purple-->
-    <button id="duplicate-button" class="btn btn-primary btn-lg" style="background-color:#CF9FFF;">Duplicate Job</button> <!--duplicate button-->
-      <!-- The Duplicate Popup -->
-      <div id="DuplicateJobPopup" class="popup">
-        <div class="popup-content">
-          <span class="close" data-popup="DuplicateJobPopup">&times;</span>
-          <p>Are you sure you want to duplicate your job?</p>
-            <a href="customer-duplicate-3d-job.php?job_id=<?php echo $job["id"]; ?>">
-                <button class="btn btn-primary btn-lg" style="background-color:#CF9FFF;">Duplicate Job</button>
-            </a>
-        </div>
-      </div>
-  </center>
-
-<script>
-window.onload = function() {
-    // Function to open a popup
-    function openPopup(popupId) {
-        var popup = document.getElementById(popupId);
-        if (popup) {
-            popup.style.display = "block";
-        }
-    }
-
-    // Function to close a popup
-    function closePopup(popupId) {
-        var popup = document.getElementById(popupId);
-        if (popup) {
-            popup.style.display = "none";
-        }
-    }
-
-    // Attach event listeners to buttons
-    var duplicateButton = document.getElementById("duplicate-button");
-
-    if (duplicateButton) {
-      duplicateButton.onclick = function() { openPopup("DuplicateJobPopup"); }
-    }
-
-    // Attach event listeners to close buttons
-      var closeButtons = document.getElementsByClassName("close");
-      for (var i = 0; i < closeButtons.length; i++) {
-          closeButtons[i].onclick = function() {
-              var popupId = this.getAttribute("data-popup");
-              closePopup(popupId);
-          }
-      }
-
-      // Close popup when clicking outside of it
-      window.onclick = function(event) {
-          if (event.target.classList.contains("popup")) {
-              event.target.style.display = "none";
-          }
-      }
-    }
-</script>
+      <!--Elements for enabling email, save updated information, return to dashboard, or duplicate the job.-->
+      <?php include('admin_spec_php_partials/admin_specs_footer_partial.php');?>
   <p></p>
   <br>
   <p></p>
