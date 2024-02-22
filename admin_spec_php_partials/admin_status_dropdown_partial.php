@@ -2,7 +2,7 @@
         <h4 class="mb-3">Status</h4>
         <div class="row">
           <div class="col-md-3 mb-3">
-            <select class="custom-select d-block w-100" name="status" id="layer-height">
+            <select class="custom-select d-block w-100" name="status" id="status-select">
               <?php 
                 if ($job["status"] == "cancelled") {?> 
                   <option value="cancelled" selected readonly>cancelled</option> 

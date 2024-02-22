@@ -5,7 +5,8 @@ $stm = $conn->query("SELECT VERSION()");
 #$version = $stm->fetch();
 #echo $version;
 
-
+$userView = 'customer';
+$statusEmail = "submitted";
 $status = "submitted"; //declaring value that the job will take when the submission form is submitted
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -87,97 +88,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       echo $e->getMessage();
 
   }
-/*  Check inputs here */
+
+
   $current_date = date("Y-m-d");
-  $infill_bind = intval($_POST["infill"]);
-  $scale_bind = intval($_POST["scale"]);
-  $layer_bind = floatval(number_format((float)$_POST["layer_height"], 2, '.',''));
-  $support_bind = intval($_POST["supports"]);
-  $copies_bind = intval($_POST["copies"]);
-  $laser_copies = intval($_POST["laser_copies"]);
-  $large_format_copies = intval($_POST["large_format_copies"]);
   $good_statement = True;
-  $stmt = $conn->prepare("INSERT INTO web_job (netlink_id, job_name, job_purpose, academic_code, course_due_date, submission_date, status) VALUES (:netlink_id, :job_name, :job_purpose, :academic_code, :course_due_date,:submission_date, :job_status)");
-  $stmt->bindParam(':netlink_id', $user);
-  $stmt->bindParam(':job_name', $_POST["job_name"]);
-  $stmt->bindParam(':job_purpose', $_POST["job_purpose"]);
-  $stmt->bindParam(':academic_code', $_POST["academic_code"]);
-  $stmt->bindParam(':course_due_date',$_POST["academic_deadline"]);
-  $stmt->bindParam(':job_status', $status);
-  $stmt->bindParam(':submission_date', $current_date);
-  $good_statement &= $stmt->execute();
+  
+  //Inserts new job into web_job and and sets netlink id, job name, status=submitted, submission_date=todat, job purpose, and if for academic purpose, course code and due date.
+  
+  insert('insert_new_webjob_snippet.php');
+  //binds user to job
+  insert('bind_user_new_snippet.php');
+
 
   /*TODO also validate laser cutting variables*/
 
-  if(!$good_statement){
-    die("Error during SQL execution");
-  }
-
-  // Extract most recent use id from the web job table based on user netlink id
-
-  $stmt = $conn->prepare("SELECT MAX(id) FROM web_job WHERE netlink_id=:user_netlink");
-  $stmt->bindParam(':user_netlink', $user);
-  $good_statement &= $stmt->execute();
-  $curr_id = $stmt->fetch(PDO::FETCH_NUM)[0];
-
-  if(!$good_statement){
-    die("Error during SQL execution");
-  }
-
-  if(!$curr_id){
-    die('No web job entry for username {$user}');
-  }
 
   if($_POST["job_type"] == "3d_print"){
-    // Use the extracted id to insert job information to the 3d print table
-
-    $stmt = $conn->prepare("INSERT INTO 3d_print_job (3d_print_id, model_name, infill, scale, layer_height, supports, copies, material_type, comments) VALUES (:3d_print_id, :model_name, :infill, :scale, :layer_height, :supports, :copies, :material_type, :comments)");
-    $stmt->bindParam(':3d_print_id', $curr_id);
-    $stmt->bindParam(':model_name', $hash_name);
-    $stmt->bindParam(':infill', $infill_bind, PDO::PARAM_INT);
-    $stmt->bindParam(':scale', $scale_bind , PDO::PARAM_INT);
-    $stmt->bindParam(':layer_height', $layer_bind);
-    $stmt->bindParam(':supports', $support_bind, PDO::PARAM_INT);
-    $stmt->bindParam(':copies', $copies_bind, PDO::PARAM_INT);
-    $stmt->bindParam(':material_type', $_POST["print_material_type"]);
-    $stmt->bindParam(':comments', $_POST["comments"]);
-    $stmt->execute();
+    //Inserts new job into 3d_print and and sets id, model (file) name, infill, scale, layer_height, supports, copies, user comments.
+    insert('new_3d_print_snippet.php');
   }
 
   elseif($_POST["job_type"] == "laser_cut"){
-    // Use extracted id to insert job information to the
-
-    $stmt = $conn->prepare("INSERT INTO laser_cut_job (laser_cut_id, model_name, copies, material_type, specifications, comments) VALUES (:laser_cut_id, :model_name, :copies, :material_type, :specifications, :comments)");
-    $stmt->bindParam('laser_cut_id', $curr_id);
-    $stmt->bindParam(':model_name', $hash_name);
-    $stmt->bindParam(':copies', $laser_copies);
-    $stmt->bindParam(':material_type', $_POST["laser_material_type"]);
-    $stmt->bindParam(':specifications', $_POST["user_specs"]);
-    $stmt->bindParam(':comments', $_POST["comments"]);
-    $stmt->execute();
-
+    //Inserts new job into laser_cut and and sets id, model (file) name, copies, material type, laser cutting specifications (text box), user comments.
+    insert('new_laser_snippet.php');
   }
 
   elseif($_POST["job_type"] == "large_format_print"){
-    // Use extracted id to insert job information to the large_format_print_jobs db
 
-    function convertToInches($cm) {
-      return floatval($cm) / 2.54; // 1 cm = 0.393701 inches
-    }
+    //Inserts new job into large_format and and sets id, model (file) name, copies, material type, laser cutting specifications (text box), user comments.
+    insert('new_large_format_snippet.php');
 
-    // Check if the unit of measurement is 'cm' and convert if necessary
-    echo 'try to convert large format print';
-    $widthInches = ($_POST["unit_measurement"] == 'cm') ? convertToInches($_POST["width_input"]) : $_POST["width_input"];
-    $lengthInches = ($_POST["unit_measurement"] == 'cm') ? convertToInches($_POST["length_input"]) : $_POST["length_input"];
-
-    $stmt = $conn->prepare("INSERT INTO large_format_print_job (large_format_print_id, model_name, copies, width_inches, height_inches, comments) VALUES (:large_format_print_id, :model_name, :copies, :width_inches, :height_inches, :comments)");
-    $stmt->bindParam('large_format_print_id', $curr_id);
-    $stmt->bindParam(':model_name', $hash_name);
-    $stmt->bindParam(':copies', $large_format_copies);
-    $stmt->bindParam(':width_inches', $widthInches);
-    $stmt->bindParam(':height_inches', $lengthInches);
-    $stmt->bindParam(':comments', $_POST["comments"]);
-    $stmt->execute();
   }
 
   else{
@@ -185,6 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $job_type = $_POST["job_type"];
     die("$job_type invalid job type");
   }
+
 
 //Set job type string and link to FAQ page-->
   $jobType = "";
@@ -207,22 +148,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               $jobType = "unknown";
       }
   }
-$job_name = $_POST["job_name"];
-//Send customer submission email
-  $msg = "
-  <html>
-  <head>
-  <title>HTML email</title>
-  </head>
-  <body>
-  <p>Hello, ".$user_name.". This is an automated message from the DSC.</p>
-  <p>Thank you for submitting your ".$jobType." (".$job_name.") request to the DSC at McPherson Library. We will evaluate the cost of the ".$jobType." and you'll be notified by email when it is ready for payment. If you have any questions about the process or the status of your ".$jobType.", please review our <a href=". $direct_link .">FAQ</a> or email us at DSCommons@uvic.ca.</p>
-  </body>
-  </html>";
-  $headers = "MIME-Version: 1.0" . "\r\n";
-  $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-  $headers .= "From: dscommons@uvic.ca" . "\r\n";
-  mail($user_email,"DSC - New ".$jobType." job",$msg,$headers);
+
+  insert('send_customer_email_partial.php');
 
 header("location: customer-dashboard.php");
 }
@@ -983,7 +910,7 @@ header("location: customer-dashboard.php");
       <div>
         <hr class="mb-4">
         <div class="col-md-3 mb-3">
-          <label for="copies">Copies</label>
+          <label for="large_format_copies">Copies</label>
           <input type="number" class="form-control" name="large_format_copies" min="1" max="100" step="1" id="copies" value = "1" required />
 
           <div class="invalid-feedback">

@@ -22,7 +22,7 @@
         <br>
 
   <!--If in admin specs pages-->
-  <?php if($user_view == "admin"){?>
+  <?php if($userView == "admin"){?>
      <div class="col-md-8 mb-3">
       <h5 class="mb-3">Modified Model</h5>
 
@@ -38,7 +38,7 @@
     <?php }?>
 
 </div>
-<?php if($job_type == "laserCut"){ ?>
+<?php if($jobType == "laserCut"){ ?>
     <h5 class="mb-2">Drawing Description</h5>
     <div class="input-group">
         <textarea rows="5" cols="50" class="form-control" aria-label="additional-comments" readonly><?php echo $job["specifications"]; ?></textarea>

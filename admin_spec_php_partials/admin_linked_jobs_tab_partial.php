@@ -27,7 +27,7 @@ if(count($active_user_jobs) > 0){?>
 
         // populating from $activeUserJobs PHP array
         // Create the select element
-        echo '<select name="select_parent" style="width:300px;" value="$job["parent"]">';
+        echo '<select id="select_parent" name="select_parent" style="width:300px;" value="$job["parent"]">';
             // Loop through the array and create an option element for each item
             foreach ($active_user_jobs as $active_user_job) {
               if(!$active_user_job['is_parent']){
@@ -199,7 +199,7 @@ if(count($active_user_jobs) > 0){?>
       }?>
     </div>        
 
-    <?php if($priced == 0){ ?>
+    <?php if($paid == 0){ ?>
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         removeStatus("Paid","paid_tab");
@@ -319,10 +319,15 @@ if(count($active_user_jobs) > 0){?>
       </a>
   </div>
 </div>
-<hr class="mb-6">
 
 <?php } ?>
 
+<?php if(count($active_user_jobs) > 0){?>
+<hr class="mb-6">
+<?php } ?>
+
+<!-- Contains the javascript to show/hide empty tabs -->
+<script type="text/javascript" src="js/linked_jobs_function.js"></script>
 
 <!--Set jobs as children button
 Unlink children

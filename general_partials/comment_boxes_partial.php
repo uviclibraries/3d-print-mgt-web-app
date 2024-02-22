@@ -4,7 +4,7 @@
     <textarea rows="5" cols="50" class="form-control" aria-label="additional-comments" readonly><?php echo $job["comments"]; ?></textarea>
 </div>
 
-<?php if($user_view == "admin"){?>
+<?php if($userView == "admin"){?>
 <hr class="mb-4">
 <h5 class="mb-2">Staff Notes</h5>
 <div class="input-group">

@@ -18,7 +18,7 @@
   $stmt->bindParam(':parent_job_id', $new_parent, PDO::PARAM_INT);
 
 
-if($job_type == ("laserCut" || "3dPrint"){
+if($jobType == "laser cut" || $jobType == "3d print"){
   $stmt->bindParam(':material_type', $_POST["material_type"]);
   $duration = intval($_POST["duration"]);  
   $stmt->bindParam(':duration', $duration , PDO::PARAM_INT);

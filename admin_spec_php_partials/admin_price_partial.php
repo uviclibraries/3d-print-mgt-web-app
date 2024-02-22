@@ -21,11 +21,13 @@
       </div>
     </div>
 
+    <?php if($jobType != "large format print"){?> 
     <div class="col-md-3 mb-3">
       <div class="input-group">
         <input type="text" name="duration" autocomplete="off" class="form-control" value="<?php echo $job["duration"]; ?>">
       </div>
       <small class="text-muted">Number of minutes the machines were running to complete the project.</small>
     </div>
+    <?php }?>
   </div>
 </div>

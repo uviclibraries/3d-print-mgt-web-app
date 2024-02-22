@@ -9,8 +9,8 @@ if ($user_type == 1) {
 }
 
 
-$jobType = "largeFormat";
-$user_view = "admin";
+$jobType = "large format print";
+$userView = "admin";
 
 $stm = $conn->prepare("SELECT * FROM web_job INNER JOIN large_format_print_job ON id=large_format_print_id WHERE id=?");
 $stm->execute([$_GET["job_id"]]);
@@ -22,38 +22,8 @@ $userSQL->bindParam(':netlink_id', $job['netlink_id']);
 $userSQL->execute();
 $job_owner = $userSQL->fetch();
 
-//get list of active jobs associated with the job's owner
-$stm = $conn->prepare("SELECT web_job.id AS id, web_job.job_name AS name, web_job.status AS status, web_job.submission_date AS submission_date, web_job.priced_date AS priced_date, web_job.paid_date AS paid_date,web_job.printing_date AS printing_date,web_job.completed_date AS completed_date,web_job.delivered_date AS delivered_date,web_job.hold_date AS hold_date,web_job.hold_signer AS hold_signer,web_job.cancelled_signer AS cancelled_signer,  web_job.priced_signer AS priced_signer, web_job.paid_signer AS paid_signer, web_job.printing_signer AS printing_signer, web_job.completed_signer AS completed_signer, web_job.delivered_signer AS delivered_signer, web_job.job_purpose AS job_purpose, web_job.academic_code AS academic_code, web_job.course_due_date AS course_due_date, web_job.parent_job_id AS parent_job_id , web_job.is_parent AS is_parent FROM web_job INNER JOIN large_format_print_job ON web_job.id=large_format_print_job.large_format_print_id WHERE web_job.status NOT IN ('delivered', 'archived', 'cancelled') AND web_job.netlink_id = :netlink_id");
-
-  $stm->bindParam(':netlink_id', $job['netlink_id']);
-  $stm->execute();
-  $user_web_jobs = $stm->fetchAll();
-
-  $parent=$job; //set self as parent if no other job has been assigned to this job as the parent.
-
-  $active_user_jobs = [];
-  $linked_jobs = [];
-
-  foreach ($user_web_jobs as $related_job) {
-    if($related_job['id'] != $job['id']){
-      array_push($active_user_jobs, $related_job);
-      if($related_job['parent_job_id'] == $job['id'] && ($related_job['parent_job_id'] !=0|| $job['parent_job_id'] != 0))
-      {
-        array_push($linked_jobs, $related_job);
-      }
-
-      if($related_job['id'] == $job['parent_job_id'] && $job['parent_job_id'] != 0){
-        $parent = $related_job; //sets parent if the job's parent id matches the id of another job
-        array_push($linked_jobs, $related_job);
-      }
-    }
-    else{
-      if($parent == $job){
-        $parent = $related_job;}
-    }
-  }
-
-  $bundled = $active_user_jobs ? true : false; //user has other active jobs
+//Fetches all of the customer's active jobs 'user_web_jobs', puts in 'active_user_jobs[]' and 'linked_jobs[]'
+include('sql_snippets/fetch_active_jobs.php');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   //used if modify is not updated.
@@ -88,239 +58,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   
   $current_date = date("Y-m-d");
 
-  $stmt->bindParam(':job_id', $job['id']);
-  $price = floatval(number_format((float)$_POST["price"], 2, '.',''));
-  $stmt->bindParam(':price', $price);
-  $length_inches = intval($_POST["length_inches"]);
-  $stmt->bindParam(':length_inches', $length_inches, PDO::PARAM_INT);
-  $width_inches = intval($_POST["width_inches"]);
-  $stmt->bindParam(':width_inches', $width_inches, PDO::PARAM_INT);
-  
-  $copies = intval($_POST["copies"]);
-  $stmt->bindParam(':copies', $copies , PDO::PARAM_INT);
-  // $duration = intval($_POST["duration"]);
-  // $stmt->bindParam(':duration',$duration, PDO::PARAM_INT);
-  $stmt->bindParam(':staff_notes', $_POST["staff_notes"]);
-  $stmt->bindParam(':status', $_POST["status"]);
-  $stmt->bindParam(':model_name_2', $modify_value);
-  $new_parent= intval($_POST["select_parent"]);
-  $stmt->bindParam(':parent_job_id', $new_parent, PDO::PARAM_INT);
-    /*
-  should dates be removed if steps are reverted: eg printing->paid
-  */
-  $d1 = $job['priced_date'];
-  $d2 = $job['paid_date'];
-  $d3 = $job['printing_date'];
-  $d4 = $job['delivered_date'];
-  $d5 = $job['hold_date'];
-  $d6 = $job['completed_date'];
-  $d7 = $job['cancelled_date'];
 
-  $stmt->bindParam(':priced_date', $d1);
-  $stmt->bindParam(':paid_date', $d2);
-  $stmt->bindParam(':printing_date', $d3);
-  $stmt->bindParam(':delivered_date', $d4);
-  $stmt->bindParam(':hold_date', $d5);
-  $stmt->bindParam(':completed_date', $d6);
-  $stmt->bindParam(':cancelled_date', $d7);
+  //Variables for status change dates and name of person who changed the status
+  $d_priced = $job['priced_date'];
+  $d_paid = $job['paid_date'];
+  $d_printing = $job['printing_date'];
+  $d_delivered = $job['delivered_date'];
+  $d_hold = $job['hold_date'];
+  $d_completed = $job['completed_date'];
+  $d_cancelled = $job['cancelled_date'];
 
-  $hs = $job['hold_signer'];
-  $cs = $job['cancelled_signer'];
-  $priceds = $job['priced_signer'];
-  $paids = $job['paid_signer'];
-  $printings = $job['printing_signer'];
-  $completes = $job['completed_signer'];
-  $ds = $job['delivered_signer'];
-
-  $stmt->bindParam(':hold_signer', $hs);
-  $stmt->bindParam(':cancelled_signer', $cs);
-  $stmt->bindParam(':priced_signer', $priceds);
-  $stmt->bindParam(':paid_signer', $paids);
-  $stmt->bindParam(':printing_signer', $printings);
-  $stmt->bindParam(':completed_signer', $completes);
-  $stmt->bindParam(':delivered_signer', $ds);
-
-  //need variable to check if admin wants to send email. case: updating notes but dont send email
-  if ($_POST['status'] == "pending payment") {
-    $d1 = $current_date;
-    $priceds=$user;
-    //email user
-    if (isset($_POST['email_enabaled']) && $_POST['email_enabaled'] == "enabled") {
-      //get job owner details
-      $userSQL = $conn->prepare("SELECT * FROM users WHERE netlink_id = :netlink_id");
-      $userSQL->bindParam(':netlink_id', $job['netlink_id']);
-      $userSQL->execute();
-      $job_owner = $userSQL->fetch();
-
-      $direct_link = "https://webapp.library.uvic.ca/3dprint/customer-large-format-print-job-information?job_id=". $job['id'];
-      $direct_link2 = "https://onlineacademiccommunity.uvic.ca/dsc/tools-tech/large-format-printer-and-scanner/";
-      $msg = "
-      <html>
-      <head>
-      <title>HTML email</title>
-      </head>
-      <body>
-      <p> Hello, ". $job_owner['name'] .". This is an automated email from the DSC. </p>
-      <p> Your large format print job (".$job['job_name']. ") has been evaluated at a cost of $" . (number_format((float)$_POST["price"], 2, '.','')) . " </p>
-      <p> Please make your payment <a href=". $direct_link .">here</a> for it to be placed in our printing queue.</p>
-      <p>If you have any questions please review our <a href=". $direct_link2 .">FAQ</a> or email us at dscommons@uvic.ca.</p>
-      </body>
-      </html>";
-      $headers = "MIME-Version: 1.0" . "\r\n";
-      $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-      $headers .= "From: dscommons@uvic.ca" . "\r\n";
-      mail($job_owner['email'],"Your Large Format Print is ready for payment",$msg,$headers);
-    }
-  } elseif($_POST['status'] == "paid"){
-    //this is done automatically when payment is received.
-    $d2 = $current_date;
-    $paids=$user;
+  $n_hold = $job['hold_signer'];
+  $n_cancelled = $job['cancelled_signer'];
+  $n_priced = $job['priced_signer'];
+  $n_paid = $job['paid_signer'];
+  $n_printing = $job['printing_signer'];
+  $n_completed = $job['completed_signer'];
+  $n_delivered = $job['delivered_signer'];
 
 
-  } elseif($_POST['status'] == "printing"){
-    $d3 = $current_date;
-    $printings=$user;
-}
-    elseif($_POST['status'] == "completed"){
-    $d6 = $current_date;
-    $completes=$user;
+  //Updates job id, price, staff notes, copies, updated model name, status, parentid, and if laser cut or 3d print, duration and material type. 
+  include('sql_snippets/update_broad_specs_snippet.php');
+
+  //Updates length and width of print
+  include('sql_snippets/update_large_format_specs_snippet.php');
 
 
-  } elseif ($_POST['status'] == "delivered") {
-    $d4 = $current_date;
-    $ds=$user;
+  //Sets job status update date, and admin who updated the status, and sends any relevant emails via 'general_partials/send_customer_email_partial.php'
+  include('admin_spec_php_partials/admin_update_job_status_email_partial.php');
 
-    //email user
-    if (isset($_POST['email_enabaled']) && $_POST['email_enabaled'] == "enabled") {
-      //Get users name & email
-      $userSQL = $conn->prepare("SELECT * FROM users WHERE netlink_id = :netlink_id");
-      $userSQL->bindParam(':netlink_id', $job['netlink_id']);
-      $userSQL->execute();
-      $job_owner = $userSQL->fetch();
-      $direct_link = "https://www.uvic.ca/library/";
-
-      $msg = "
-      <html>
-      <head>
-      <title>HTML email</title>
-      </head>
-      <body>
-      <p>Hello, ". $job_owner['name'] .". This is an automated email from the DSC. </p>
-      <p> Your large format print job (".$job['job_name']. ") has been printed. You can pick it up from the front desk at the McPherson Library.</p>
-      <p>Please check up to date library hours by checking the library website <a href=". $direct_link .">here</a></p>
-      </body>
-      </html>";
-      $headers = "MIME-Version: 1.0" . "\r\n";
-      $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-      $headers .= "From: dscommons@uvic.ca" . "\r\n";
-      mail($job_owner['email'], "Your Large Format Print is ready for collection",$msg,$headers);
-    }
-  } elseif($_POST['status'] == "archived"){
-    $d4 = $current_date;
-    $completes = $user;
-
-  }elseif($_POST['status'] == "on hold"){
-    $d5 = $current_date;
-    $hs = $user;
-  }
-  elseif($_POST['status'] == "cancelled"){
-    $d7 = $current_date;
-    $cs = $user;
-  }
 
   $stmt->execute();
 
-//Set status details for associated jobs selected from associated jobs table
-  print_r($_POST);
-  if (isset($_POST['checked_jobs'])) {
-    $checked_jobs = $_POST['checked_jobs'];
-    // echo 'line190 checked jobs exists';
-    // print_r($checked_jobs);echo '<br>';
-
-    if(count($checked_jobs)>0){
-    
-      $checked_jobs = array_map(function($item) {
-        return "'" . $item . "'";
-      }, $checked_jobs);
-      // print_r($checked_jobs);
-
-      $checkedIDs_sql = implode(',', $checked_jobs);//to create comma separated list for update query
-      // echo $checkedIDs_sql;
-
-      $stm = $conn->prepare("UPDATE web_job INNER JOIN large_format_print_job ON id=large_format_print_id SET status = :status, priced_date = :priced_date, paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, delivered_date = :delivered_date, priced_signer=:priced_signer,  paid_signer= :paid_signer, printing_signer=:printing_signer, completed_signer=:completed_signer, delivered_signer=:delivered_signer, hold_date = :hold_date, hold_signer= :hold_signer, cancelled_date=:cancelled_date, cancelled_signer = :cancelled_signer WHERE id IN ($checkedIDs_sql)");
-
-      $stm->bindParam(':status', $_POST["status"]);
-
-      $stm->bindParam(':priced_date', $d1);
-      $stm->bindParam(':paid_date', $d2);
-      $stm->bindParam(':printing_date', $d3);
-      $stm->bindParam(':completed_date', $d6);
-      $stm->bindParam(':hold_date', $d5);
-      $stm->bindParam(':delivered_date', $d4);
-      $stm->bindParam(':cancelled_date', $d7);
-     
-      $stm->bindParam(':hold_signer', $hs);
-      $stm->bindParam(':cancelled_signer', $cs);
-      $stm->bindParam(':priced_signer', $priceds);
-      $stm->bindParam(':paid_signer', $paids);
-      $stm->bindParam(':printing_signer', $printings);
-      $stm->bindParam(':completed_signer', $completes);
-      $stm->bindParam(':delivered_signer', $ds);
-
-      $stm->execute();
-    }
-  } else {
-  // echo 'no checked jobs';
-  }
+  //Snippet checks if any related active user jobs have been selected, and updates those jobs' status to match the jobs status after save.
+  include('sql_snippets/admin_update_multiple_status_snippet.php');
 
   //exit to dashboard after saving
   header("location: admin-dashboard.php");
   }
 
-  //Sets the date to appear in `echo "Status changed: <br>" .$status_date;`
-  $status_date = ""; // To display the date that the current status was set
-  $status_signer = "";
-  switch ($job['status']) {
-    case "submitted":
-      $status_date = $job["submission_date"];
-      $status_signer = $job_owner["name"];
-      break;
-    case "on hold":
-      $status_date = $job["hold_date"];
-      $status_signer = $job["hold_signer"];
-      break;
-    case "pending payment":
-      $status_date = $job["priced_date"];
-      $status_signer=$job["priced_signer"];
-      break;
-    case "paid":
-      $status_date = $job["paid_date"];
-      $status_signer=$job["paid_signer"];
-      break;
-    case "printing":
-      $status_date = $job["printing_date"];
-      $status_signer=$job["printing_signer"];
-      break;
-    case "completed":
-      $status_date = $job["completed_date"];
-      $status_signer=$job["completed_signer"];
-      break;
-    case "delivered":
-      $status_date = $job["delivered_date"];
-      $status_signer=$job["delivered_signer"];
-      break;
-    case "cancelled":
-      $status_date = $job["cancelled_date"];
-      $status_signer = $job["cancelled_signer"];
-      break;
-    case "archived":
-      $status_date = $job["completed_date"];
-      $status_signer=$job["completed_signer"];
-      break;
-  }
-
-  $job['status_date'] = $status_date;
-  $job['status_signer'] = $status_signer;
+  //Sets the date to appear in `echo "Status changed: <br>" .$status_date;` based on $job['status'] and $job_owner['name'] at time of page load
+  include('general_partials/declare_status_date.php');
 
 ?>
 
@@ -414,20 +192,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
       <!--Element and js for viewing and editing the specs specific to large format jobs
         (length and width)-->
-      <?php include('admin_spec_php_partials/    admin_large_format-specific_specs_partial.php');?>
+      <?php include('admin_spec_php_partials/admin_large_format-specific_specs_partial.php');?>
 
       <!--Element for viewing the customer comments and adding/modifying admin comments-->
       <?php include('general_partials/comment_boxes_partial.php');?>
 
 
-      <!--Elements for enabling email, save updated information, return to dashboard, or duplicate the job.-->
+      <!--Elements for enabling email, save updated information, return to dashboard.-->
       <?php include('admin_spec_php_partials/admin_specs_footer_partial.php');?>
+
+
+      </form>
+    </div>
+
+    <!--Button element to duplicate job-->
+
+    <?php include('general_partials/duplicate_button_partial.php');?>
+        
   <p></p>
   <br>
   <p></p>
 
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-      <script>window.jQuery || document.write('<script src="/docs/4.5/assets/js/vendor/jquery.slim.min.js"><\/script>')</script><script src="/docs/4.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-1CmrxMRARb6aLqgBO7yyAxTOQE2AKb9GfXnEo760AUcUmFx3ibVJJAzGytlQcNXd" crossorigin="anonymous"></script>
-        <script src="form-validation.js"></script>
-        </body>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+  <script>window.jQuery || document.write('<script src="/docs/4.5/assets/js/vendor/jquery.slim.min.js"><\/script>')</script><script src="/docs/4.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-1CmrxMRARb6aLqgBO7yyAxTOQE2AKb9GfXnEo760AUcUmFx3ibVJJAzGytlQcNXd" crossorigin="anonymous"></script>
+  <script src="form-validation.js"></script>
+  <script type="text/javascript" src="js/popup_function.js"></script>
+  </body>
 </html>
