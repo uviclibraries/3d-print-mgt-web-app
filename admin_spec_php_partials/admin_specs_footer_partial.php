@@ -22,10 +22,12 @@
 </div>
 
 <script>
-  document.querySelector('status-select').addEventListener("change", function() {
-  if (this.value == "pending payment" || this.value == "delivered") {
+  document.getElementById('status-select').addEventListener("change", function() {
+  if (document.getElementById('status-select').value == "pending payment" || document.getElementById('status-select').value == "delivered") {
     document.getElementById("en_email").checked = true;
-  }
+  }else{    document.getElementById("en_email").checked = false;
+}
+console.log(document.getElementById("en_email").checked)
 });
 
-</script><!--Prevent oversize prints-->
+</script>

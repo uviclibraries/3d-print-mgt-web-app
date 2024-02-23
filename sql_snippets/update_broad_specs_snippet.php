@@ -33,16 +33,17 @@ if($jobType == "laser cut" || $jobType == "3d print"){
   $stmt->bindParam(':priced_date', $d_priced);
   $stmt->bindParam(':paid_date', $d_paid);
   $stmt->bindParam(':printing_date', $d_printing);
-  $stmt->bindParam(':delivered_date', $d_delivered);
-  $stmt->bindParam(':hold_date', $d_hold);
   $stmt->bindParam(':completed_date', $d_completed);
+  $stmt->bindParam(':delivered_date', $d_delivered);
   $stmt->bindParam(':cancelled_date', $d_cancelled);
+  $stmt->bindParam(':hold_date', $d_hold);
 
-  $stmt->bindParam(':hold_signer', $n_hold);
-  $stmt->bindParam(':cancelled_signer', $n_cancelled);
   $stmt->bindParam(':priced_signer', $n_priced);
   $stmt->bindParam(':paid_signer', $n_paid);
   $stmt->bindParam(':printing_signer', $n_printing);
   $stmt->bindParam(':completed_signer', $n_completed);
   $stmt->bindParam(':delivered_signer', $n_delivered);
+  $stmt->bindParam(':cancelled_signer', $n_cancelled);
+  $stmt->bindParam(':hold_signer', $n_hold);
+
 ?>

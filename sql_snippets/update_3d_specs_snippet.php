@@ -1,5 +1,5 @@
 <?php 
-$infill = intval($_POST["infill"]);
+  $infill = intval($_POST["infill"]);
   $stmt->bindParam(':infill', $infill, PDO::PARAM_INT);
   $scale = intval($_POST["scale"]);
   $stmt->bindParam(':scale', $scale, PDO::PARAM_INT);

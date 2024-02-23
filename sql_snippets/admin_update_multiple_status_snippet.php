@@ -14,21 +14,21 @@
 
       $stm->bindParam(':status', $_POST["status"]);
 
-      $stm->bindParam(':priced_date', $d1);
-      $stm->bindParam(':paid_date', $d2);
-      $stm->bindParam(':printing_date', $d3);
-      $stm->bindParam(':completed_date', $d6);
-      $stm->bindParam(':hold_date', $d5);
-      $stm->bindParam(':delivered_date', $d4);
-      $stm->bindParam(':cancelled_date', $d7);
+      $stm->bindParam(':priced_date', $d_priced);
+      $stm->bindParam(':paid_date', $d_paid);
+      $stm->bindParam(':printing_date', $d_printing);
+      $stm->bindParam(':completed_date', $d_completed);
+      $stm->bindParam(':hold_date', $d_hold);
+      $stm->bindParam(':delivered_date', $d_delivered);
+      $stm->bindParam(':cancelled_date', $d_cancelled);
      
-      $stm->bindParam(':hold_signer', $hs);
-      $stm->bindParam(':cancelled_signer', $cs);
-      $stm->bindParam(':priced_signer', $priceds);
-      $stm->bindParam(':paid_signer', $paids);
-      $stm->bindParam(':printing_signer', $printings);
-      $stm->bindParam(':completed_signer', $completes);
-      $stm->bindParam(':delivered_signer', $ds);
+      $stm->bindParam(':hold_signer', $n_hold);
+      $stm->bindParam(':cancelled_signer', $n_cancelled);
+      $stm->bindParam(':priced_signer', $n_priced);
+      $stm->bindParam(':paid_signer', $n_paid);
+      $stm->bindParam(':printing_signer', $n_printing);
+      $stm->bindParam(':completed_signer', $n_completed);
+      $stm->bindParam(':delivered_signer', $n_delivered);
 
       $stm->execute();
     }
