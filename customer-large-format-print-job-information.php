@@ -135,39 +135,12 @@ if ($user != $job["netlink_id"] && $user_type == 1) {
     <?php } ?>
       <br>
 
-    <!-- if its priced/payed-->
-    <?php if($job["status"] != "submitted"){?>
-      <hr class="mb-6">
+    </div>
 
-        <div class="col-md-3 mb-3">
-                <label for="username">Price</label>
+  <hr class="mb-6">
+    <?php include('customer_spec_php_partials/customer_price_partial.php');?>
 
-
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">$</span>
-                          <input type="text" name="price" class="form-control" value="<?php echo $job["price"]; ?>" readonly>
-                    </div>
-
-
-            </div>
-        <!-- if its priced and not payed-->
-        <?php
-        if ($job["status"] == "pending payment") {
-          $_SESSION['price'] = strval($job["price"]);
-          $_SESSION['job_id'] = $job['id'];
-          ?>
-          <a href="moneris/customer-payment.php">
-            <button type="button" class="btn btn-primary btn-lg" type="submit">
-              Payment
-            </button>
-          </a>
-        <?php } ?>
-    <?php }  ?>
-           <!-- end if(if) else -->
-
-        </div>
-
-      <hr class="mb-6">
+  
 <div id="large_format_specs" class="col-md-12 order-md-1">
       <h3 class="mb-3">Large Format Print Specifications</h3>
       <div class="row"> 

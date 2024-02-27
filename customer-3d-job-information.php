@@ -139,41 +139,12 @@ if ($user != $job["netlink_id"] && $user_type == 1) {
       <p>File Deleted</p>
     <?php } ?>
       <br>
+</div>
 
-    <!-- if its priced/payed-->
-    <?php if($job["status"] != "submitted"){?>
-      <hr class="mb-6">
-        <div class="col-md-3 mb-3">
-        <h3 class="mb-3">Price</h3>
-            <?php if($job["price"] > 0 && $job['parent_job_id'] == 0){?>
-            <div class="input-group-prepend">
-                <span class="input-group-text">$</span>
-                  <input type="text" name="price" class="form-control" value="<?php echo $job["price"]; ?>" readonly>
-            </div>
-            <?php } ?>
-        </div>
-        <?php if($job["parent_job_id"] != 0){?>
-            <p style="color:red">This job is priced with another job. Go to <a href="customer-3d-job-information.php?job_id=<?php echo $job["parent_job_id"]; ?>">this job</a> to pay.</p>
-        <?php }  ?>
-        <!-- if its priced and not payed-->
-        <?php
-        if ($job["status"] == "pending payment") {
-          $_SESSION['price'] = strval($job["price"]);
-          $_SESSION['job_id'] = $job['id'];
-          if($job["parent_job_id"] != 0 || $job['is_parent']){?>
-          <a href="moneris/customer-payment.php">
-            <button type="button" class="btn btn-primary btn-lg" type="submit">
-              Payment
-            </button>
-          </a>
-            <?php }} ?>
-        <?php }  ?>
-           <!-- end if(if) else -->
+    <hr class="mb-6">
+    <?php include('customer_spec_php_partials/customer_price_partial.php');?>
 
-        </div>
-
-      <hr class="mb-6">
-
+        
     <div class="col-md-12 order-md-1">
       <h4 class="mb-3">Specifications</h4>
       <form class="needs-validation" novalidate>

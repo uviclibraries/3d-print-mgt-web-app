@@ -46,6 +46,8 @@ for ($type = 0; $type <=2; $type++){
       $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
       $headers .= "From: dscommons@uvic.ca" . "\r\n";
       mail($job['email'],"Reminder-Your 3D Print is ready for payment",$msg,$headers);
+      mail('chloefarr@uvic.ca',"cron-job test Reminder-Your 3D Print is ready for payment",$msg,$headers);
+
     }
   }
 }

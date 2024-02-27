@@ -88,9 +88,9 @@ $subject = $yesterday . " 3D print Moneris Report";
 $stm = $conn->query("SELECT email FROM users WHERE cron_report = 1 && user_type = 0");
 $cron_report_email = $stm->fetchAll();
 
+mail('chloefarr@uvic.ca',$subject,$msg,$headers);
 foreach ($cron_report_email as $admin) {
   // print($admin['email'].'<br>');
-  // mail('chloefarr@uvic.ca',$subject,$msg,$headers);
   mail($admin['email'],$subject,$msg,$headers);
 }
 ?>
