@@ -1,6 +1,8 @@
 <?php
 //daily
 chdir("/usr/local/apache2/htdocs-webapp/3dprint/jobs_cron");
+// chdir("/usr/local/apache2/htdocs-webapp/demo/3dwebapp/jobs_cron");
+
 require ('../db.php');
 
 //yesterday's approved transactions
@@ -9,7 +11,7 @@ $yesterday = date("Y-m-d", strtotime("-1 days"));
 $stm->bindParam(':yesterday_date', $yesterday, PDO::PARAM_STR);
 $stm->execute();
 $daily_results = $stm->fetchAll();
-
+// print("num transactions: ". count($daily_results).'<br>');
 $header = array("Order ID", "Netlink ID", "Full Name", "Date", "Time", "Message", "Transaction Num", "Cardholder", "Charge", "Card", "Bank Approval Code", "Bank Transaction ID", "INVOICE", "ISSCONF", "ISSNAME", "ISO Code", "AVS Response Code", "CAVV Result Code", "Response Code");
 $fix = array("Result", "Trans Name", "f4l4");
 $header = array_merge($header, $fix);
@@ -85,7 +87,11 @@ $subject = $yesterday . " 3D print Moneris Report";
 //Get mailing list
 $stm = $conn->query("SELECT email FROM users WHERE cron_report = 1 && user_type = 0");
 $cron_report_email = $stm->fetchAll();
+
 foreach ($cron_report_email as $admin) {
-  mail($admin["email"],$subject,$msg,$headers);
+  // print($admin['email'].'<br>');
+  // mail('chloefarr@uvic.ca',$subject,$msg,$headers);
+  mail($admin['email'],$subject,$msg,$headers);
 }
 ?>
+<!--enter in url bar when on Triton: https://devwebapp.library.uvic.ca/demo/3dwebapp/jobs_cron/dsc-moneris-daily.php-->
