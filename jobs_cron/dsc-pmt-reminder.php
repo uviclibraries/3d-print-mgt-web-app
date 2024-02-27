@@ -17,24 +17,20 @@ $jobTypeIDs=['3d_print_id', 'laser_cut_id', 'large_format_print_id'];
 $faq_hrefs=['https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/', 'https://onlineacademiccommunity.uvic.ca/dsc/how-to-laser-cut/', 'https://onlineacademiccommunity.uvic.ca/dsc/tools-tech/large-format-printer-and-scanner/'];
 $job_hrefs=['https://webapp.library.uvic.ca/3dprint/customer-3d-job-information?job_id=', 'https://webapp.library.uvic.ca/3dprint/customer-laser-job-information.php?job_id=', 'https://webapp.library.uvic.ca/3dprint/customer-large-format-print-job-information?job_id='];
 
+
+//FOR JOBS THAT HAVE BEEN LEFT UNPAID FOR 21+ DAYS    
 for ($type = 0; $type <=2; $type++){
-  echo($jobTypeIDs[$type]."<br>");
   //pending_payment jobs query
-  $stm = $conn->query("SELECT web_job.id AS id, web_job.job_name AS job_name, web_job.netlink_id AS netlink_id, web_job.status AS status, web_job.priced_date AS priced_date, users.email AS email, users.name AS user_name FROM web_job INNER JOIN users ON users.netlink_id = web_job.netlink_id INNER JOIN $jobTypeTables[$type] ON web_job.id = $jobTypeTables[$type].$jobTypeIDs[$type] WHERE web_job.status = 'pending payment' AND web_job.netlink_id = 'chloefarr' ORDER BY priced_date ASC");
+  $stm = $conn->query("SELECT web_job.id AS id, web_job.job_name AS job_name, web_job.netlink_id AS netlink_id, web_job.status AS status, web_job.priced_date AS priced_date, users.email AS email, users.name AS user_name FROM web_job INNER JOIN users ON users.netlink_id = web_job.netlink_id INNER JOIN $jobTypeTables[$type] ON web_job.id = $jobTypeTables[$type].$jobTypeIDs[$type] WHERE web_job.status = 'pending payment' AND web_job.netlink_id = 'chloefarr' AND web_job.priced_date >= DATE_ADD(web_job.priced_date, INTERVAL -10 DAY)");
+
   $job_pp = $stm->fetchAll();
 
-  //Updating database preperation
-  // $stm1 = $conn->prepare("UPDATE web_job SET status = :status, delivered_date = :delivered_date INNER JOIN $jobTypeTables[$type] ON web_job.id=$jobTypeTables[$type].$jobTypeIDs[$type] WHERE id = :job_id");
-
-  echo("type: ". $jobTypes[$type]."; length job_pp: " . count($job_pp)."<br>");
-
-  //pending payment reminder & Cancelations
-  foreach ($job_pp as $job) {
-    print($job['id']);
-    echo($job['id']."<br>");
-    $days_passed = ($today-strtotime($job['priced_date']))/$day;
-    //reminder email if is been 10 days
-    if($days_passed == 12){
+  //pending payment reminder
+  if($job_pp && count($job_pp)>0){
+    foreach ($job_pp as $job) {
+      // echo($job['id']."<br>");
+      //reminder email if is been 10 days
+      
       $msg = "
       <html>
       <head>
@@ -50,38 +46,38 @@ for ($type = 0; $type <=2; $type++){
       $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
       $headers .= "From: dscommons@uvic.ca" . "\r\n";
       mail($job['email'],"Reminder-Your 3D Print is ready for payment",$msg,$headers);
-      // print('id: '. $job['id'] . ' ; job name: ' . $job['job_name'] . ' -- 10 days have passed<br>');
-    }
-  
-    // elseif($days_passed > 20){
-    //   //update satus to cancelled
-    //   $cancelled = "cancelled";
-    //   $stm1->bindParam(':job_id', $job['job_id']);
-    //   $stm1->bindParam(':status', $cancelled);
-    //   $stm1->bindParam(':delivered_date', $today_str);
-
-    //   $stm1->execute();
-
-    //   //deleting 3d file
-    //   $delete = "uploads/" . $job['model_name'];
-    //   if(is_file($delete)){
-    //     unlink($delete);
-    //   }
-
-    //   //check if secondary file exists. If so delete
-    //   if ($job["model_name_2"] != NULL) {
-    //     $delete2 = "uploads/" . $job['model_name_2'];
-    //     if (is_file($delete2)) {
-    //       unlink($delete2);
-    //     }
-    //   }
-    //   print('id: '. $job['id'] . ' ; job name: ' . $job['job_name'] . '20 days have passed<br>');
-    // }
-    else{
-      print('id: '. $job['id'] . ' ; job name: ' . $job['job_name'] . ' -- failed condition<br>');
     }
   }
 }
+
+
+//FOR JOBS THAT HAVE BEEN LEFT UNPAID FOR 21+ DAYS    
+for ($type = 0; $type <=2; $type++){
+  $table = $jobTypeTables[$type];
+  $table_id = $jobTypeIDs[$type];
+  $id_on_table = $table .'.'. $table_id;
+
+  //pending_payment jobs query
+  $stm = $conn->query("SELECT web_job.id AS id, web_job.status AS status, web_job.priced_date AS priced_date, web_job.delivered_date AS delivered_date, {$table}.model_name AS model_name, {$table}.model_name_2 AS model_name_2 FROM web_job INNER JOIN {$table} ON web_job.id = {$id_on_table} WHERE web_job.status = 'pending payment' AND web_job.netlink_id = 'chloefarr' AND web_job.priced_date >= DATE_ADD(web_job.priced_date, INTERVAL -21 DAY)");
+
+    $job_pp = $stm->fetchAll();
+
+   if($job_pp && count($job_pp)>0){
+    foreach ($job_pp as $job) {
+      $cur_jobID = (int)$job['id'];
+      $cancelled = "cancelled";
+      $job_past_due = $conn->prepare("UPDATE web_job SET id = :id, status = :status, delivered_date = :delivered_date WHERE id = $cur_jobID");
+
+      //update status to cancelled
+      $job_past_due->bindParam(':id', $job['id'], PDO::PARAM_INT);
+      $job_past_due->bindParam(':status', $cancelled, PDO::PARAM_STR);
+      $job_past_due->bindParam(':delivered_date', $job['delivered_date']);
+      $job_past_due->execute();
+    }
+  }
+  }
+
 ?>
+
 
 <!--enter in url bar when on Triton: https://devwebapp.library.uvic.ca/demo/3dwebapp/jobs_cron/dsc-pmt-reminder.php-->
