@@ -32,5 +32,6 @@ foreach ($job_com as $job) {
   // print('job_id: '. $job['id'] . " ; name: ". $job['job_name'].'<br>');
 }
 // print('done run chron job dsc-archive-jobs.php');
+
+// enter in url bar when on Triton: https://devwebapp.library.uvic.ca/demo/3dwebapp/jobs_cron/dsc-archive-jobs.php
 ?>
-<!--enter in url bar when on Triton: https://devwebapp.library.uvic.ca/demo/3dwebapp/jobs_cron/dsc-archive-jobs.php-->

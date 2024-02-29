@@ -1,8 +1,8 @@
 <?php
 //daily
 chdir("/usr/local/apache2/htdocs-webapp/3dprint/jobs_cron");
-// chdir("/usr/local/apache2/htdocs-webapp/demo/3dwebapp/jobs_cron");
-
+// Triton path: chdir("/usr/local/apache2/htdocs-webapp/demo/3dwebapp/jobs_cron");
+ 
 require ('../db.php');
 
 //yesterday's approved transactions
@@ -93,5 +93,6 @@ foreach ($cron_report_email as $admin) {
   // print($admin['email'].'<br>');
   mail($admin['email'],$subject,$msg,$headers);
 }
+
+// enter in url bar when on Triton: https://devwebapp.library.uvic.ca/demo/3dwebapp/jobs_cron/dsc-moneris-daily.php 
 ?>
-<!--enter in url bar when on Triton: https://devwebapp.library.uvic.ca/demo/3dwebapp/jobs_cron/dsc-moneris-daily.php-->
