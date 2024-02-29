@@ -32,6 +32,10 @@ $stm = $conn->prepare("SELECT web_job.id AS id, web_job.job_name AS name, web_jo
 
   $parent=$job; //set self as parent if no other job has been assigned to this job as the parent.
 
+  //will be used in admin_update_multiple_status_snippet.php to find the previous parent job, check if it's still a parent if different job selected in <select id="select_parent" name="select_parent">
+  $prev_parent_id = $job['parent_job_id'];
+
+
   $active_user_jobs = [];
   $linked_jobs = [];
 
@@ -53,6 +57,6 @@ $stm = $conn->prepare("SELECT web_job.id AS id, web_job.job_name AS name, web_jo
         $parent = $related_job;}
     }
   }
-
+  echo('active jobs: ' . count($active_user_jobs) . " ; linked jobs: " . count($linked_jobs));
   $bundled = $active_user_jobs ? true : false; //user has other active jobs
 ?>

@@ -35,6 +35,8 @@ if(count($active_user_jobs) > 0){?>
                   $isSelected = (string)$parent === (string)$active_user_job['id'] && (string)$parent != '0' ? 'selected' : '';
                   echo '<option value="' . htmlspecialchars($active_user_job['id']) . '" ' . $isSelected . '>' . htmlspecialchars($active_user_job['id']) . ' - ' . htmlspecialchars($active_user_job['name']) . '</option>';
                   if ($isSelected) {$default_set = true;} // Mark that the default has been set
+              }else{
+                echo '<option value="' . htmlspecialchars($active_user_job['id']) . '" ' . '>' . htmlspecialchars($active_user_job['id']) . ' - ' . htmlspecialchars($active_user_job['name']) . '</option>';
               }
             }
             echo 'console.log("selected")';
@@ -301,20 +303,26 @@ if(count($active_user_jobs) > 0){?>
   </div><!--show "on hold" tab if there are jobs on hold-->
 
 
+
   <?php if(count($active_user_jobs) > 0){?>  
+    <div class="row">
     <?php if(count($active_user_jobs) > 0){?>
     <!--add checkbox for "change status of selected "-->
-    <input type="checkbox" id="set-statuses-checkbox" name="set-statuses-checkbox" value="set_statuses" style="margin:3px;">
-      <label for="set-statuses-checkbox">Update statuses to match</label> 
-
+    <div class="col-md-4 mb-3">
+      <input type="checkbox" id="set-statuses-checkbox" name="set-statuses-checkbox" value="set_statuses" style="margin-top:3px;">
+      <label for="set-statuses-checkbox" style="margin-top:5px;margin-left: 10px;">Update statuses to match</label> 
+    </div>
     <?php if($job['is_parent'] || ($job['parent_job_id'] == 0)) {?>
-      <!--set to checkbox "Set selected as children"-->
-      <input type="checkbox" id="set-children-checkbox" name="set-children-checkbox" value="set_children" style="margin:3px;">
-      <label for="set-children-checkbox">Set selected jobs as children</label> 
+      <div class="col-md-4 mb-3">
+        <!--set to checkbox "Set selected as children"-->
+        <input type="checkbox" id="set-children-checkbox" name="set-children-checkbox" value="set_children" style="margin-top:3px;">
+        <label for="set-children-checkbox"style="margin-top:5px;">Set selected jobs as children</label> 
+      </div>
     <?php } ?>
-
+    
   <?php } ?>
   </div> 
+</div>
 <?php } ?>
 
 

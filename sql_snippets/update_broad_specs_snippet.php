@@ -19,7 +19,7 @@
 
   
   $isParent = $job['is_parent'];
-
+  //if the job is selected as a parent in <select id="select_parent" name="select_parent">, change "is_parent" field val to true
   if(isset($_POST["select_parent"])){
     if(intval($_POST["select_parent"]) != $job['parent_job_id']){
       foreach($user_web_jobs AS $user_job){
@@ -27,11 +27,12 @@
           $isParent = true;
           break;
         }
-        else{ $isParent = false;}
+        else{$isParent = false;}
       }
     }
   }
-  
+
+  //if job(s) was selected from within any <div class="user_jobs_container"> and 'set selected jobs as children' checkbox selected, change "is_parent" field val to true
   $isParent = ($_POST['set-children-checkbox'] == 'set_children' && count($_POST['checked_jobs'])>0) ? true : $isParent;
   $stmt->bindParam(':is_parent', $isParent, PDO:: PARAM_BOOL);
 
