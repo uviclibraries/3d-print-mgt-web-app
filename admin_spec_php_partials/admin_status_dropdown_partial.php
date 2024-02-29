@@ -6,6 +6,8 @@
               <?php 
                 if ($job["status"] == "cancelled") {?> 
                   <option value="cancelled" selected readonly>cancelled</option> 
+                <?php } if ($job["status"] == "archived") {?> 
+                  <option value="arachived" selected readonly>archived</option> 
                 <?php } 
                 else { ?>
                   <option value="submitted" <?php if ($job["status"]== "submitted"){echo "selected";} ?>>Not Priced</option>

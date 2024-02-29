@@ -1,37 +1,23 @@
 <?php
 //Daily
-chdir("/usr/local/apache2/htdocs-webapp/3dprint/jobs_cron");
-// Triton path: chdir("/usr/local/apache2/htdocs-webapp/demo/3dwebapp/jobs_cron");
+// chdir("/usr/local/apache2/htdocs-webapp/3dprint/jobs_cron");
+// Triton path: 
+chdir("/usr/local/apache2/htdocs-webapp/demo/3dwebapp/jobs_cron");
 require ('../db.php');
 
 
-//date management numbers
-$today_str = date("Y-m-d");
-$today =  strtotime($today_str);
-$day = 86400;
+//search for all jobs with:
+  // current `status` as either 'archived' or 'delivered'
+  // where a date has been assigned for either the date they were set to cancelled or date they were set to delivered (`cancelled_date` or `archived_date`) for cautious redundancy of appropriate status set.
+  // They were either cancelled or archived (can't be both, or one would be redundant) more than 14 days ago
+  // where netlink id is 'chloefarr' <- only for testing
+//set all of their `status` values to 'archived'
+//set all of their `archived_date` values to date cron_job ran
+//set all of their `archived_signer` values to 'cron_job' to indicate it was automatically archived
 
-//delivered jobs query
-$stm = $conn->query("SELECT id, delivered_date, job_name FROM web_job WHERE status = 'delivered'");
-$job_com = $stm->fetchAll();
+$stm1 = $conn->query("UPDATE web_job SET status = 'archived', archived_date = CURRENT_DATE, archived_signer = 'cron_job' WHERE netlink_id = 'chloefarr' AND status IN ('delivered','cancelled') AND (cancelled_date IS NOT NULL OR delivered_date IS NOT NULL) AND (cancelled_date < DATE_ADD(NOW(), INTERVAL -14 DAY) OR delivered_date < DATE_ADD(NOW(), INTERVAL -14 DAY) )");
 
-//Updating database preperation
-$stm1 = $conn->prepare("UPDATE web_job SET status = :status, delivered_date = :delivered_date WHERE id = :job_id");
-
-//Archiving
-$archived = "archived";
-foreach ($job_com as $job) {
-  $days_passed = ($today-strtotime($job['delivered_date']))/$day;
-  //If older than 14 days
-  if ($days_passed > 14) {
-    $stm1->bindParam(':job_id', $job['id']);
-    $stm1->bindParam(':status', $archived);
-    $stm1->bindParam(':delivered_date', $job['delivered_date']);
-    $stm1->execute();
-    // print('job_id: '. $job['id'] . " ; name: ". $job['job_name'].'1 day has passed.<br>');
-  }
-  // print('job_id: '. $job['id'] . " ; name: ". $job['job_name'].'<br>');
-}
-// print('done run chron job dsc-archive-jobs.php');
+$stm1->execute();
 
 // enter in url bar when on Triton: https://devwebapp.library.uvic.ca/demo/3dwebapp/jobs_cron/dsc-archive-jobs.php
 ?>
