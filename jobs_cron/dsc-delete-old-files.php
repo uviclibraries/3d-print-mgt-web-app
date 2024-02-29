@@ -2,21 +2,25 @@
 
 //Weekly
 chdir("/usr/local/apache2/htdocs-webapp/3dprint/jobs_cron");
-// chdir("/usr/local/apache2/htdocs-webapp/demo/3dwebapp/jobs_cron");
+// Testing on Triton: chdir("/usr/local/apache2/htdocs-webapp/demo/3dwebapp/jobs_cron");
 
 require ('../db.php');
 
-$jobTypes=['3d print', 'laser cut', 'large format print'];
-$jobTypeTables=['3d_print_job', 'laser_cut_job', 'large_format_print_job'];
-$jobTypeIDs=['3d_print_id', 'laser_cut_id', 'large_format_print_id'];
+// $jobTypes=['3d print', 'laser cut', 'large format print'];
+// $jobTypeTables=['3d_print_job', 'laser_cut_job', 'large_format_print_job'];
+// $jobTypeIDs=['3d_print_id', 'laser_cut_id', 'large_format_print_id'];
 
+//Can add job types to each array as new types are built in to webapp
+$jobTypes=['3d print', 'laser cut'];
+$jobTypeTables=['3d_print_job', 'laser_cut_job'];
+$jobTypeIDs=['3d_print_id', 'laser_cut_id'];
 
 //One semester ago & one semester + 2 weeks ago.
 $today_120 = date('Ymd', strtotime("-120 days"));
 $today_134 = date('Ymd', strtotime("-134 days"));
 
 //Search archived jobs
-for ($type = 0; $type <=2; $type++){
+for ($type = 0; $type <=count($jobTypes); $type++){
   $table = $jobTypeTables[$type];
   $table_id = $jobTypeIDs[$type];
   $id_on_table = $table .'.'. $table_id;
@@ -41,6 +45,6 @@ for ($type = 0; $type <=2; $type++){
     }
   }
 }
-?>
 
-<!--enter in url bar when on Triton: https://devwebapp.library.uvic.ca/demo/3dwebapp/jobs_cron/dsc-delete-old-files.php-->
+// enter in url bar when on Triton: https://devwebapp.library.uvic.ca/demo/3dwebapp/jobs_cron/dsc-delete-old-files.php
+?>

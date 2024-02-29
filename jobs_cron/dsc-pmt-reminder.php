@@ -1,7 +1,7 @@
 <?php
 //Daily
 chdir("/usr/local/apache2/htdocs-webapp/3dprint/jobs_cron");
-// chdir("/usr/local/apache2/htdocs-webapp/demo/3dwebapp/jobs_cron");
+// Triton path: chdir("/usr/local/apache2/htdocs-webapp/demo/3dwebapp/jobs_cron");
 
 require ('../db.php');
 
@@ -11,17 +11,23 @@ $today_str = date("Y-m-d");
 $today =  strtotime($today_str);
 $day = 86400;
 
-$jobTypes=['3d print', 'laser cut', 'large format print'];
-$jobTypeTables=['3d_print_job', 'laser_cut_job', 'large_format_print_job'];
-$jobTypeIDs=['3d_print_id', 'laser_cut_id', 'large_format_print_id'];
+// $jobTypes=['3d print', 'laser cut', 'large format print'];
+// $jobTypeTables=['3d_print_job', 'laser_cut_job', 'large_format_print_job'];
+// $jobTypeIDs=['3d_print_id', 'laser_cut_id', 'large_format_print_id'];
+
+//Can add job types to each array as new types are built in to webapp
+$jobTypes=['3d print', 'laser cut'];
+$jobTypeTables=['3d_print_job', 'laser_cut_job'];
+$jobTypeIDs=['3d_print_id', 'laser_cut_id'];
+
 $faq_hrefs=['https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/', 'https://onlineacademiccommunity.uvic.ca/dsc/how-to-laser-cut/', 'https://onlineacademiccommunity.uvic.ca/dsc/tools-tech/large-format-printer-and-scanner/'];
 $job_hrefs=['https://webapp.library.uvic.ca/3dprint/customer-3d-job-information?job_id=', 'https://webapp.library.uvic.ca/3dprint/customer-laser-job-information.php?job_id=', 'https://webapp.library.uvic.ca/3dprint/customer-large-format-print-job-information?job_id='];
 
 
 //FOR JOBS THAT HAVE BEEN LEFT UNPAID FOR 21+ DAYS    
-for ($type = 0; $type <=2; $type++){
+for ($type = 0; $type <=count($jobTypes); $type++){
   //pending_payment jobs query
-  $stm = $conn->query("SELECT web_job.id AS id, web_job.job_name AS job_name, web_job.netlink_id AS netlink_id, web_job.status AS status, web_job.priced_date AS priced_date, users.email AS email, users.name AS user_name FROM web_job INNER JOIN users ON users.netlink_id = web_job.netlink_id INNER JOIN $jobTypeTables[$type] ON web_job.id = $jobTypeTables[$type].$jobTypeIDs[$type] WHERE web_job.status = 'pending payment' AND web_job.netlink_id = 'chloefarr' AND web_job.priced_date >= DATE_ADD(web_job.priced_date, INTERVAL -10 DAY)");
+  $stm = $conn->query("SELECT web_job.id AS id, web_job.job_name AS job_name, web_job.netlink_id AS netlink_id, web_job.status AS status, web_job.priced_date AS priced_date, users.email AS email, users.name AS user_name FROM web_job INNER JOIN users ON users.netlink_id = web_job.netlink_id INNER JOIN $jobTypeTables[$type] ON web_job.id = $jobTypeTables[$type].$jobTypeIDs[$type] WHERE web_job.status = 'pending payment' AND web_job.netlink_id = 'chloefarr' AND web_job.priced_date = DATE_ADD(web_job.priced_date, INTERVAL -10 DAY)");
 
   $job_pp = $stm->fetchAll();
 
@@ -54,7 +60,7 @@ for ($type = 0; $type <=2; $type++){
 
 
 //FOR JOBS THAT HAVE BEEN LEFT UNPAID FOR 21+ DAYS    
-for ($type = 0; $type <=2; $type++){
+for ($type = 0; $type <=count($jobTypes); $type++){
   $table = $jobTypeTables[$type];
   $table_id = $jobTypeIDs[$type];
   $id_on_table = $table .'.'. $table_id;
@@ -78,8 +84,5 @@ for ($type = 0; $type <=2; $type++){
     }
   }
   }
-
+// enter in url bar when on Triton: https://devwebapp.library.uvic.ca/demo/3dwebapp/jobs_cron/dsc-pmt-reminder.php
 ?>
-
-
-<!--enter in url bar when on Triton: https://devwebapp.library.uvic.ca/demo/3dwebapp/jobs_cron/dsc-pmt-reminder.php-->
