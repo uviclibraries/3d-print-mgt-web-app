@@ -29,6 +29,7 @@ $stm = $conn->prepare("SELECT web_job.id AS id, web_job.job_name AS name, web_jo
   $stm->execute();
   $user_web_jobs = $stm->fetchAll();
 
+
   $parent=$job; //set self as parent if no other job has been assigned to this job as the parent.
 
   $active_user_jobs = [];

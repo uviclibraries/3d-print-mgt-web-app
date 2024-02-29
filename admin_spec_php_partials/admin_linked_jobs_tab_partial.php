@@ -30,23 +30,20 @@ if(count($active_user_jobs) > 0){?>
         echo '<select id="select_parent" name="select_parent" style="width:300px;" value="$job["parent"]">';
             // Loop through the array and create an option element for each item
             foreach ($active_user_jobs as $active_user_job) {
-              if(!$active_user_job['is_parent']){
-                // Check if this item is the default item
-                if ($active_user_job['parent_job_id'] === $parent && !$default_set) {
-                  echo '<option value="' . htmlspecialchars($active_user_job['id']) . '" selected>' . htmlspecialchars($active_user_job['id']) . ' - ' . htmlspecialchars($active_user_job['name']) . '</option>';
-                  $default_set = true; // Mark that the default has been set
-                } else {
-                    echo '<option value="' . htmlspecialchars($active_user_job['id']) . '" >' . htmlspecialchars($active_user_job['id']) . ' - ' . htmlspecialchars($active_user_job['name']) . '</option>';
-                }
+              // Check if this item is the parent to set as default item
+              if ($parent == $active_user_job['id'] && (string)$parent != '0') {
+                  $isSelected = (string)$parent === (string)$active_user_job['id'] && (string)$parent != '0' ? 'selected' : '';
+                  echo '<option value="' . htmlspecialchars($active_user_job['id']) . '" ' . $isSelected . '>' . htmlspecialchars($active_user_job['id']) . ' - ' . htmlspecialchars($active_user_job['name']) . '</option>';
+                  if ($isSelected) {$default_set = true;} // Mark that the default has been set
               }
             }
             echo 'console.log("selected")';
-            if(!default_set){
-              echo '<option value=0 selected>None</option>';
-              $default_set=true;
+            // Set "None" as default if $parent is 0 or no other default has been set
+            if ($parent == 0 || !$default_set) {
+              echo '<option value="0" selected>None</option>';
+            } else {
+              echo '<option value="0">None</option>';
             }
-            else{echo '<option value=0 >None</option>';
-          }
         // Close the select element
         echo '</select>';
         ?> 
@@ -54,6 +51,8 @@ if(count($active_user_jobs) > 0){?>
     </div> <!--Setting or resetting a job's parent-->
     <?php
       echo '<p>Select the different tabs to see the customer’s active jobs with those statuses.</p>';
+    } else{
+      //<div class="col-md-4 mb-3"> button unlink children from this job button (unlink / remove as parent) </div>
     }
     ?></div>
   <?php } ?> <!--Display parent identifer and/or set (new) parent if the customer has multiple active jobs-->
@@ -302,25 +301,22 @@ if(count($active_user_jobs) > 0){?>
   </div><!--show "on hold" tab if there are jobs on hold-->
 
 
-<?php if(count($active_user_jobs) > 0){?>  
-</div> 
+  <?php if(count($active_user_jobs) > 0){?>  
+    <?php if(count($active_user_jobs) > 0){?>
+    <!--add checkbox for "change status of selected "-->
+    <input type="checkbox" id="set-statuses-checkbox" name="set-statuses-checkbox" value="set_statuses" style="margin:3px;">
+      <label for="set-statuses-checkbox">Update statuses to match</label> 
+
+    <?php if($job['is_parent'] || ($job['parent_job_id'] == 0)) {?>
+      <!--set to checkbox "Set selected as children"-->
+      <input type="checkbox" id="set-children-checkbox" name="set-children-checkbox" value="set_children" style="margin:3px;">
+      <label for="set-children-checkbox">Set selected jobs as children</label> 
+    <?php } ?>
+
+  <?php } ?>
+  </div> 
 <?php } ?>
 
-<?php if($job['is_parent'] || ($job['parent_job_id'] != 0)) {?>
-      
-<button id="set-children-button" class="btn btn-primary">Set jobs as children</button> <!--duplicate button-->
-<!-- The Duplicate Popup -->
-<div id="set-children-popup" class="popup">
-  <div class="popup-content">
-    <span class="close" data-popup="set-children-popup">&times;</span>
-    <p>Are you sure you want to set these jobs as children for the job: <?php echo $job['id'] . ' - ' . $job['name']?></p>
-      <a href="customer-duplicate-3d-job.php?job_id=<?php echo $job["id"]; ?>">
-          <button class="btn btn-primary">Set Children</button>
-      </a>
-  </div>
-</div>
-
-<?php } ?>
 
 <?php if(count($active_user_jobs) > 0){?>
 <hr class="mb-6">
@@ -328,7 +324,7 @@ if(count($active_user_jobs) > 0){?>
 
 <!-- Contains the javascript to show/hide empty tabs -->
 <script type="text/javascript" src="js/linked_jobs_function.js"></script>
-
+<script type="text/javascript" src="js/update_checked_linked.js"></script>
 <!--Set jobs as children button
 Unlink children
 Update status to match $post(status dropdown)-->

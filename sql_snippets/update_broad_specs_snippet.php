@@ -17,12 +17,30 @@
   $new_parent= intval($_POST["select_parent"]);
   $stmt->bindParam(':parent_job_id', $new_parent, PDO::PARAM_INT);
 
+  
+  $isParent = $job['is_parent'];
 
-if($jobType == "laser cut" || $jobType == "3d print"){
-  $stmt->bindParam(':material_type', $_POST["material_type"]);
-  $duration = intval($_POST["duration"]);  
-  $stmt->bindParam(':duration', $duration , PDO::PARAM_INT);
-}
+  if(isset($_POST["select_parent"])){
+    if(intval($_POST["select_parent"]) != $job['parent_job_id']){
+      foreach($user_web_jobs AS $user_job){
+        if($user_job['parent_job_id'] == $job['id']){
+          $isParent = true;
+          break;
+        }
+        else{ $isParent = false;}
+      }
+    }
+  }
+  
+  $isParent = ($_POST['set-children-checkbox'] == 'set_children' && count($_POST['checked_jobs'])>0) ? true : $isParent;
+  $stmt->bindParam(':is_parent', $isParent, PDO:: PARAM_BOOL);
+
+
+  if($jobType == "laser cut" || $jobType == "3d print"){
+    $stmt->bindParam(':material_type', $_POST["material_type"]);
+    $duration = intval($_POST["duration"]);  
+    $stmt->bindParam(':duration', $duration , PDO::PARAM_INT);
+  }
 
 
   /*
