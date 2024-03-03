@@ -36,8 +36,8 @@
       $status_signer = $job["cancelled_signer"];
       break;
     case "archived":
-      $status_date = $job["completed_date"];
-      $status_signer=$job["completed_signer"];
+      $status_date = $job["archived_date"];
+      $status_signer=$job["archived_signer"];
       break;
   }
 

@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   // change to source from web job and large_format_print_job
-  $stmt = $conn->prepare("UPDATE web_job INNER JOIN large_format_print_job ON id=large_format_print_id SET price = :price, width_inches = :width_inches, copies =:copies, length_inches = :length_inches, staff_notes = :staff_notes, status = :status, parent_job_id =:parent_job_id,priced_date = :priced_date, paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, cancelled_date = :cancelled_date, delivered_date = :delivered_date, priced_signer =:priced_signer,  paid_signer= :paid_signer, printing_signer=:printing_signer, completed_signer=:completed_signer, delivered_signer=:delivered_signer, hold_date = :hold_date, hold_signer= :hold_signer,cancelled_signer= :cancelled_signer, model_name_2 =:model_name_2, is_parent = :is_parent WHERE id = :job_id");
+  $stmt = $conn->prepare("UPDATE web_job INNER JOIN large_format_print_job ON id=large_format_print_id SET price = :price, width_inches = :width_inches, copies =:copies, length_inches = :length_inches, staff_notes = :staff_notes, status = :status, parent_job_id =:parent_job_id,priced_date = :priced_date, paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, cancelled_date = :cancelled_date, delivered_date = :delivered_date, archived_date=:archived_date, priced_signer =:priced_signer,  paid_signer= :paid_signer, printing_signer=:printing_signer, completed_signer=:completed_signer, delivered_signer=:delivered_signer, hold_date = :hold_date, hold_signer= :hold_signer,cancelled_signer= :cancelled_signer, archived_signer=:archived_signer, model_name_2 =:model_name_2, is_parent = :is_parent WHERE id = :job_id");
   
   $current_date = date("Y-m-d");
 
@@ -73,6 +73,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $d_hold = $job['hold_date'];
   $d_completed = $job['completed_date'];
   $d_cancelled = $job['cancelled_date'];
+  $d_archived = $job['archived_date'];
+
 
   $n_hold = $job['hold_signer'];
   $n_cancelled = $job['cancelled_signer'];
@@ -81,6 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $n_printing = $job['printing_signer'];
   $n_completed = $job['completed_signer'];
   $n_delivered = $job['delivered_signer'];
+  $n_archived=$job['archived_date'];
 
 
   //Updates job id, price, staff notes, copies, updated model name, status, parentid, and if laser cut or 3d print, duration and material type. 

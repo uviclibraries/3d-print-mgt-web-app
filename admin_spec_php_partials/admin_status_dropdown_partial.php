@@ -23,6 +23,7 @@
             </select>
           </div>
           <div class="col-md-3 mb-3">
+          <!--Set in general_partials/declare_status_date.php-->
             <p><?php echo "Status changed: <br>" .$status_date;?></p>
           </div>
           <div class="col-md-3 mb-3">

@@ -56,6 +56,7 @@
   $stmt->bindParam(':delivered_date', $d_delivered);
   $stmt->bindParam(':cancelled_date', $d_cancelled);
   $stmt->bindParam(':hold_date', $d_hold);
+  $stmt->bindParam(':archived_date',$d_archived);
 
   $stmt->bindParam(':priced_signer', $n_priced);
   $stmt->bindParam(':paid_signer', $n_paid);
@@ -64,5 +65,6 @@
   $stmt->bindParam(':delivered_signer', $n_delivered);
   $stmt->bindParam(':cancelled_signer', $n_cancelled);
   $stmt->bindParam(':hold_signer', $n_hold);
+  $stmt->bindParam(':archived_signer',$n_archived);
 
 ?>

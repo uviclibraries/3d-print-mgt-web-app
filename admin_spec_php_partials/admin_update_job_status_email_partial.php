@@ -98,8 +98,8 @@ $job_owner = $userSQL->fetch();
     $n_cancelled = $user;
   }
   elseif($_POST['status'] == "archived"){
-    $d_delivered = $current_date;
-    $n_delivered = $user;
+    $d_archived = $current_date;
+    $n_archived = $user;
 
   }
 ?>
