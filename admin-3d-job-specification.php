@@ -28,6 +28,9 @@ $job_owner = $userSQL->fetch();
 include('sql_snippets/fetch_active_jobs.php');
 $parent_href = $type_href.$job['parent_job_id'] . '"">' . $prev_parent_id . '</a>';
 
+//Displays a warning if the user has had 3d jobs done in the current semester totalling over 30 hours
+include('sql_snippets/3d_customer_duration_warning_snippet.php');
+$max_minutes = 30*60; //current max hours in a term (1/3 of the year) is 30 hours, or 30*60 minutes
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   //used if modify is not updated.
@@ -189,8 +192,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         });
       </script>
 
+
       <!--Name of job, customer, date submited, academic/personal project, what admins updated status last-->
       <?php include('admin_spec_php_partials/admin_broad_spec_partial.php');?>
+      
+      <?php if($duration > $max_minutes){?><!--Displays a warning if the user has had 3d jobs done in the current semester totalling over 30 hours--> 
+        <div class="col-md-12 order-md-1" style="color: red;">
+          <?php echo "This customer's 3d print jobs between {$termStart} and {$today} have totalled {$duration_hm}. The count will reset on {$termEnd}.";?>
+        </div>
+      <?php }?>
 
       <!--Dropdown to set a new status-->
       <?php include('admin_spec_php_partials/admin_status_dropdown_partial.php');?>
