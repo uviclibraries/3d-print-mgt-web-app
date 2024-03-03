@@ -34,8 +34,8 @@ $stm = $conn->prepare("SELECT web_job.id AS id, web_job.job_name AS name, web_jo
 
   //will be used in admin_update_multiple_status_snippet.php to find the previous parent job, check if it's still a parent if different job selected in <select id="select_parent" name="select_parent">
   $prev_parent_id = $job['parent_job_id'];
-  echo('parent job id: '. $job['parent_job_id']."<br>");
-  echo ('my id: '. $job['id'].'<br>');
+  // echo('parent job id: '. $job['parent_job_id']."<br>");
+  // echo ('my id: '. $job['id'].'<br>');
   $active_user_jobs = [];
 
   foreach ($user_web_jobs as $related_job) {
@@ -58,7 +58,7 @@ $stm = $conn->prepare("SELECT web_job.id AS id, web_job.job_name AS name, web_jo
 $stm->execute();
 $user_linked_jobs = $stm->fetchAll();
 
-echo ('count stm linked: '. count($user_linked_jobs)."<br>");
+// echo ('count stm linked: '. count($user_linked_jobs)."<br>");
 
 $linked_jobs = [];
 foreach ($user_linked_jobs as $related_job) {
@@ -72,6 +72,6 @@ foreach ($user_linked_jobs as $related_job) {
 //   $stm1->execute();
 //   $parent = $stm1->fetch();
 // }
-  echo('parent job id: ' . $parent['id']. ' ; active jobs: ' . count($active_user_jobs) . " ; linked jobs: " . count($linked_jobs));
+  // echo('parent job id: ' . $parent['id']. ' ; active jobs: ' . count($active_user_jobs) . " ; linked jobs: " . count($linked_jobs));
   $bundled = $active_user_jobs ? true : false; //user has other active jobs
 ?>
