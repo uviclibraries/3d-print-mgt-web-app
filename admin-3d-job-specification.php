@@ -10,6 +10,9 @@ if ($user_type == 1) {
 
 $jobType = "3d print";
 $userView = "admin";
+$type_href= '<a href="';
+$type_href  = $type_href . 'https://devwebapp.library.uvic.ca/demo/3dwebapp/admin-3d-job-specification.php?job_id=';
+
 
 $stm = $conn->prepare("SELECT * FROM web_job INNER JOIN 3d_print_job ON id=3d_print_id WHERE id=?");
 $stm->execute([$_GET["job_id"]]);
@@ -23,6 +26,8 @@ $job_owner = $userSQL->fetch();
 
 //Fetches all of the customer's active jobs 'user_web_jobs', puts in 'active_user_jobs[]' and 'linked_jobs[]'
 include('sql_snippets/fetch_active_jobs.php');
+$parent_href = $type_href.$job['parent_job_id'] . '"">' . $prev_parent_id . '</a>';
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   //used if modify is not updated.

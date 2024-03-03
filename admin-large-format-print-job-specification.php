@@ -11,6 +11,9 @@ if ($user_type == 1) {
 
 $jobType = "large format print";
 $userView = "admin";
+$type_href= '<a href="';
+$type_href  = $type_href . 'https://devwebapp.library.uvic.ca/demo/3dwebapp/admin-large-format-print-job-specification.php?job_id=';
+
 
 $stm = $conn->prepare("SELECT * FROM web_job INNER JOIN large_format_print_job ON id=large_format_print_id WHERE id=?");
 $stm->execute([$_GET["job_id"]]);
@@ -24,6 +27,9 @@ $job_owner = $userSQL->fetch();
 
 //Fetches all of the customer's active jobs 'user_web_jobs', puts in 'active_user_jobs[]' and 'linked_jobs[]'
 include('sql_snippets/fetch_active_jobs.php');
+
+$parent_href = $type_href.$job['parent_job_id'] . '"">' . $prev_parent_id . '</a>';
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   //used if modify is not updated.
@@ -54,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   // change to source from web job and large_format_print_job
-  $stmt = $conn->prepare("UPDATE web_job INNER JOIN large_format_print_job ON id=large_format_print_id SET price = :price, width_inches = :width_inches, copies =:copies, length_inches = :length_inches, staff_notes = :staff_notes, status = :status, priced_date = :priced_date, paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, cancelled_date = :cancelled_date, delivered_date = :delivered_date, priced_signer =:priced_signer,  paid_signer= :paid_signer, printing_signer=:printing_signer, completed_signer=:completed_signer, delivered_signer=:delivered_signer, hold_date = :hold_date, hold_signer= :hold_signer,cancelled_signer= :cancelled_signer, model_name_2 =:model_name_2, parent_job_id =:parent_job_id WHERE id = :job_id;");
+  $stmt = $conn->prepare("UPDATE web_job INNER JOIN large_format_print_job ON id=large_format_print_id SET price = :price, width_inches = :width_inches, copies =:copies, length_inches = :length_inches, staff_notes = :staff_notes, status = :status, parent_job_id =:parent_job_id,priced_date = :priced_date, paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, cancelled_date = :cancelled_date, delivered_date = :delivered_date, priced_signer =:priced_signer,  paid_signer= :paid_signer, printing_signer=:printing_signer, completed_signer=:completed_signer, delivered_signer=:delivered_signer, hold_date = :hold_date, hold_signer= :hold_signer,cancelled_signer= :cancelled_signer, model_name_2 =:model_name_2, is_parent = :is_parent WHERE id = :job_id");
   
   $current_date = date("Y-m-d");
 

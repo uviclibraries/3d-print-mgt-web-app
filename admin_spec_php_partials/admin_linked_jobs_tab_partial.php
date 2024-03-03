@@ -1,4 +1,6 @@
 <?php 
+//job hrefs in admin..-specification.php files
+
 // echo "linked jobs: ". count($linked_jobs) . " ; active user jobs: " . count($active_user_jobs);
 if(count($active_user_jobs) > 0){?>
   <div class="col-md-12 order-md-1">
@@ -6,11 +8,9 @@ if(count($active_user_jobs) > 0){?>
     <h4>Active Customer Jobs</h4>
     <div class="row">
       <!--Shows 'Current parent: #parent id - parent name if the job has a parent, and allows for reassignment-->
-      <?php if(!$job['is_parent'] && $job['parent_job_id'] != 0) { 
-        $job_pointer = '<a href="admin-3d-job-specification.php?job_id=' . $parent["id"] . '">' . $parent["id"] . '</a>';
-      ?>
+      <?php if(!$job['is_parent'] && $prev_parent_id != 0) { ?>
         <div class="col-md-4 mb-3">
-           <p>Current parent: <?php echo $job_pointer . ' - ' . $parent['name'];?></p>
+           <p>Current parent: <?php echo $parent_href . ' - ' . $parent['job_name'];?></p>
         </div>
       <?php } ?>
         
@@ -22,7 +22,7 @@ if(count($active_user_jobs) > 0){?>
     
       <div class="col-md-4 mb-3">
         <!--set which item in the dropdown will be set as the default value-->
-        <?php $parent = $job['parent_job_id'];
+        <?php
         $default_set = false;
 
         // populating from $activeUserJobs PHP array
@@ -31,8 +31,8 @@ if(count($active_user_jobs) > 0){?>
             // Loop through the array and create an option element for each item
             foreach ($active_user_jobs as $active_user_job) {
               // Check if this item is the parent to set as default item
-              if ($parent == $active_user_job['id'] && (string)$parent != '0') {
-                  $isSelected = (string)$parent === (string)$active_user_job['id'] && (string)$parent != '0' ? 'selected' : '';
+              if ($prev_parent_id == $active_user_job['id'] && $prev_parent_id != '0') {
+                  $isSelected = (string)$prev_parent_id === (string)$active_user_job['id'] && (string)$prev_parent_id != '0' ? 'selected' : '';
                   echo '<option value="' . htmlspecialchars($active_user_job['id']) . '" ' . $isSelected . '>' . htmlspecialchars($active_user_job['id']) . ' - ' . htmlspecialchars($active_user_job['name']) . '</option>';
                   if ($isSelected) {$default_set = true;} // Mark that the default has been set
               }else{
@@ -41,7 +41,7 @@ if(count($active_user_jobs) > 0){?>
             }
             echo 'console.log("selected")';
             // Set "None" as default if $parent is 0 or no other default has been set
-            if ($parent == 0 || !$default_set) {
+            if ($prev_parent_id == 0 || !$default_set) {
               echo '<option value="0" selected>None</option>';
             } else {
               echo '<option value="0">None</option>';
@@ -79,7 +79,7 @@ if(count($active_user_jobs) > 0){?>
       <?php foreach ($linked_jobs as $linked_job) {
         if($linked_job != $job) {
             $print_relationship = $linked_job['id'] == $job['parent_job_id'] ? 'PARENT: ' : ($linked_job['parent_job_id'] == $job['id']? 'CHILD: ':'');
-            $job_pointer = '<a href="admin-3d-job-specification.php?job_id=' . $linked_job["id"] . '">' . $linked_job["id"] . '</a>';
+            $job_pointer = $type_href . $linked_job["id"] . '">' . $linked_job["id"] . '</a>';
             echo '<div class="job-item">';
             echo '<input type="checkbox" class ="job-checkbox" id="'. $linked_job['id'] . '" name="checked_jobs[]" value="' . $linked_job['id'] . '">';                  
             // Check if 'name' index is set
@@ -119,7 +119,7 @@ if(count($active_user_jobs) > 0){?>
       <?php foreach ($active_user_jobs as $active_job) {
         if($active_job != $job && $active_job['status'] == 'submitted') {
           $submitted++;
-            $job_pointer = '<a href="admin-3d-job-specification.php?job_id=' . $active_job["id"] . '">' . $active_job["id"] . '</a>';
+            $job_pointer = $type_href . $active_job["id"] . '">' . $active_job["id"] . '</a>';
             echo '<div class="job-item">';
             echo '<input type="checkbox" class ="job-checkbox" id="'. $active_job['id'] . '" name="checked_jobs[]" value="' . $active_job['id'] . '">';                  
             // Check if 'name' index is set
@@ -152,7 +152,7 @@ if(count($active_user_jobs) > 0){?>
       <?php foreach ($active_user_jobs as $active_job) {
         if($active_job != $job && $active_job['status'] == 'pending payment') {
           $priced++;
-            $job_pointer = '<a href="admin-3d-job-specification.php?job_id=' . $active_job["id"] . '">' . $active_job["id"] . '</a>';
+            $job_pointer = $type_href . $active_job["id"] . '">' . $active_job["id"] . '</a>';
             echo '<div class="job-item">';
             echo '<input type="checkbox" class ="job-checkbox" id="'. $active_job['id'] . '" name="checked_jobs[]" value="' . $active_job['id'] . '">';                  
             // Check if 'name' index is set
@@ -185,7 +185,7 @@ if(count($active_user_jobs) > 0){?>
       <?php foreach ($active_user_jobs as $active_job) {
         if($active_job != $job && $active_job['status'] == 'paid') {
           $paid++;
-            $job_pointer = '<a href="admin-3d-job-specification.php?job_id=' . $active_job["id"] . '">' . $active_job["id"] . '</a>';
+            $job_pointer = $type_href . $active_job["id"] . '">' . $active_job["id"] . '</a>';
             echo '<div class="job-item">';
             echo '<input type="checkbox" class ="job-checkbox" id="'. $active_job['id'] . '" name="checked_jobs[]" value="' . $active_job['id'] . '">';                  
             // Check if 'name' index is set
@@ -219,7 +219,7 @@ if(count($active_user_jobs) > 0){?>
       <?php foreach ($active_user_jobs as $active_job) {
         if($active_job != $job && $active_job['status'] == 'printing') {
           $ip++;
-            $job_pointer = '<a href="admin-3d-job-specification.php?job_id=' . $active_job["id"] . '">' . $active_job["id"] . '</a>';
+            $job_pointer = $type_href . $active_job["id"] . '">' . $active_job["id"] . '</a>';
             echo '<div class="job-item">';
             echo '<input type="checkbox" class ="job-checkbox" id="'. $active_job['id'] . '" name="checked_jobs[]" value="' . $active_job['id'] . '">';                  
             // Check if 'name' index is set
@@ -250,7 +250,7 @@ if(count($active_user_jobs) > 0){?>
       <?php foreach ($active_user_jobs as $active_job) {
         if($active_job != $job && $active_job['status'] == 'printed') {
           $printed++;
-            $job_pointer = '<a href="admin-3d-job-specification.php?job_id=' . $active_job["id"] . '">' . $active_job["id"] . '</a>';
+            $job_pointer = $type_href . $active_job["id"] . '">' . $active_job["id"] . '</a>';
             echo '<div class="job-item">';
             echo '<input type="checkbox" class ="job-checkbox" id="'. $active_job['id'] . '" name="checked_jobs[]" value="' . $active_job['id'] . '">';                  
             // Check if 'name' index is set
@@ -280,7 +280,7 @@ if(count($active_user_jobs) > 0){?>
       <?php foreach ($active_user_jobs as $active_job) {
         if($active_job != $job && $active_job['status'] == 'on hold') {
           $hold++;
-            $job_pointer = '<a href="admin-3d-job-specification.php?job_id=' . $active_job["id"] . '">' . $active_job["id"] . '</a>';
+            $job_pointer = $type_href . $active_job["id"] . '">' . $active_job["id"] . '</a>';
             echo '<div class="job-item">';
             echo '<input type="checkbox" class ="job-checkbox" id="'. $active_job['id'] . '" name="checked_jobs[]" value="' . $active_job['id'] . '">';                  
             // Check if 'name' index is set

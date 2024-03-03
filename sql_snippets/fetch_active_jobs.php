@@ -34,29 +34,44 @@ $stm = $conn->prepare("SELECT web_job.id AS id, web_job.job_name AS name, web_jo
 
   //will be used in admin_update_multiple_status_snippet.php to find the previous parent job, check if it's still a parent if different job selected in <select id="select_parent" name="select_parent">
   $prev_parent_id = $job['parent_job_id'];
-
-
+  echo('parent job id: '. $job['parent_job_id']."<br>");
+  echo ('my id: '. $job['id'].'<br>');
   $active_user_jobs = [];
-  $linked_jobs = [];
 
   foreach ($user_web_jobs as $related_job) {
     if($related_job['id'] != $job['id']){
       array_push($active_user_jobs, $related_job);
-      if($related_job['parent_job_id'] == $job['id'] && ($related_job['parent_job_id'] !=0|| $job['parent_job_id'] != 0))
-      {
-        array_push($linked_jobs, $related_job);
-      }
-
-      if($related_job['id'] == $job['parent_job_id'] && $job['parent_job_id'] != 0){
-        $parent = $related_job; //sets parent if the job's parent id matches the id of another job
-        array_push($linked_jobs, $related_job);
-      }
-    }
-    else{
-      if($parent == $job){
-        $parent = $related_job;}
     }
   }
-  echo('active jobs: ' . count($active_user_jobs) . " ; linked jobs: " . count($linked_jobs));
+
+
+$stm = $conn->prepare("SELECT web_job.id AS id, web_job.job_name AS name, web_job.status AS status, web_job.parent_job_id AS parent_job_id , web_job.is_parent AS is_parent FROM web_job INNER JOIN $typeTableName ON id = $typeID WHERE 
+  status NOT IN ('delivered', 'archived', 'cancelled') 
+  AND netlink_id = 'chloefarr' 
+  AND id != {$job['id']}
+  AND (
+    parent_job_id = {$job['id']} OR 
+    id = {$job['parent_job_id']} OR 
+    (parent_job_id != 0 AND parent_job_id = {$job['parent_job_id']}) 
+  )
+");
+$stm->execute();
+$user_linked_jobs = $stm->fetchAll();
+
+echo ('count stm linked: '. count($user_linked_jobs)."<br>");
+
+$linked_jobs = [];
+foreach ($user_linked_jobs as $related_job) {
+    if($related_job['id'] != $job['id']){
+      array_push($linked_jobs, $related_job);
+    }
+  }
+
+// if($job['parent_job_id']!= 0){
+//   $stm1 = $conn->prepare("SELECT web_job.id AS id, web_job.job_name AS name, web_job.status AS status, web_job.parent_job_id AS parent_job_id , web_job.is_parent AS is_parent WHERE id = {$job['parent_job_id']}");
+//   $stm1->execute();
+//   $parent = $stm1->fetch();
+// }
+  echo('parent job id: ' . $parent['id']. ' ; active jobs: ' . count($active_user_jobs) . " ; linked jobs: " . count($linked_jobs));
   $bundled = $active_user_jobs ? true : false; //user has other active jobs
 ?>
