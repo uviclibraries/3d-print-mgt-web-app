@@ -22,6 +22,10 @@ if ($user != $job["netlink_id"] && $user_type == 1) {
 //   $stm = $conn->prepare("UPDATE * FROM web_job INNER JOIN laser_cut_job ON id=laser_cut_id WHERE id=?");
 //   $current_date = date("Y-m-d");
 // }
+$jobType = "laser cut";
+$userView = "customer";
+$type_href= '<a href="';
+$type_href  = $type_href . 'customer-laser-job-information.php?job_id=';
 
 ?>
 
@@ -152,24 +156,14 @@ if ($user != $job["netlink_id"] && $user_type == 1) {
       <form class="needs-validation" novalidate>
         <div class="row">
           <div class="col-md-3 mb-3">
-                <label for="username">Copies</label>
+                <label for="copies">Copies</label>
                 <div class="input-group">
                 <div class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="100" value="<?php echo $job["copies"]; ?>" aria-label="100" aria-describedby="basic-addon2" readonly>
+                    <input name="copies" type="text" class="form-control" placeholder="100" value="<?php echo $job["copies"]; ?>" aria-label="100" aria-describedby="basic-addon2" readonly>
                     </div>
                 </div>
             </div>
-
-          <div class="col-md-3 mb-3">
-            <label for="username">Drawing Description</label>
-            <div class="input-group">
-              <textarea class="form-control" aria-label="additional-comments" readonly><?php echo $job["specifications"]; ?></textarea>
-            </div>
-          </div>
-
-
-          <hr class="mb-4">
-          <div class="col-md-3 mb-3">
+            <div class="col-md-3 mb-3">
               <label for="username">Material Type</label>
               <div class="input-group">
               <div class="input-group mb-3">
@@ -177,6 +171,15 @@ if ($user != $job["netlink_id"] && $user_type == 1) {
                   </div>
               </div>
           </div>
+        </div>
+
+          <!-- <div class="col-md-3 mb-3"> -->
+        <label for="drawing-description">Drawing Description</label>
+        <div class="input-group">
+          <textarea rows="5" cols="50" class="form-control" aria-label="drawing-description" readonly><?php echo $job["specifications"]; ?></textarea>
+        </div>
+          
+          
 
         <hr class="mb-4">
         <h5 class="mb-2">Additional Comments</h5>
@@ -184,7 +187,7 @@ if ($user != $job["netlink_id"] && $user_type == 1) {
                 <textarea rows="5" cols="50" class="form-control" aria-label="additional-comments"readonly ><?php echo $job["comments"]; ?>
                 </textarea>
             </div>
-        </div>
+        <!-- </div> -->
 
         <hr class="mb-4">
         <center>
