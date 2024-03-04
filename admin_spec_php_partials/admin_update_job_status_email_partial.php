@@ -56,6 +56,10 @@ $job_owner = $userSQL->fetch();
     //this is done automatically when payment is received.
     $d_paid = $current_date;
     $n_paid=$user;
+    if(!$job['priced_date']){
+      $d_priced = $current_date;
+      $n_priced = $user;
+    }
 
   } elseif($_POST['status'] == "printing"){
     $d_printing = $current_date;
@@ -64,6 +68,15 @@ $job_owner = $userSQL->fetch();
   } elseif ($_POST['status'] == "delivered") {
     $d_delivered = $current_date;
     $n_delivered=$user;
+
+    if(!$job['printing_date']){
+      $d_printing = $current_date;
+      $n_printing = $user;
+    }
+    if(!$job['completed_date']){
+      $d_completed = $current_date;
+      $n_completed = $user;
+    }
     // $status_email = "delivered";
     //email user
     if (isset($_POST['email_enabaled']) && $_POST['email_enabaled'] == "enabled") {
@@ -93,6 +106,11 @@ $job_owner = $userSQL->fetch();
     $d_completed = $current_date;
     $n_completed=$user;
 
+    if(!$job['printing_date']){
+      $d_printing = $current_date;
+      $n_printing = $user;
+    }
+
   } elseif($_POST['status'] == "cancelled"){
     $d_cancelled = $current_date;
     $n_cancelled = $user;
@@ -101,5 +119,13 @@ $job_owner = $userSQL->fetch();
     $d_archived = $current_date;
     $n_archived = $user;
 
+    if(!$job['completed_date']){
+      $d_completed = $current_date;
+      $n_completed = $user;
+    }
+    if(!$job['delivered_date']){
+      $d_delivered = $current_date;
+      $n_delivered = $user;
+    }
   }
 ?>
