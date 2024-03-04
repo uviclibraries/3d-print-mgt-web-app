@@ -12,29 +12,19 @@
   
   $stmt->bindParam(':model_name_2', $modify_value);
 
-  $stmt->bindParam(':status', $_POST["status"]);
-
-  $new_parent= intval($_POST["select_parent"]);
-  $stmt->bindParam(':parent_job_id', $new_parent, PDO::PARAM_INT);
+  $stmt->bindParam(':status', $_POST["status"], PDO:: PARAM_STR);
+  
+  
+  //if job(s) was selected from within any <div class="user_jobs_container"> and 'set selected jobs as children' checkbox selected, change "is_parent" field val to true
+  $isParent = ($_POST['set-children-checkbox'] == 'set_children' && count($_POST['checked_jobs'])>0) ? true : $job['is_parent'];
+  $stmt->bindParam(':is_parent', $isParent, PDO:: PARAM_BOOL);
 
   
-  $isParent = $job['is_parent'];
-  //if the job is selected as a parent in <select id="select_parent" name="select_parent">, change "is_parent" field val to true
-  if(isset($_POST["select_parent"])){
-    if(intval($_POST["select_parent"]) != $job['parent_job_id']){
-      foreach($user_web_jobs AS $user_job){
-        if($user_job['parent_job_id'] == $job['id']){
-          $isParent = true;
-          break;
-        }
-        else{$isParent = false;}
-      }
-    }
+  $new_parent_id = $job['parent_job_id'];
+  if($_POST["status"] = "cancelled" && $job['parent_job_id']!=0){
+    $new_parent_id = 0;
   }
-
-  //if job(s) was selected from within any <div class="user_jobs_container"> and 'set selected jobs as children' checkbox selected, change "is_parent" field val to true
-  $isParent = ($_POST['set-children-checkbox'] == 'set_children' && count($_POST['checked_jobs'])>0) ? true : $isParent;
-  $stmt->bindParam(':is_parent', $isParent, PDO:: PARAM_BOOL);
+  $stmt->bindParam(':parent_job_id', $new_parent_id, PDO:: PARAM_INT);
 
 
   if($jobType == "laser cut" || $jobType == "3d print"){
