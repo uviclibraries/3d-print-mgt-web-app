@@ -1,5 +1,5 @@
 <div class="py-5 text-center">
-  <h1><?php echo " Job name: " . $job["job_name"];?></h1>
+  <h1><?php echo " Job: " . $job['id'].' - '. $job["job_name"];?></h1>
   <h2><?php echo "Customer: " . $job_owner["name"];?></h2>
 </div> <!-- Job name and owner-->
 
