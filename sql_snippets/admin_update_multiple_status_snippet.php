@@ -37,15 +37,15 @@
       }
 
       if (isset($_POST['set-children-checkbox']) && $_POST['set-children-checkbox'] == 'set_children') {
-      
+      $new_parent_job_id = $job['id'];
       //change parent_job_ids of all jobs that have been selected when <set-children-checkbox> has also been checked
-      $new_children = "UPDATE web_job SET parent_job_id = :parent_job_id WHERE id IN ($checkedIDs_sql) AND is_parent = 0";
+      $new_children = "UPDATE web_job SET parent_job_id = $new_parent_job_id WHERE id IN ($checkedIDs_sql) AND is_parent = 0";
 
         $link_children = $conn->prepare($new_children);
 
         // Ensure $job['id'] is defined and valid
-        $parent_job_id = $job['id']; 
-        $link_children->bindParam(':parent_job_id', $parent_job_id, PDO::PARAM_INT);
+         
+        // $link_children->bindParam(':parent_job_id', $new_parent_job_id, PDO::PARAM_INT);
 
         $link_children->execute();
       }
