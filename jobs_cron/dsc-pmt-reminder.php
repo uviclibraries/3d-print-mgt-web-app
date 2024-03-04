@@ -1,7 +1,8 @@
 <?php
 //Daily
-chdir("/usr/local/apache2/htdocs-webapp/3dprint/jobs_cron");
-// Triton path: chdir("/usr/local/apache2/htdocs-webapp/demo/3dwebapp/jobs_cron");
+// chdir("/usr/local/apache2/htdocs-webapp/3dprint/jobs_cron");
+//Triton path: 
+chdir("/usr/local/apache2/htdocs-webapp/demo/3dwebapp/jobs_cron");
 
 require ('../db.php');
 
@@ -21,13 +22,33 @@ $jobTypeTables=['3d_print_job', 'laser_cut_job'];
 $jobTypeIDs=['3d_print_id', 'laser_cut_id'];
 
 $faq_hrefs=['https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/', 'https://onlineacademiccommunity.uvic.ca/dsc/how-to-laser-cut/', 'https://onlineacademiccommunity.uvic.ca/dsc/tools-tech/large-format-printer-and-scanner/'];
-$job_hrefs=['https://webapp.library.uvic.ca/3dprint/customer-3d-job-information?job_id=', 'https://webapp.library.uvic.ca/3dprint/customer-laser-job-information.php?job_id=', 'https://webapp.library.uvic.ca/3dprint/customer-large-format-print-job-information?job_id='];
+$job_hrefs=['../customer-3d-job-information?job_id=', '../customer-laser-job-information.php?job_id=', '../customer-large-format-print-job-information?job_id='];
 
 
 //FOR JOBS THAT HAVE BEEN LEFT UNPAID FOR 21+ DAYS    
-for ($type = 0; $type <=count($jobTypes); $type++){
+for ($type = 0; $type <=1; $type++){
   //pending_payment jobs query
-  $stm = $conn->query("SELECT web_job.id AS id, web_job.job_name AS job_name, web_job.netlink_id AS netlink_id, web_job.status AS status, web_job.priced_date AS priced_date, users.email AS email, users.name AS user_name FROM web_job INNER JOIN users ON users.netlink_id = web_job.netlink_id INNER JOIN $jobTypeTables[$type] ON web_job.id = $jobTypeTables[$type].$jobTypeIDs[$type] WHERE web_job.status = 'pending payment' AND web_job.netlink_id = 'chloefarr' AND web_job.priced_date = DATE_ADD(web_job.priced_date, INTERVAL -10 DAY)");
+  // $stm = $conn->query("SELECT web_job.id AS id, web_job.job_name AS job_name, web_job.netlink_id AS netlink_id, web_job.status AS status, web_job.priced_date AS priced_date, users.email AS email, users.name AS user_name FROM web_job INNER JOIN users ON users.netlink_id = web_job.netlink_id INNER JOIN {$jobTypeTables[$type]} ON web_job.id = {$jobTypeTables[$type]}.$jobTypeIDs[$type] WHERE web_job.status = 'pending payment' AND web_job.netlink_id = 'chloefarr' AND web_job.priced_date = CURDATE() - INTERVAL 10 DAY");
+
+$stm = $conn->query("SELECT 
+    web_job.id AS id, 
+    web_job.job_name AS job_name, 
+    web_job.netlink_id AS netlink_id, 
+    web_job.status AS status, 
+    web_job.priced_date AS priced_date, 
+    users.email AS email, 
+    users.name AS user_name 
+FROM 
+    web_job 
+INNER JOIN 
+    users ON users.netlink_id = web_job.netlink_id 
+INNER JOIN 
+    {$jobTypeTables[$type]} ON web_job.id = {$jobTypeTables[$type]}.{$jobTypeIDs[$type]}
+WHERE 
+    web_job.status = 'pending payment' 
+    AND web_job.netlink_id = 'chloefarr' 
+    AND web_job.priced_date = CURDATE() - INTERVAL 2 DAY");
+
 
   $job_pp = $stm->fetchAll();
 
@@ -60,7 +81,7 @@ for ($type = 0; $type <=count($jobTypes); $type++){
 
 
 //FOR JOBS THAT HAVE BEEN LEFT UNPAID FOR 21+ DAYS    
-for ($type = 0; $type <=count($jobTypes); $type++){
+for ($type = 0; $type <=1; $type++){
   $table = $jobTypeTables[$type];
   $table_id = $jobTypeIDs[$type];
   $id_on_table = $table .'.'. $table_id;
