@@ -1,13 +1,41 @@
-// Get the checkbox element
-var checkbox = document.getElementById('set-children-checkbox');
+/*
+Listeners for 
+    - Set statuses to match in all selected jobs (set-statuses-checkbox)
+    - Set selected jobs as children ('set-children-checkbox')
+    - Unlink slected jobs as children ('unlink-children-checkbox')
+*/
 
-// Add an event listener for the 'change' event
-checkbox.addEventListener('change', function() {
+//Get checkbox elements
+var setChildrenCheckbox = document.getElementById('set-children-checkbox');
+var matchStatusCheckbox = document.getElementById('set-statuses-checkbox');
+var unlinkChildrenCheckbox = document.getElementById('unlink-children-checkbox');
+
+//uncheck "unlink children" checkbox if "set children" has been selected
+if (setChildrenCheckbox && setChildrenCheckbox.offsetParent !== null) {
+    setChildrenCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+            console.log('Checkbox is checked');
+            unlinkChildrenCheckbox.checked = false;
+        } 
+    });
+}
+
+//uncheck "unlink children" checkbox if "update status to match" has been selected
+matchStatusCheckbox.addEventListener('change', function() {
     if (this.checked) {
-        console.log('Checkbox is checked');
-        // Perform action when checkbox is checked
-    } else {
-        console.log('Checkbox is unchecked');
-        // Perform action when checkbox is unchecked
+        unlinkChildrenCheckbox.checked = false;
+    }
+});
+
+
+//uncheck "update status to match" and "set-children-checkbox" checkboxes 
+    //if "unlink children" has been selected
+unlinkChildrenCheckbox.addEventListener('change', function() {
+    if (this.checked) {
+        console.log("checkbox checked");
+        if (setChildrenCheckbox && setChildrenCheckbox.offsetParent !== null) {
+            setChildrenCheckbox.checked = false;
+        }
+        matchStatusCheckbox.checked = false;
     }
 });
