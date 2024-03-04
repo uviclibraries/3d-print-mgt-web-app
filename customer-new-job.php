@@ -95,9 +95,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   
   //Inserts new job into web_job and and sets netlink id, job name, status=submitted, submission_date=todat, job purpose, and if for academic purpose, course code and due date.
   
-  insert('insert_new_webjob_snippet.php');
+  include('sql_snippets/insert_new_webjob_snippet.php');
   //binds user to job
-  insert('bind_user_new_snippet.php');
+  include('sql_snippets/bind_user_new_snippet.php');
 
 
   /*TODO also validate laser cutting variables*/
@@ -105,18 +105,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   if($_POST["job_type"] == "3d_print"){
     //Inserts new job into 3d_print and and sets id, model (file) name, infill, scale, layer_height, supports, copies, user comments.
-    insert('new_3d_print_snippet.php');
+    include('sql_snippets/new_3d_print_snippet.php');
   }
 
   elseif($_POST["job_type"] == "laser_cut"){
     //Inserts new job into laser_cut and and sets id, model (file) name, copies, material type, laser cutting specifications (text box), user comments.
-    insert('new_laser_snippet.php');
+    include('sql_snippets/new_laser_snippet.php');
   }
 
   elseif($_POST["job_type"] == "large_format_print"){
 
     //Inserts new job into large_format and and sets id, model (file) name, copies, material type, laser cutting specifications (text box), user comments.
-    insert('new_large_format_snippet.php');
+    include('sql_snippets/new_large_format_snippet.php');
 
   }
 
@@ -149,7 +149,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       }
   }
 
-  insert('send_customer_email_partial.php');
+  include('general_partials/send_customer_email_partial.php');
 
 header("location: customer-dashboard.php");
 }
@@ -373,7 +373,7 @@ header("location: customer-dashboard.php");
               <span class="popup">
                 &#9432
                 <span class="popuptext" id="myPopup">
-                  <p>Academic jobs will be prioritized during high-volume periods.</p>
+                  <p>Academic jobs will be prioritized during high-volume periods.<br>Please indicate the latest date you need this picked up by.<br>We will do our best to complete it earlier.</p>
                   <span class="close-btn">x</span>
                 </span>
               </span> <!-- popup box for job_purpose =="academic"-->
@@ -387,7 +387,7 @@ header("location: customer-dashboard.php");
         </div>
         <div class="col-md-3 mb-3 w-100" id="academicdeadline_textbox" style="display:none;">
           <p>Assignment due date:  </p>
-          <input type="date" class="form-control" name="academic_deadline" placeholder="Assignment Due Date" autocomplete="off" min="<?php echo date('Y-m-d'); ?>">
+          <input type="date" class="form-control" name="academic_deadline" placeholder="Assignment due date:" value="<?php echo date('Y-m-d',strtotime('+7 days')); ?>" autocomplete="off" min="<?php echo date('Y-m-d'); ?>">
         </div>
             
       </div>
