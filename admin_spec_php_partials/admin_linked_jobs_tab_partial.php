@@ -4,60 +4,11 @@
 // echo "linked jobs: ". count($linked_jobs) . " ; active user jobs: " . count($active_user_jobs);
 if(count($active_user_jobs) > 0){?>
   <div class="col-md-12 order-md-1">
-  <div id="job_relation">
-    <h4>Active Customer Jobs</h4>
-    <div class="row">
-      <!--Shows 'Current parent: #parent id - parent name if the job has a parent, and allows for reassignment-->
-      <?php if(!$job['is_parent'] && $prev_parent_id != 0) { ?>
-        <div class="col-md-4 mb-3">
-           <p>Current parent: <?php echo $parent_href . ' - ' . $parent['job_name'];?></p>
-        </div>
-      <?php } ?>
-        
-      <?php if(!$job['is_parent']) { ?>
-      <div class="col-md-4 mb-3">
-        <label for="select_parent">Set a new parent:</label>
-      </div>
-      
-    
-      <div class="col-md-4 mb-3">
-        <!--set which item in the dropdown will be set as the default value-->
-        <?php
-        $default_set = false;
+  
+    <!-- <h4>Active Customer Jobs</h4> -->
+    <!-- <p>Select the different tabs to see the customer’s active jobs with those statuses.</p> -->
 
-        // populating from $activeUserJobs PHP array
-        // Create the select element
-        echo '<select id="select_parent" name="select_parent" style="width:300px;" value="$job["parent"]">';
-            // Loop through the array and create an option element for each item
-            foreach ($active_user_jobs as $active_user_job) {
-              // Check if this item is the parent to set as default item
-              if ($prev_parent_id == $active_user_job['id'] && $prev_parent_id != '0') {
-                  $isSelected = (string)$prev_parent_id === (string)$active_user_job['id'] && (string)$prev_parent_id != '0' ? 'selected' : '';
-                  echo '<option value="' . htmlspecialchars($active_user_job['id']) . '" ' . $isSelected . '>' . htmlspecialchars($active_user_job['id']) . ' - ' . htmlspecialchars($active_user_job['name']) . '</option>';
-                  if ($isSelected) {$default_set = true;} // Mark that the default has been set
-              }else{
-                echo '<option value="' . htmlspecialchars($active_user_job['id']) . '" ' . '>' . htmlspecialchars($active_user_job['id']) . ' - ' . htmlspecialchars($active_user_job['name']) . '</option>';
-              }
-            }
-            echo 'console.log("selected")';
-            // Set "None" as default if $parent is 0 or no other default has been set
-            if ($prev_parent_id == 0 || !$default_set) {
-              echo '<option value="0" selected>None</option>';
-            } else {
-              echo '<option value="0">None</option>';
-            }
-        // Close the select element
-        echo '</select>';
-        ?> 
-      </div>
-    </div> <!--Setting or resetting a job's parent-->
-    <?php
-      echo '<p>Select the different tabs to see the customer’s active jobs with those statuses.</p>';
-    } else{
-      //<div class="col-md-4 mb-3"> button unlink children from this job button (unlink / remove as parent) </div>
-    }
-    ?></div>
-  <?php } ?> <!--Display parent identifer and/or set (new) parent if the customer has multiple active jobs-->
+   <!--Display parent identifer and/or set (new) parent if the customer has multiple active jobs-->
 
   <div class="tab">
     <!--show "linked jobs" tab if the job either a parent of other jobs but or has a parent thats not itself-->
@@ -248,7 +199,7 @@ if(count($active_user_jobs) > 0){?>
     <?php $printed = 0;?>
     <div class="user_jobs_container">
       <?php foreach ($active_user_jobs as $active_job) {
-        if($active_job != $job && $active_job['status'] == 'printed') {
+        if($active_job != $job && $active_job['status'] == 'completed') {
           $printed++;
             $job_pointer = $type_href . $active_job["id"] . '">' . $active_job["id"] . '</a>';
             echo '<div class="job-item">';
@@ -309,10 +260,12 @@ if(count($active_user_jobs) > 0){?>
     <?php if(count($active_user_jobs) > 0){?>
     <!--add checkbox for "change status of selected "-->
     <div class="col-md-4 mb-3">
-      <input type="checkbox" id="set-statuses-checkbox" name="set-statuses-checkbox" value="set_statuses" style="margin-top:3px;">
+      <input type="checkbox" id="set-statuses-checkbox" name="set-statuses-checkbox" value="set_statuses" style="margin-top:3px;" checked>
       <label for="set-statuses-checkbox" style="margin-top:5px;margin-left: 10px;">Update statuses to match</label> 
     </div>
-    <?php if($job['is_parent'] || ($job['parent_job_id'] == 0)) {?>
+
+    <?php $accepted_linking_statuses = array("submitted", "pending payment", "paid", "on hold");
+      if(($job['is_parent'] || ($job['parent_job_id'] == 0)) && in_array($job['status'], $accepted_linking_statuses)) {?>
       <div class="col-md-4 mb-3">
         <!--set to checkbox "Set selected as children"-->
         <input type="checkbox" id="set-children-checkbox" name="set-children-checkbox" value="set_children" style="margin-top:3px;">
@@ -320,18 +273,27 @@ if(count($active_user_jobs) > 0){?>
       </div>
     <?php } ?>
     
+    <?php if(($job['is_parent'] && ($job['parent_job_id'] == 0))) {?>
+      <div class="col-md-4 mb-3">
+        <!--set to checkbox "Unlink selected as children"-->
+        <input type="checkbox" id="unlink-children-checkbox" name="unlink-children-checkbox" value="unlink_children" style="margin-top:3px;">
+        <label for="unlink-children-checkbox" style="margin-top:5px;">Abandon selected jobs as children</label> 
+      </div>
+    <?php } ?>
+
   <?php } ?>
   </div> 
 </div>
 <?php } ?>
 
-
+<?php } ?>
 <?php if(count($active_user_jobs) > 0){?>
 <hr class="mb-6">
 <?php } ?>
 
 <!-- Contains the javascript to show/hide empty tabs -->
 <script type="text/javascript" src="js/linked_jobs_function.js"></script>
+<!--Contains the javascript to check/uncheck linked job action checkboxes-->
 <script type="text/javascript" src="js/update_checked_linked.js"></script>
 <!--Set jobs as children button
 Unlink children
