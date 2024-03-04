@@ -11,7 +11,7 @@ if ($user_type == 1) {
 $jobType = "laser cut";
 $userView = "admin";
 $type_href= '<a href="';
-$type_href  = $type_href . 'https://devwebapp.library.uvic.ca/demo/3dwebapp/admin-laser-job-specification.php?job_id=';
+$type_href  = $type_href . 'admin-laser-job-specification.php?job_id=';
 
 
 $stm = $conn->prepare("SELECT * FROM web_job INNER JOIN laser_cut_job ON id=laser_cut_id WHERE id=?");
