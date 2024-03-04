@@ -28,8 +28,9 @@
         }?>
       </div>
       <!--If the job is a child, redirect to parent job-->
-      <?php if($job["parent_job_id"] != 0 && $job["status"] == "pending payment"){?>
-        <p style="color:red">This job is priced with another job. Go to <a href="customer-3d-job-information.php?job_id=<?php echo $job["parent_job_id"]; ?>">this job</a> to pay.</p>
+      <?php if($job["parent_job_id"] != 0 && $job["status"] == "pending payment"){
+        $job_pointer = $type_href . $job["parent_job_id"] . '">' . 'this job' . '</a>';?>
+        <p style="color:red">This job is priced with another job. Go to <?php echo $job_pointer ?> to pay.</p>
       <?php }?>
   </div>
   <hr class="mb-6">
