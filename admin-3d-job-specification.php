@@ -11,7 +11,7 @@ if ($user_type == 1) {
 $jobType = "3d print";
 $userView = "admin";
 $type_href= '<a href="';
-$type_href  = $type_href . 'https://devwebapp.library.uvic.ca/demo/3dwebapp/admin-3d-job-specification.php?job_id=';
+$type_href  = $type_href . 'admin-3d-job-specification.php?job_id=';
 
 
 $stm = $conn->prepare("SELECT * FROM web_job INNER JOIN 3d_print_job ON id=3d_print_id WHERE id=?");

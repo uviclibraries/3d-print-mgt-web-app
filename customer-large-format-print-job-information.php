@@ -18,6 +18,10 @@ if ($user != $job["netlink_id"] && $user_type == 1) {
   die();
 }
 
+$jobType = "large format print";
+$userView = "customer";
+$type_href= '<a href="';
+$type_href  = $type_href . 'customer-large-format-print-job-information.php?job_id=';
 
 ?>
 

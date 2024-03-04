@@ -12,7 +12,7 @@ if ($user_type == 1) {
 $jobType = "large format print";
 $userView = "admin";
 $type_href= '<a href="';
-$type_href  = $type_href . 'https://devwebapp.library.uvic.ca/demo/3dwebapp/admin-large-format-print-job-specification.php?job_id=';
+$type_href  = $type_href . 'admin-large-format-print-job-specification.php?job_id=';
 
 
 $stm = $conn->prepare("SELECT * FROM web_job INNER JOIN large_format_print_job ON id=large_format_print_id WHERE id=?");
