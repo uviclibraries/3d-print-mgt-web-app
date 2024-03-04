@@ -65,6 +65,9 @@ foreach ($user_linked_jobs as $related_job) {
     if($related_job['id'] != $job['id']){
       array_push($linked_jobs, $related_job);
     }
+    if($related_job['id'] == $job['parent_job_id']){
+      $parent = $related_job;
+    }
   }
 
 // if($job['parent_job_id']!= 0){
