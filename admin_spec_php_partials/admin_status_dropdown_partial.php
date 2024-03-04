@@ -17,7 +17,9 @@
                   <option value="printing" <?php if ($job["status"]== "printing"){echo "selected";} ?>>Printing</option>
                   <option value="completed" <?php if ($job["status"]== "completed"){echo "selected";} ?>>Completed</option>
                   <option value="delivered" <?php if ($job["status"]== "delivered"){echo "selected";} ?>>Delivered</option>
+                  <?php if(!$job['is_parent']) { ?>
                   <option value="cancelled" <?php if ($job["status"]== "cancelled"){echo "selected";} ?>>Cancelled</option>
+                <?php } ?>
                   <option value="archived" <?php if ($job["status"]== "archived"){echo "selected";} ?>>Archived</option>
               <?php } ?>
             </select>
