@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   //doesn't include change is_parent
   $current_date = date("Y-m-d");
 
-
+//new values set in admin_update_job_status_email_partial.php
   $d_priced = $job['priced_date'];
   $d_paid = $job['paid_date'];
   $d_printing = $job['printing_date'];
