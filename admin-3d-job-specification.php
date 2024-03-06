@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
   }
 
-  // change to source from web job and 3d_print_job
+//bound in update_broad_specs_snippet.php and update_3d_specs_snippet.php
   $stmt = $conn->prepare("UPDATE web_job INNER JOIN 3d_print_job ON id=3d_print_id SET price = :price, staff_notes = :staff_notes, copies=:copies, model_name_2 =:model_name_2, status = :status, parent_job_id =:parent_job_id, duration = :duration, material_type = :material_type, priced_date = :priced_date, paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, delivered_date = :delivered_date, cancelled_date = :cancelled_date, hold_date = :hold_date, archived_date=:archived_date, priced_signer =:priced_signer,  paid_signer= :paid_signer, printing_signer=:printing_signer, completed_signer=:completed_signer, delivered_signer=:delivered_signer, cancelled_signer= :cancelled_signer, hold_signer= :hold_signer, archived_signer=:archived_signer,infill = :infill, scale = :scale, layer_height = :layer_height, supports = :supports, is_parent = :is_parent WHERE id = :job_id;");
   //doesn't include change is_parent
   $current_date = date("Y-m-d");
