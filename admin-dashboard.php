@@ -193,6 +193,7 @@ foreach ($largeformat_job7 as $job) {
     <title>Admin Dashboard</title>
     <!--header link-->
     <link rel="stylesheet" href="css/uvic_banner.css">
+    <link rel="stylesheet" href="css/accordion_styles.css">
     <link rel="icon" href="https://www.uvic.ca/assets/core-4-0/img/favicon-32.png">
     <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/checkout/">
 
@@ -226,42 +227,6 @@ foreach ($largeformat_job7 as $job) {
         }
       }
 
-      .accordion {
-        background-color: #eee;
-        color: #444;
-        cursor: pointer;
-        padding: 18px;
-        width: 100%;
-        border: none;
-        text-align: left;
-        outline: none;
-        font-size: 15px;
-        transition: 0.4s;
-      }
-
-      .active, .accordion:hover {
-        background-color: #ccc; 
-      }
-
-      .panel {
-        padding: 0 18px;
-        display: none;
-        background-color: white;
-        overflow: hidden;
-      }
-
-      .accordion:after {
-        content: '\21A7'; /* Unicode character for "down" sign (↧) */
-        font-size: 15px;
-        color: #777;
-        float: right;
-        margin-left: 5px;
-      }
-
-      .active:after {
-        content: "\21A5"; /* Unicode character for "up" sign (↥) */
-        font-size: 15px;
-      }
     </style>
 
     <!-- Custom styles for this template -->
@@ -328,238 +293,97 @@ foreach ($largeformat_job7 as $job) {
             <div class="container">
           <div class="py-5 text-left">
 
+<?php 
+function displayJobName($row) {
+  $no_link_statues = array("cancelled", "archived", "delivered");
+  $display_name = "";
+
+  if (!in_array($row['status'], $no_link_statues)) {
+    if ($row['parent_job_id'] > 0) {
+      $display_name = '&copy ';
+      // echo $display_name;
+    } elseif ($row['is_parent']) {
+      $display_name = '&#9413 ';
+      // echo $display_name;
+    }
+  } 
+  $display_name = $display_name . $row["job_name"];
+    // echo $display_name;
+  return $display_name;
+}
+
+$d_href='admin-3d-job-specification.php?job_id=';
+$l_href= 'admin-laser-job-specification.php?job_id=';
+$lf_href='admin-large-format-print-job-specification.php?job_id=';
+
+function generateTable($table_id, $rel_jobs, $job_ref, $status_date, $date_header) {
+    echo '  <div class="table-responsive" style="width: 100%; table-layout: fixed;">';
+    echo '    <table id="' . $table_id . '" class="table table-striped table-md">';
+    echo '      <thead>';
+    echo '        <tr>';
+    echo '          <th style="width:15%;">Name</th>';
+    echo '          <th style="width:50%;">Job</th>';
+    echo '          <th style="width:20%;">' . $date_header . '</th>';
+    echo '          <th style="width:15%;">Purpose</th>';
+    echo '        </tr>';
+    echo '      </thead>';
+    echo '      <tbody>';
+
+    foreach ($rel_jobs as $row) {
+        echo '        <tr>';
+        echo '          <td style="width:15%;">' . $row["name"] . '</td>';
+        echo '          <td style="width:50%;"><a href="' .$job_ref. $row["id"] . '">' . displayJobName($row) . '</a></td>';
+        echo '          <td style="width:20%;">' . $row[$status_date] . '</td>';
+        echo '          <td style="width:15%;">' . $row["job_purpose"] . '</td>';
+        echo '        </tr>';
+    }
+
+    echo '      </tbody>';
+    echo '    </table>';
+    echo '  </div>';
+}
+?>
+
+
 
 <h2 id="3d-print-jobs">3D Print Jobs</h2>
   <p><a href="#laser-cut-jobs" >(Jump to Laser Cut jobs)</a></p>
   <p><a href="#large-format-print-jobs" >(Jump to Large Format Print jobs)</a></p>
   <button class="accordion active">Submitted</button>
     <div class="panel" style="display:block;">
-      <div class="table-responsive">
-        <table id='d_not_priced' class="table table-striped table-md">
-          <thead>
-            <tr>
-              <!-- table header-->
-              <th style="width:95px;">Name</th>
-              <th style="width:95px;">Job</th>
-              <th style="width:95px;">Submission Date</th>
-              <th style="width:95px;">Status</th>
-              <th style="width:20px;">Purpose</th>
-            </tr>
-          </thead>
-          <tbody>
-          <?php
-          //Grab each item from each array
-          foreach($d_not_priced as $row){
-          ?>
-          <tr>
-            <td style="width:95px;"><?php echo $row["name"] ; ?></td>
-            <td style="width:95px;"><a href="admin-3d-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row['parent_job_id'] > 0 ? '&#169 '. $row["job_name"] : ($row['is_parent'] ? '&#9413 ' . $row["job_name"] : $row["job_name"]); ?></a></td>
-            <td style="width:95px;"><?php echo $row["submission_date"]; ?></td>
-            <td style="width:95px;"><?php echo $row["status"]; ?></td>
-            <td style="width:20px;"><?php echo $row["job_purpose"]; ?></td>
-          </tr>
-          <?php
-          } ?>
-          </tbody>
-        </table>
-      </div>
+      <?php generateTable('d_not_priced',$d_not_priced, $d_href, 'submission_date', 'Submission Date'); ?>
     </div>
     
     <button class="accordion">On Hold</button>
     <div class="panel">
-      <div class="table-responsive">
-        <table id='d_on_hold' class="table table-striped table-md">
-          <thead>
-            <tr>
-              <!-- table header-->
-              <th style="width:95px;">Name</th>
-              <th style="width:95px;">Job</th>
-              <th style="width:95px;">Hold Date</th>
-              <th style="width:95px;">Status</th>
-              <th style="width:20px;">Purpose</th>
-            </tr>
-          </thead>
-          <tbody>
-          <?php
-          //Grab each item from each array
-          foreach($d_on_hold as $row){
-          ?>
-          <tr>
-            <td style="width:95px;"><?php echo $row["name"]; ?></td>
-            <td style="width:95px;"><a href="admin-3d-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row['parent_job_id'] > 0 ? '&#169 '. $row["job_name"] : ($row['is_parent'] ? '&#9413 ' . $row["job_name"] : $row["job_name"]); ?></a></td>            
-            <td style="width:95px;"><?php echo $row["hold_date"]; ?></td>
-            <td style="width:95px;"><?php echo $row["status"]; ?></td>
-            <td style="width:20px;"><?php echo $row["job_purpose"]; ?></td>
-          </tr>
-          <?php
-          } ?>
-          </tbody>
-        </table>
-      </div>
+      <?php generateTable('d_on_hold', $d_on_hold, $d_href, 'hold_date', 'Hold Date'); ?>
     </div>
   
   
   <button class="accordion">Pending Payment</button>
     <div class="panel">
-      <div class="table-responsive">
-        <table id='d_pending_payment' class="table table-striped table-md">
-          <thead>
-            <tr>
-              <!-- table header-->
-              <th style="width:95px;">Name</th>
-              <th style="width:95px;">Job</th>
-              <th style="width:95px;">Priced Date</th>
-              <th style="width:95px;">Status</th>
-              <th style="width:20px;">Purpose</th>
-              <!--  -->
-            </tr>
-          </thead>
-          <tbody>
-            <?php foreach ($d_pending_payment as $row) {
-            ?>
-            <tr>
-              <td style="width:95px;"><?php echo $row["name"]; ?></td>
-              <td style="width:95px;"><a href="admin-3d-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row['parent_job_id'] > 0 ? '&#169 '. $row["job_name"] : ($row['is_parent'] ? '&#9413 ' . $row["job_name"] : $row["job_name"]); ?></a></td>
-              <td style="width:95px;"><?php echo $row["priced_date"]; ?></td>
-              <td style="width:95px;"><?php echo $row["status"]; ?></td>
-              <td style="width:20px;"><?php echo $row["job_purpose"]; ?></td>
-
-            </tr>
-            <?php
-            }?>
-          </tbody>
-        </table>
-      </div>
+      <?php generateTable('d_pending_payment',$d_pending_payment, $d_href, 'priced_date', 'Priced Date'); ?>
     </div>
   
   <button class="accordion active">Paid</button>
     <div class="panel" style="display:block;">
-      <div class="table-responsive">
-        <table id='d_paid' class="table table-striped table-md">
-          <thead>
-            <tr>
-              <!-- table header-->
-              <th style="width:95px;">Name</th>
-              <th style="width:95px;">Job</th>
-              <th style="width:95px;">Payment Date</th>
-              <th style="width:95px;">Status</th>
-              <th style="width:20px;">Purpose</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php foreach ($d_paid as $row) {
-            ?>
-            <tr>
-              <td style="width:95px;"><?php echo $row["name"]; ?></td>
-              <td style="width:95px;"><a href="admin-3d-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row['parent_job_id'] > 0 ? '&#169 '. $row["job_name"] : ($row['is_parent'] ? '&#9413 ' . $row["job_name"] : $row["job_name"]); ?></a></td>
-              <td style="width:95px;"><?php echo $row["paid_date"]; ?></td>
-              <td style="width:95px;"><?php echo $row["status"]; ?></td>
-              <td style="width:20px;"><?php echo $row["job_purpose"]; ?></td>
-              
-            </tr>
-            <?php
-            }?>
-          </tbody>
-        </table>
-      </div>
+      <?php generateTable('d_paid', $d_paid, $d_href, 'paid_date', 'Paid Date'); ?>
     </div>
   
   <button class="accordion active">Printing</button>
     <div class="panel" style="display:block;">
-      <div class="table-responsive">
-        <table id='d_printing' class="table table-striped table-md">
-          <thead>
-            <tr>
-              <!-- table header-->
-              <th style="width:95px;">Name</th>
-              <th style="width:95px;">Job</th>
-              <th style="width:95px;">Print Start Date</th>
-              <th style="width:95px;">Status</th>
-              <th style="width:20px;">Purpose</th>
-              
-            </tr>
-          </thead>
-          <tbody>
-            <?php foreach ($d_printing as $row) {
-              ?>
-              <tr>
-                <td style="width:95px;"><?php echo $row["name"]; ?></td>
-                <td style="width:95px;"><a href="admin-3d-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row['parent_job_id'] > 0 ? '&#169 '. $row["job_name"] : ($row['is_parent'] ? '&#9413 ' . $row["job_name"] : $row["job_name"]); ?></a></td>
-                <td style="width:95px;"><?php echo $row["printing_date"]; ?></td>
-                <td style="width:95px;"><?php echo $row["status"]; ?></td>
-                <td style="width:20px;"><?php echo $row["job_purpose"]; ?></td>
-              </tr>
-              <?php
-            }?>
-          </tbody>
-        </table>
-      </div>
+      <?php generateTable('d_printing',$d_printing, $d_href, 'printing_date', 'Print Start Date'); ?>
     </div>
 
     
   <button class="accordion active">Completed Print</button>
     <div class="panel" style="display:block;">
-      <div class="table-responsive">
-        <table id='d_completed' class="table table-striped table-md">
-          <thead>
-            <tr>
-              <!-- table header-->
-              <th style="width:95px;">Name</th>
-              <th style="width:95px;">Job</th>
-              <th style="width:95px;">Print Start Date</th>
-              <th style="width:95px;">Status</th>
-              <th style="width:20px;">Purpose</th>
-              
-            </tr>
-          </thead>
-          <tbody>
-            <?php foreach ($d_completed as $row) {
-              ?>
-              <tr>
-                <td style="width:95px;"><?php echo $row["name"]; ?></td>
-                <td style="width:95px;"><a href="admin-3d-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row['parent_job_id'] > 0 ? '&#169 '. $row["job_name"] : ($row['is_parent'] ? '&#9413 ' . $row["job_name"] : $row["job_name"]); ?></a></td>
-                <td style="width:95px;"><?php echo $row["completed_date"]; ?></td>
-                <td style="width:95px;"><?php echo $row["status"]; ?></td>
-                <td style="width:20px;"><?php echo $row["job_purpose"]; ?></td>
-              </tr>
-              <?php
-            }?>
-          </tbody>
-        </table>
-      </div>
+      <?php generateTable('d_completed', $d_completed, $d_href, 'completed_date', 'Completed Date'); ?>
     </div>
   
   <button class="accordion">Ready for pickup</button>
     <div class="panel">
-      <div class="table-responsive">
-        <table id='d_delivered' class="table table-striped table-md">
-        <thead>
-          <tr>
-            <!-- table header-->
-            <th style="width:95px;">Name</th>
-            <th style="width:95px;">Job</th>
-            <th style="width:95px;">Completion Date</th>
-            <th style="width:95px;">Status</th>
-            <th style="width:20px;">Purpose</th>
-            
-          </tr>
-        </thead>
-        <tbody>
-          <?php foreach ($d_delivered as $row) {
-          ?>
-          <tr>
-            <td style="width:95px;"><?php echo $row["name"]; ?></td>
-            <td style="width:95px;"><a href="admin-3d-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row['parent_job_id'] > 0 ? '&#169 '. $row["job_name"] : ($row['is_parent'] ? '&#9413 ' . $row["job_name"] : $row["job_name"]); ?></a></td>
-            <td style="width:95px;"><?php echo $row["delivered_date"]; ?></td>
-            <td style="width:95px;"><?php echo $row["status"]; ?></td>
-            <td style="width:20px;"><?php echo $row["job_purpose"]; ?></td>
-          </tr>
-          <?php
-          }
-          ?>
-          </tbody>
-        </table>
-      </div>
+        <?php generateTable('d_delivered',$d_delivered, $d_href, 'delivered_date', 'Delivered Date'); ?>
     </div>
 
     
@@ -569,247 +393,39 @@ foreach ($largeformat_job7 as $job) {
   <p><a href="#large-format-print-jobs" >(Jump to Large Format Print jobs)</a></p>
   <button class="accordion active">Submitted</button>
     <div class="panel" style="display:block;">
-      <div class="table-responsive">
-        <table id='l_not_priced' class="table table-striped table-md">
-          <thead>
-            <tr>
-              <!-- table header-->
-              <th style="width:95px;">Name</th>
-              <th style="width:95px;">Job</th>
-              <th style="width:95px;">Submission Date</th>
-              <th style="width:95px;">Status</th>
-              <th style="width:20px;">Purpose</th>
-              
-            </tr>
-          </thead>
-          <tbody>
-
-          <?php
-          //Grab each item from each array
-          foreach($l_not_priced as $row){
-          ?>
-          <tr>
-            <td style="width:95px;"><?php echo $row["name"]; ?></td>
-            <td style="width:95px;"><a href="admin-laser-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row['parent_job_id'] > 0 ? '&#169 '. $row["job_name"] : ($row['is_parent'] ? '&#9413 ' . $row["job_name"] : $row["job_name"]); ?></a></td>
-            <td style="width:95px;"><?php echo $row["submission_date"]; ?></td>
-            <td style="width:95px;"><?php echo $row["status"]; ?></td>
-            <td style="width:20px;"><?php echo $row["job_purpose"]; ?></td>
-          </tr>
-          <?php
-          } ?>
-          </tbody>
-        </table>
-      </div>
+      <?php generateTable('l_not_priced', $l_not_priced, $l_href, 'submission_date', 'Submission Date'); ?>
     </div>
 
   <button class="accordion">On Hold</button>
       <div class="panel">
-        <div class="table-responsive">
-          <table id='l_on_hold' class="table table-striped table-md">
-            <thead>
-              <tr>
-                <!-- table header-->
-                <th style="width:95px;">Name</th>
-                <th style="width:95px;">Job</th>
-                <th style="width:95px;">Hold Date</th>
-                <th style="width:95px;">Status</th>
-                <th style="width:20px;">Purpose</th>
-                
-              </tr>
-            </thead>
-            <tbody>
-
-            <?php
-            //Grab each item from each array
-            foreach($l_on_hold as $row){
-            ?>
-            <tr>
-              <td style="width:95px;"><?php echo $row["name"]; ?></td>
-              <td style="width:95px;"><a href="admin-laser-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row['parent_job_id'] > 0 ? '&#169 '. $row["job_name"] : ($row['is_parent'] ? '&#9413 ' . $row["job_name"] : $row["job_name"]); ?></a></td>
-              <td style="width:95px;"><?php echo $row["hold_date"]; ?></td>
-              <td style="width:95px;"><?php echo $row["status"]; ?></td>
-              <td style="width:20px;"><?php echo $row["job_purpose"]; ?></td>
-            </tr>
-            <?php
-            } ?>
-            </tbody>
-          </table>
-        </div>
+        <?php generateTable('l_on_hold',$l_on_hold, $l_href, 'hold_date', 'Hold Date'); ?>
       </div>
   
 
   <button class="accordion">Pending Payment</button>
     <div class="panel">
-      <div class="table-responsive">
-        <table id='l_pending_payment' class="table table-striped table-md">
-          <thead>
-            <tr>
-              <!-- table header-->
-              <th style="width:95px;">Name</th>
-              <th style="width:95px;">Job</th>
-              <th style="width:95px;">Priced Date</th>
-              <th style="width:95px;">Status</th>
-              <th style="width:95px;">Purpose</th>
-              
-            </tr>
-          </thead>
-          <tbody>
-
-          <?php foreach ($l_pending_payment as $row) {
-          ?>
-          <tr>
-            <td style="width:95px;"><?php echo $row["name"]; ?></td>
-            <td style="width:95px;"><a href="admin-laser-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row['parent_job_id'] > 0 ? '&#169 '. $row["job_name"] : ($row['is_parent'] ? '&#9413 ' . $row["job_name"] : $row["job_name"]); ?></a></td>
-            <td style="width:95px;"><?php echo $row["priced_date"]; ?></td>
-            <td style="width:95px;"><?php echo $row["status"]; ?></td>
-            <td style="width:20px;"><?php echo $row["job_purpose"]; ?></td>
-
-          </tr>
-          <?php
-          }
-          ?>
-          </tbody>
-        </table>
-      </div>
+      <?php generateTable('l_pending_payment',$l_pending_payment, $l_href, 'priced_date', 'Priced Date'); ?>
     </div>
 
   <button class="accordion active">Paid</button> 
     <div class="panel" style="display:block;">
-      <div class="table-responsive">
-        <table id='l_paid' class="table table-striped table-md">
-          <thead>
-            <tr>
-              <!-- table header-->
-              <th style="width:95px;">Name</th>
-              <th style="width:95px;">Job</th>
-              <th style="width:95px;">Payment Date</th>
-              <th style="width:95px;">Status</th>
-              <th style="width:20px;">Purpose</th>
-              
-            </tr>
-          </thead>
-          <tbody>
-
-          <?php foreach ($l_paid as $row) {
-          ?>
-          <tr>
-            <td style="width:95px;"><?php echo $row["name"]; ?></td>
-            <td style="width:95px;"><a href="admin-laser-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row['parent_job_id'] > 0 ? '&#169 '. $row["job_name"] : ($row['is_parent'] ? '&#9413 ' . $row["job_name"] : $row["job_name"]); ?></a></td>
-            <td style="width:95px;"><?php echo $row["paid_date"]; ?></td>
-            <td style="width:95px;"><?php echo $row["status"]; ?></td>
-            <td style="width:20px;"><?php echo $row["job_purpose"]; ?></td>
-
-          </tr>
-          <?php
-          }
-          ?>
-          </tbody>
-        </table>
-      </div>
+      <?php generateTable('l_paid', $l_paid, $l_href, 'paid_date', 'Paid Date'); ?>
     </div>
 
   <button class="accordion active">Cutting</button> 
     <div class="panel" style="display:block;">
-      <div class="table-responsive">
-        <table id='l_printing' class="table table-striped table-md">
-          <thead>
-            <tr>
-              <!-- table header-->
-              <th style="width:95px;">Name</th>
-              <th style="width:95px;">Job</th>
-              <th style="width:95px;">Cut Start Date</th>
-              <th style="width:95px;">Status</th>
-              <th style="width:20px;">Purpose</th>
-              
-            </tr>
-          </thead>
-          <tbody>
-
-          <?php foreach ($l_printing as $row) {
-          ?>
-          <tr>
-            <td style="width:95px;"><?php echo $row["name"]; ?></td>
-            <td style="width:95px;"><a href="admin-laser-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row['parent_job_id'] > 0 ? '&#169 '. $row["job_name"] : ($row['is_parent'] ? '&#9413 ' . $row["job_name"] : $row["job_name"]); ?></a></td>
-            <td style="width:95px;"><?php echo $row["printing_date"]; ?></td>
-            <td style="width:95px;"><?php echo $row["status"]; ?></td>
-            <td style="width:20px;"><?php echo $row["job_purpose"]; ?></td>
-
-          </tr>
-          <?php
-          }
-          ?>
-          </tbody>
-        </table>
-      </div>
+      <?php generateTable('l_printing',$l_printing, $l_href, 'printing_date', 'Cut Start Date'); ?>
     </div>
 
   
   <button class="accordion active">Completed</button> 
     <div class="panel" style="display:block;">
-      <div class="table-responsive">
-        <table id='l_completed' class="table table-striped table-md">
-          <thead>
-            <tr>
-              <!-- table header-->
-              <th style="width:95px;">Name</th>
-              <th style="width:95px;">Job</th>
-              <th style="width:95px;">Completed Cut Date</th>
-              <th style="width:95px;">Status</th>
-              <th style="width:20px;">Purpose</th>
-              
-            </tr>
-          </thead>
-          <tbody>
-
-          <?php foreach ($l_completed as $row) {
-          ?>
-          <tr>
-            <td style="width:95px;"><?php echo $row["name"]; ?></td>
-            <td style="width:95px;"><a href="admin-laser-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row['parent_job_id'] > 0 ? '&#169 '. $row["job_name"] : ($row['is_parent'] ? '&#9413 ' . $row["job_name"] : $row["job_name"]); ?></a></td>
-            <td style="width:95px;"><?php echo $row["completed_date"]; ?></td>
-            <td style="width:95px;"><?php echo $row["status"]; ?></td>
-            <td style="width:20px;"><?php echo $row["job_purpose"]; ?></td>
-
-          </tr>
-          <?php
-          }
-          ?>
-          </tbody>
-        </table>
-      </div>
+      <?php generateTable('l_completed',$l_completed, $l_href, 'completed_date', 'Completed Date'); ?>
     </div>
   
   <button class="accordion">Ready for pickup</button>
     <div class="panel">
-      <div class="table-responsive">
-        <table id='l_delivered' class="table table-striped table-md">
-        <thead>
-          <tr>
-            <!-- table header-->
-            <th style="width:95px;">Name</th>
-            <th style="width:95px;">Job</th>
-            <th style="width:95px;">Delivery Date</th>
-            <th style="width:95px;">Status</th>
-            <th style="width:20px;">Purpose</th>
-            
-          </tr>
-        </thead>
-        <tbody>
-        <?php foreach ($l_delivered as $row) {
-          ?>
-          <tr>
-            <td style="width:95px;"><?php echo $row["name"]; ?></td>
-            <td style="width:95px;"><a href="admin-laser-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row['parent_job_id'] > 0 ? '&#169 '. $row["job_name"] : ($row['is_parent'] ? '&#9413 ' . $row["job_name"] : $row["job_name"]); ?></a></td>
-            <td style="width:95px;"><?php echo $row["delivered_date"]; ?></td>
-            <td style="width:95px;"><?php echo $row["status"]; ?></td>
-            <td style="width:20px;"><?php echo $row["job_purpose"]; ?></td>
-          </tr>
-          <?php
-          }
-          ?>
-          </tbody>
-        </table>
-      </div>
+      <?php generateTable('l_delivered',$l_delivered, $l_href, 'delivered_date', 'Delivered Date'); ?>
     </div>
 
 <!--Large Format Print jobs-->
@@ -818,232 +434,39 @@ foreach ($largeformat_job7 as $job) {
   <p><a href="#laser-cut-jobs" >(Jump to Laser Cut jobs)</a></p>
   <button class="accordion active">Submitted</button>
     <div class="panel" style="display:block;">
-      <div class="table-responsive">
-        <table id='d_not_priced' class="table table-striped table-md">
-          <thead>
-            <tr>
-              <!-- table header-->
-              <th style="width:95px;">Name</th>
-              <th style="width:95px;">Job</th>
-              <th style="width:95px;">Submission Date</th>
-              <th style="width:95px;">Status</th>
-              <th style="width:20px;">Purpose</th>
-            </tr>
-          </thead>
-          <tbody>
-          <?php
-          //Grab each item from each array
-          foreach($lf_not_priced as $row){
-          ?>
-          <tr>
-            <td style="width:95px;"><?php echo $row["name"]; ?></td>
-            <td style="width:95px;"><a href="admin-large-format-print-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row['parent_job_id'] > 0 ? '&#169 '. $row["job_name"] : ($row['is_parent'] ? '&#9413 ' . $row["job_name"] : $row["job_name"]); ?></a></td>
-            <td style="width:95px;"><?php echo $row["submission_date"]; ?></td>
-            <td style="width:95px;"><?php echo $row["status"]; ?></td>
-            <td style="width:20px;"><?php echo $row["job_purpose"]; ?></td>
-          </tr>
-          <?php
-          } ?>
-          </tbody>
-        </table>
-      </div>
+      <?php generateTable('lf_not_priced',$lf_not_priced, $lf_href, 'submission_date', 'Submission Date'); ?>
     </div>
     
     <button class="accordion">On Hold</button>
     <div class="panel">
-      <div class="table-responsive">
-        <table id='d_on_hold' class="table table-striped table-md">
-          <thead>
-            <tr>
-              <!-- table header-->
-              <th style="width:95px;">Name</th>
-              <th style="width:95px;">Job</th>
-              <th style="width:95px;">Hold Date</th>
-              <th style="width:95px;">Status</th>
-              <th style="width:20px;">Purpose</th>
-            </tr>
-          </thead>
-          <tbody>
-          <?php
-          //Grab each item from each array
-          foreach($lf_on_hold as $row){
-          ?>
-          <tr>
-            <td style="width:95px;"><?php echo $row["name"]; ?></td>
-            <td style="width:95px;"><a href="admin-large-format-print-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row['parent_job_id'] > 0 ? '&#169 '. $row["job_name"] : ($row['is_parent'] ? '&#9413 ' . $row["job_name"] : $row["job_name"]); ?></a></td>
-            <td style="width:95px;"><?php echo $row["hold_date"]; ?></td>
-            <td style="width:95px;"><?php echo $row["status"]; ?></td>
-            <td style="width:20px;"><?php echo $row["job_purpose"]; ?></td>
-          </tr>
-          <?php
-          } ?>
-          </tbody>
-        </table>
-      </div>
+      <?php generateTable('lf_on_hold',$lf_on_hold, $lf_href, 'hold_date', 'Hold Date'); ?>
     </div>
   
   
   <button class="accordion">Pending Payment</button>
     <div class="panel">
-      <div class="table-responsive">
-        <table id='lf_pending_payment' class="table table-striped table-md">
-          <thead>
-            <tr>
-              <!-- table header-->
-              <th style="width:95px;">Name</th>
-              <th style="width:95px;">Job</th>
-              <th style="width:95px;">Priced Date</th>
-              <th style="width:95px;">Status</th>
-              <th style="width:20px;">Purpose</th>
-              <!--  -->
-            </tr>
-          </thead>
-          <tbody>
-            <?php foreach ($lf_pending_payment as $row) {
-            ?>
-            <tr>
-              <td style="width:95px;"><?php echo $row["name"]; ?></td>
-              <td style="width:95px;"><a href="admin-large-format-print-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row['parent_job_id'] > 0 ? '&#169 '. $row["job_name"] : ($row['is_parent'] ? '&#9413 ' . $row["job_name"] : $row["job_name"]); ?></a></td>
-              <td style="width:95px;"><?php echo $row["priced_date"]; ?></td>
-              <td style="width:95px;"><?php echo $row["status"]; ?></td>
-              <td style="width:20px;"><?php echo $row["job_purpose"]; ?></td>
-
-            </tr>
-            <?php
-            }?>
-          </tbody>
-        </table>
-      </div>
+      <?php generateTable('lf_pending_payment',$lf_pending_payment, $lf_href, 'priced_date', 'Priced Date'); ?>
     </div>
   
   <button class="accordion active">Paid</button>
     <div class="panel" style="display:block;">
-      <div class="table-responsive">
-        <table id='lf_paid' class="table table-striped table-md">
-          <thead>
-            <tr>
-              <!-- table header-->
-              <th style="width:95px;">Name</th>
-              <th style="width:95px;">Job</th>
-              <th style="width:95px;">Payment Date</th>
-              <th style="width:95px;">Status</th>
-              <th style="width:20px;">Purpose</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php foreach ($lf_paid as $row) {
-            ?>
-            <tr>
-              <td style="width:95px;"><?php echo $row["name"]; ?></td>
-              <td style="width:95px;"><a href="admin-large-format-print-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row['parent_job_id'] > 0 ? '&#169 '. $row["job_name"] : ($row['is_parent'] ? '&#9413 ' . $row["job_name"] : $row["job_name"]); ?></a></td>
-              <td style="width:95px;"><?php echo $row["paid_date"]; ?></td>
-              <td style="width:95px;"><?php echo $row["status"]; ?></td>
-              <td style="width:20px;"><?php echo $row["job_purpose"]; ?></td>
-              
-            </tr>
-            <?php
-            }?>
-          </tbody>
-        </table>
-      </div>
+      <?php generateTable('lf_paid',$lf_paid, $lf_href, 'paid_date', 'Paid Date'); ?>
     </div>
   
   <button class="accordion active">Printing</button>
     <div class="panel" style="display:block;">
-      <div class="table-responsive">
-        <table id='lf_printing' class="table table-striped table-md">
-          <thead>
-            <tr>
-              <!-- table header-->
-              <th style="width:95px;">Name</th>
-              <th style="width:95px;">Job</th>
-              <th style="width:95px;">Print Start Date</th>
-              <th style="width:95px;">Status</th>
-              <th style="width:20px;">Purpose</th>
-              
-            </tr>
-          </thead>
-          <tbody>
-            <?php foreach ($lf_printing as $row) {
-              ?>
-              <tr>
-                <td style="width:95px;"><?php echo $row["name"]; ?></td>
-                <td style="width:95px;"><a href="admin-large-format-print-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row['parent_job_id'] > 0 ? '&#169 '. $row["job_name"] : ($row['is_parent'] ? '&#9413 ' . $row["job_name"] : $row["job_name"]); ?></a></td>
-                <td style="width:95px;"><?php echo $row["printing_date"]; ?></td>
-                <td style="width:95px;"><?php echo $row["status"]; ?></td>
-                <td style="width:20px;"><?php echo $row["job_purpose"]; ?></td>
-              </tr>
-              <?php
-            }?>
-          </tbody>
-        </table>
-      </div>
+      <?php generateTable('lf_printing',$lf_printing, $lf_href, 'printing_date', 'Print Start Date'); ?>
     </div>
 
     
   <button class="accordion active">Completed Print</button>
     <div class="panel" style="display:block;">
-      <div class="table-responsive">
-        <table id='lf_completed' class="table table-striped table-md">
-          <thead>
-            <tr>
-              <!-- table header-->
-              <th style="width:95px;">Name</th>
-              <th style="width:95px;">Job</th>
-              <th style="width:95px;">Print Start Date</th>
-              <th style="width:95px;">Status</th>
-              <th style="width:20px;">Purpose</th>
-              
-            </tr>
-          </thead>
-          <tbody>
-            <?php foreach ($lf_completed as $row) {
-              ?>
-              <tr>
-                <td style="width:95px;"><?php echo $row["name"]; ?></td>
-                <td style="width:95px;"><a href="admin-large-format-print-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row['parent_job_id'] > 0 ? '&#169 '. $row["job_name"] : ($row['is_parent'] ? '&#9413 ' . $row["job_name"] : $row["job_name"]); ?></a></td>
-                <td style="width:95px;"><?php echo $row["completed_date"]; ?></td>
-                <td style="width:95px;"><?php echo $row["status"]; ?></td>
-                <td style="width:20px;"><?php echo $row["job_purpose"]; ?></td>
-              </tr>
-              <?php
-            }?>
-          </tbody>
-        </table>
-      </div>
+      <?php generateTable('lf_completed',$lf_completed, $lf_href, 'completed_date', 'Completed Date'); ?>
     </div>
   
   <button class="accordion">Ready for pickup</button>
     <div class="panel">
-      <div class="table-responsive">
-        <table id='lf_delivered' class="table table-striped table-md">
-        <thead>
-          <tr>
-            <!-- table header-->
-            <th style="width:95px;">Name</th>
-            <th style="width:95px;">Job</th>
-            <th style="width:95px;">Completion Date</th>
-            <th style="width:95px;">Status</th>
-            <th style="width:20px;">Purpose</th>
-            
-          </tr>
-        </thead>
-        <tbody>
-          <?php foreach ($lf_delivered as $row) {
-          ?>
-          <tr>
-            <td style="width:95px;"><?php echo $row["name"]; ?></td>
-            <td style="width:95px;"><a href="admin-large-format-print-job-specification.php?job_id=<?php echo $row["id"]; ?>"><?php echo $row['parent_job_id'] > 0 ? '&#169 '. $row["job_name"] : ($row['is_parent'] ? '&#9413 ' . $row["job_name"] : $row["job_name"]); ?></a></td>
-            <td style="width:95px;"><?php echo $row["delivered_date"]; ?></td>
-            <td style="width:95px;"><?php echo $row["status"]; ?></td>
-            <td style="width:20px;"><?php echo $row["job_purpose"]; ?></td>
-          </tr>
-          <?php
-          }
-          ?>
-          </tbody>
-        </table>
-      </div>
+      <?php generateTable('lf_delivered', $lf_delivered, $lf_href, 'delivered_date', 'Delivered Date'); ?>
     </div>
 
     
@@ -1071,8 +494,6 @@ foreach ($largeformat_job7 as $job) {
 </script>
 
 <script>
-
-
 function sortTable(tableId) {
   var table, rows, switching, i, shouldSwitch;
   table = document.getElementById(tableId);
@@ -1081,18 +502,25 @@ function sortTable(tableId) {
   // Convert rows to an array
   rows = Array.from(table.rows).slice(1); // skip the header row
 
-  // Custom sort function
+  // sort by job purpose then by date
   rows.sort(function(rowA, rowB) {
-    var col4A = rowA.cells[4].textContent.toLowerCase(); // Column purpose
-    var col4B = rowB.cells[4].textContent.toLowerCase();
-    var col3A = rowA.cells[2].textContent.toLowerCase(); // Column date
-    var col3B = rowB.cells[2].textContent.toLowerCase();
+    var purposeOrder = { 'academic': 1, 'personal': 2, 'null': 3 };
 
-    if (col4A < col4B) return -1;
-    if (col4A > col4B) return 1;
-    if (col3A < col3B) return -1;
-    if (col3A > col3B) return 1;
-    return 0;
+    var col4A = rowA.cells[3].textContent.toLowerCase(); // Column purpose
+    var col4B = rowB.cells[3].textContent.toLowerCase();
+    var purposeA = purposeOrder[col4A] || purposeOrder['null']; 
+    var purposeB = purposeOrder[col4B] || purposeOrder['null']; 
+
+    if (purposeA < purposeB) return -1;
+    if (purposeA > purposeB) return 1;
+
+    var col3A = rowA.cells[2].textContent; // Column date
+    var col3B = rowB.cells[2].textContent;
+    var dateA = new Date(col3A);
+    var dateB = new Date(col3B);
+
+    return dateB - dateA;
+    
   });
 
   // Re-adding the sorted rows to the table
@@ -1102,22 +530,11 @@ function sortTable(tableId) {
 }
 
 function sortAllTablesPurpose() {
-  sortTable('d_not_priced');
-  sortTable('d_on_hold');
-  sortTable('d_pending_payment');
-  sortTable('d_paid');
-  sortTable('d_printing');
-  sortTable('d_completed');
-  sortTable('d_delivered');
-  console.log('sorted 3d');
-  sortTable('l_not_priced');
-  sortTable('l_on_hold');
-  sortTable('l_pending_payment');
-  sortTable('l_paid');
-  sortTable('l_printing');
-  sortTable('l_completed');
-  sortTable('l_delivered');
-  console.log('sorted laser');
+  var tables_to_sort=['d_not_priced','d_not_priced','d_not_priced','d_on_hold','d_pending_payment','d_paid','d_printing','d_completed','d_delivered','l_not_priced','l_on_hold','l_pending_payment','l_paid','l_printing','l_completed','l_delivered','lf_not_priced','lf_on_hold','lf_pending_payment','lf_paid','lf_printing','lf_completed','lf_delivered'];
+
+
+  tables_to_sort.forEach(sortTable);
+  
 }
 
 window.onload = sortAllTablesPurpose();
