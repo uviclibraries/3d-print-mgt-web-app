@@ -6,15 +6,15 @@ $library_href= "https://www.uvic.ca/library/";
 switch($jobType){
   case ("3d print"):
     $faq_href = 'https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/';
-    $job_href = 'https://webapp.library.uvic.ca/3dprint/customer-3d-job-information?job_id=';
+    $job_href = 'customer-3d-job-information?job_id=';
     break;
   case("laser cut"):
     $faq_href = 'https://onlineacademiccommunity.uvic.ca/dsc/how-to-laser-cut/';
-    $job_href = 'https://webapp.library.uvic.ca/3dprint/customer-laser-job-information.php?job_id=';
+    $job_href = 'customer-laser-job-information.php?job_id=';
     break;
   case("large format print"):
     $faq_href = 'https://onlineacademiccommunity.uvic.ca/dsc/tools-tech/large-format-printer-and-scanner/';
-    $job_href = 'https://webapp.library.uvic.ca/3dprint/customer-large-format-print-job-information?job_id=';
+    $job_href = 'customer-large-format-print-job-information?job_id=';
     break;
 }
 $job_href = $job_href.$job['id'];
