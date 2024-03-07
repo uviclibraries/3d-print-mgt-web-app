@@ -1,4 +1,5 @@
 <?php 
+  $isParent = $job['is_parent'];
 
   $stmt->bindParam(':job_id', $job['id']);
 
@@ -19,6 +20,7 @@
   $new_parent_id = $job['parent_job_id'];
   if($_POST["status"] = "cancelled" && $job['parent_job_id']!=0){
     $new_parent_id = 0;
+    include('remove_as_parent-snippet.php');
   }
   $stmt->bindParam(':parent_job_id', $new_parent_id, PDO:: PARAM_INT);
 
@@ -29,11 +31,9 @@
     $stmt->bindParam(':duration', $duration , PDO::PARAM_INT);
   }
 
-
   if($_POST['checked_jobs'] && count($_POST['checked_jobs'])>0){
 
     //if job(s) was selected from within any <div class="user_jobs_container"> and 'set selected jobs as children' checkbox selected, change "is_parent" field val to true
-    $isParent = $job['is_parent'];
     if(isset($_POST['set-children-checkbox']) && $_POST['set-children-checkbox'] == 'set_children'){
       $isParent = true;
     }
@@ -50,7 +50,7 @@
       }
     }
   }
-  
+
   $stmt->bindParam(':is_parent', $isParent, PDO:: PARAM_BOOL);
 
   /*
