@@ -51,8 +51,8 @@ $stm = $conn->prepare("SELECT web_job.id AS id, web_job.job_name AS name, web_jo
   AND id != {$job['id']}
   AND (
     parent_job_id = {$job['id']} OR 
-    id = {$job['parent_job_id']} OR 
-    (parent_job_id != 0 AND parent_job_id = {$job['parent_job_id']}) 
+    id = $prev_parent_id OR 
+    (parent_job_id != 0 AND parent_job_id IS NOT NULL AND parent_job_id = $prev_parent_id) 
   )
 ");
 $stm->execute();
