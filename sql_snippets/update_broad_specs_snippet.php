@@ -12,14 +12,10 @@
   
   $stmt->bindParam(':model_name_2', $modify_value);
 
-  $stmt->bindParam(':status', $_POST["status"], PDO:: PARAM_STR);
+  $new_status = isset($_POST["status"]) ? $_POST["status"] : $job['status'];
+  $stmt->bindParam(':status', $new_status, PDO:: PARAM_STR);
   
-  
-  //if job(s) was selected from within any <div class="user_jobs_container"> and 'set selected jobs as children' checkbox selected, change "is_parent" field val to true
-  $isParent = ($_POST['set-children-checkbox'] == 'set_children' && count($_POST['checked_jobs'])>0) ? true : $job['is_parent'];
-  $stmt->bindParam(':is_parent', $isParent, PDO:: PARAM_BOOL);
 
-  
   $new_parent_id = $job['parent_job_id'];
   if($_POST["status"] = "cancelled" && $job['parent_job_id']!=0){
     $new_parent_id = 0;
@@ -33,6 +29,29 @@
     $stmt->bindParam(':duration', $duration , PDO::PARAM_INT);
   }
 
+
+  if($_POST['checked_jobs'] && count($_POST['checked_jobs'])>0){
+
+    //if job(s) was selected from within any <div class="user_jobs_container"> and 'set selected jobs as children' checkbox selected, change "is_parent" field val to true
+    $isParent = $job['is_parent'];
+    if(isset($_POST['set-children-checkbox']) && $_POST['set-children-checkbox'] == 'set_children'){
+      $isParent = true;
+    }
+
+    //if job(s) was selected from within any <div class="user_jobs_container"> and 'unlink selected jobs as children' checkbox selected, loop through linked jobs and compare against checked jobs. if any remain whose parent id is the current job's id, change "is_parent" field val to true
+    elseif(isset($_POST['unlink-children-checkbox']) && $_POST['unlink-children-checkbox'] == 'unlink_children'){
+      forEach ($linked_jobs as $linked) {
+        //if the previously linked job's parent id is set to current job, and isn't in the list of jobs set to be unlinked
+        if($linked['parent_job_id'] == $job['id'] && !in_array($linked['id'], $_POST['checked_jobs'])) {
+            $isParent = true;
+            break;
+        }
+        else{$isParent = false;}
+      }
+    }
+  }
+  
+  $stmt->bindParam(':is_parent', $isParent, PDO:: PARAM_BOOL);
 
   /*
   should dates be removed if steps are reverted: eg printing->paid

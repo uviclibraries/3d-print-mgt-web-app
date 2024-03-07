@@ -10,11 +10,11 @@
 
       $checkedIDs_sql = implode(',', $checked_jobs);//to create comma separated list for update query
 
-      if(isset($_POST['set-statuses-checkbox']) && $_POST['set-statuses-checkbox'] == 'set_statuses'){
+      if(isset($_POST['set-statuses-checkbox']) && $_POST['set-statuses-checkbox'] == 'set_statuses' && isset($_POST["status"])){
 
         $status_updates = $conn->prepare("UPDATE web_job SET status = :status, priced_date = :priced_date, paid_date = :paid_date, printing_date = :printing_date, completed_date = :completed_date, delivered_date = :delivered_date, archived_date=:archived_date, priced_signer=:priced_signer,  paid_signer= :paid_signer, printing_signer=:printing_signer, completed_signer=:completed_signer, delivered_signer=:delivered_signer, hold_date = :hold_date, hold_signer= :hold_signer, cancelled_date=:cancelled_date, cancelled_signer = :cancelled_signer, archived_signer = :archived_signer WHERE id IN ($checkedIDs_sql)");
 
-        $status_updates->bindParam(':status', $_POST["status"]);
+        $status_updates->bindParam(':status', $new_status);
 
         $status_updates->bindParam(':priced_date', $d_priced);
         $status_updates->bindParam(':paid_date', $d_paid);
@@ -48,6 +48,20 @@
         // $link_children->bindParam(':parent_job_id', $new_parent_job_id, PDO::PARAM_INT);
 
         $link_children->execute();
+      }
+
+      if (isset($_POST['unlink-children-checkbox']) && $_POST['unlink-children-checkbox'] == 'unlink_children') {
+        $new_parent_job_id = 0;
+        //change parent_job_ids of all jobs to 0 that have been selected when <unlink-children-checkbox> has also been checked
+        $un_children = "UPDATE web_job SET parent_job_id = $new_parent_job_id WHERE id IN ($checkedIDs_sql) AND is_parent = 0";
+
+        $unlink_children = $conn->prepare($un_children);
+
+        // Ensure $job['id'] is defined and valid
+         
+        // $link_children->bindParam(':parent_job_id', $new_parent_job_id, PDO::PARAM_INT);
+
+        $unlink_children->execute();
       }
     }
   } //end set associated jobs status
