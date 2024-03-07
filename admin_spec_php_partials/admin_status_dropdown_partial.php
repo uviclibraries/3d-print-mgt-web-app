@@ -3,13 +3,6 @@
         <div class="row">
           <div class="col-md-3 mb-3">
             <select class="custom-select d-block w-100" name="status" id="status-select">
-              <?php 
-                if ($job["status"] == "cancelled") {?> 
-                  <option value="cancelled" selected readonly>cancelled</option> 
-                <?php } if ($job["status"] == "archived") {?> 
-                  <option value="archived" selected readonly>archived</option> 
-                <?php } 
-                else { ?>
                   <option value="submitted" <?php if ($job["status"]== "submitted"){echo "selected";} ?>>Not Priced</option>
                   <option value="pending payment" <?php if ($job["status"]== "pending payment"){echo "selected";} ?>>Pending Payment</option>
                   <option value="on hold" <?php if ($job["status"]== "on hold"){echo "selected";} ?>>On Hold</option>
@@ -21,7 +14,6 @@
                   <option value="cancelled" <?php if ($job["status"]== "cancelled"){echo "selected";} ?>>Cancelled</option>
                 <?php } ?>
                   <option value="archived" <?php if ($job["status"]== "archived"){echo "selected";} ?>>Archived</option>
-              <?php } ?>
             </select>
           </div>
           <div class="col-md-3 mb-3">
@@ -33,3 +25,13 @@
           </div>
         </div>
       </div><!--Status-->
+
+<script>
+window.addEventListener('load', function() {
+    var statusSelect = document.getElementById('status-select');
+    var lockedStatuses = ['cancelled', 'archived'];
+    if (lockedStatuses.includes(statusSelect.value)) {
+        statusSelect.disabled = true; // Disable select if it has a "locked" status
+    }
+});
+</script>
