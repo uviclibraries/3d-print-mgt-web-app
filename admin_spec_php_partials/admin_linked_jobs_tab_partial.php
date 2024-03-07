@@ -49,15 +49,24 @@ if(count($active_user_jobs) > 0){?>
       <script>
         document.addEventListener('DOMContentLoaded', function() {
           removeStatus("Linked", "linked_tab");
+          document.getElementById("unlink-children-div").style.display='none';
         });
       </script>
-    <?php } else{ ?>
+      <?php 
+    }
+    else{ ?>
       <script>
         document.addEventListener('DOMContentLoaded', function() {
         document.getElementById("linked_tab").click();
         });
       </script>
-    <?php } ?>
+
+      <?php 
+      if(!$job['parent_job_id'] && $job['parent_job_id'] != 0 && $job['is_parent']){?>
+        <script>document.getElementById("unlink-children-div").style.display='block'; </script>
+      <?php }
+
+    }?> 
   </div> <!--show "linked jobs" tab if there are linked jobs-->
 
 
@@ -257,7 +266,6 @@ if(count($active_user_jobs) > 0){?>
 
   <?php if(count($active_user_jobs) > 0){?>  
     <div class="row">
-    <?php if(count($active_user_jobs) > 0){?>
     <!--add checkbox for "change status of selected "-->
     <div class="col-md-4 mb-3">
       <input type="checkbox" id="set-statuses-checkbox" name="set-statuses-checkbox" value="set_statuses" style="margin-top:3px;" checked>
@@ -272,21 +280,17 @@ if(count($active_user_jobs) > 0){?>
         <label for="set-children-checkbox"style="margin-top:5px;">Set selected jobs as children</label> 
       </div>
     <?php } ?>
-    
-    <?php if(($job['is_parent'] && ($job['parent_job_id'] == 0))) {?>
-      <div class="col-md-4 mb-3">
-        <!--set to checkbox "Unlink selected as children"-->
-        <input type="checkbox" id="unlink-children-checkbox" name="unlink-children-checkbox" value="unlink_children" style="margin-top:3px;">
-        <label for="unlink-children-checkbox" style="margin-top:5px;">Abandon selected jobs as children</label> 
-      </div>
-    <?php } ?>
 
   <?php } ?>
+    <div class="col-md-4 mb-3" id= "unlink-children-div">
+      <!--set to checkbox "Unlink selected as children"-->
+      <input type="checkbox" id="unlink-children-checkbox" name="unlink-children-checkbox" value="unlink_children" style="margin-top:3px;">
+      <label for="unlink-children-checkbox" style="margin-top:5px;">Abandon selected jobs as children</label> 
+    </div>
   </div> 
 </div>
 <?php } ?>
 
-<?php } ?>
 <?php if(count($active_user_jobs) > 0){?>
 <hr class="mb-6">
 <?php } ?>

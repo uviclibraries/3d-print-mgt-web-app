@@ -4,7 +4,6 @@ Listeners for
     - Set selected jobs as children ('set-children-checkbox')
     - Unlink slected jobs as children ('unlink-children-checkbox')
 */
-
 //Get checkbox elements
 var setChildrenCheckbox = document.getElementById('set-children-checkbox');
 var matchStatusCheckbox = document.getElementById('set-statuses-checkbox');

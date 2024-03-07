@@ -24,4 +24,3 @@ function removeStatus(tab, div) {
     divElement.style.display = 'none';
   } 
 }
-
