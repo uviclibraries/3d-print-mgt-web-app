@@ -47,7 +47,6 @@ $stm = $conn->prepare("SELECT web_job.id AS id, web_job.job_name AS name, web_jo
 
 $stm = $conn->prepare("SELECT web_job.id AS id, web_job.job_name AS name, web_job.status AS status, web_job.parent_job_id AS parent_job_id , web_job.is_parent AS is_parent FROM web_job INNER JOIN $typeTableName ON id = $typeID WHERE 
   status NOT IN ('delivered', 'archived', 'cancelled') 
-  AND netlink_id = 'chloefarr' 
   AND id != {$job['id']}
   AND (
     parent_job_id = {$job['id']} OR 
@@ -55,6 +54,7 @@ $stm = $conn->prepare("SELECT web_job.id AS id, web_job.job_name AS name, web_jo
     (parent_job_id != 0 AND parent_job_id IS NOT NULL AND parent_job_id = $prev_parent_id) 
   )
 ");
+$stm->bindParam(':netlink_id', $job['netlink_id']);
 $stm->execute();
 $user_linked_jobs = $stm->fetchAll();
 
