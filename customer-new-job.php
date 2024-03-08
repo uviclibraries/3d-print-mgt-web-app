@@ -93,6 +93,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $current_date = date("Y-m-d");
   $good_statement = True;
   
+  //Inserts new job into web_job and and sets netlink id, job name, status=submitted, submission_date=todat, job purpose, and if for academic purpose, course code and due date.
+  include('sql_snippets/insert_new_webjob_snippet.php');
+  
   //binds user to job
   include('sql_snippets/bind_user_new_snippet.php');
 
@@ -105,44 +108,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           case "laser_cut":
               $jobType = "laser cut";
               $direct_link ="https://onlineacademiccommunity.uvic.ca/dsc/how-to-laser-cut/";
+              //Inserts new job into laser_cut and and sets id, model (file) name, copies, material type, laser cutting specifications (text box), user comments.
+              include('sql_snippets/new_laser_snippet.php');
               break;
           case "3d_print":
               $jobType = "3d print";
-              $direct_link ="https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/";
+              $direct_link ="https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/";//Inserts new job into 3d_print and and sets id, model (file) name, infill, scale, layer_height, supports, copies, user comments.
+              include('sql_snippets/new_3d_print_snippet.php');
               break;
           case "large_format_print":
               $jobType = "large format print";
               $direct_link = "https://onlineacademiccommunity.uvic.ca/dsc/tools-tech/large-format-printer-and-scanner/";
+              //Inserts new job into large_format and and sets id, model (file) name, copies, material type, laser cutting specifications (text box), user comments.
+              include('sql_snippets/new_large_format_snippet.php');
               break;
           default:
               $jobType = "unknown";
       }
-  }
-
-  include('general_partials/send_customer_email_partial.php');
-
-  //Inserts new job into web_job and and sets netlink id, job name, status=submitted, submission_date=todat, job purpose, and if for academic purpose, course code and due date.
-  include('sql_snippets/insert_new_webjob_snippet.php');
-  
-
-  /*TODO also validate laser cutting variables*/
-  // echo($_POST["job_type"]);
-
-  if($_POST["job_type"] == "3d_print"){
-    //Inserts new job into 3d_print and and sets id, model (file) name, infill, scale, layer_height, supports, copies, user comments.
-    include('sql_snippets/new_3d_print_snippet.php');
-  }
-
-  elseif($_POST["job_type"] == "laser_cut"){
-    //Inserts new job into laser_cut and and sets id, model (file) name, copies, material type, laser cutting specifications (text box), user comments.
-    include('sql_snippets/new_laser_snippet.php');
-  }
-
-  elseif($_POST["job_type"] == "large_format_print"){
-
-    //Inserts new job into large_format and and sets id, model (file) name, copies, material type, laser cutting specifications (text box), user comments.
-    include('sql_snippets/new_large_format_snippet.php');
-
   }
 
   else{
@@ -150,9 +132,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $job_type = $_POST["job_type"];
     die("$job_type invalid job type");
   }
+  include('general_partials/send_customer_email_partial.php');
 
 
-// header("location: customer-dashboard.php");
+header("location: customer-dashboard.php");
 }
 
 ?>
