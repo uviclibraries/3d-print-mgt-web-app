@@ -178,6 +178,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <div class="container">
     <form method="POST" enctype="multipart/form-data">
+
+      <script>
+        // Listen for keypress events on the form
+        document.getElementById('myForm').addEventListener('keypress', function(event) {
+          // Check if the pressed key is the Enter key
+          if (event.key === 'Enter') {
+              // Prevent the default action to stop form submission
+              event.preventDefault();
+          }
+        });
+      </script>
+
       <!--Name of job, customer, date submited, academic/personal project, what admins updated status last-->
       <?php include('admin_spec_php_partials/admin_broad_spec_partial.php');?>
 
