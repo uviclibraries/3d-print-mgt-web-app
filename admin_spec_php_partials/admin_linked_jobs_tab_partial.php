@@ -24,15 +24,16 @@ if(count($active_user_jobs) > 0){?>
   </div><!--Status tabs for user's other linked and active jobs-->
 
   <div id="Linked" class="tabcontent">
-    <h4>Linked</h4>
+    <!-- <h4>Linked</h4> -->
     <p>These are the user's jobs that are financially linked to the job in this page. </p> 
     <div class="user_jobs_container">
       <?php foreach ($linked_jobs as $linked_job) {
         if($linked_job != $job) {
+          $isChecked = $linked_job['status'] == 'submitted' || $linked_job['status'] == 'pending payment' ?'checked':'';
             $print_relationship = $linked_job['id'] == $job['parent_job_id'] ? 'PARENT: ' : ($linked_job['parent_job_id'] == $job['id']? 'CHILD: ':'');
             $job_pointer = $type_href . $linked_job["id"] . '">' . $linked_job["id"] . '</a>';
             echo '<div class="job-item">';
-            echo '<input type="checkbox" class ="job-checkbox" id="'. $linked_job['id'] . '" name="checked_jobs[]" value="' . $linked_job['id'] . '">';                  
+            echo '<input type="checkbox" class ="job-checkbox" id="'. $linked_job['id'] . '" name="checked_jobs[]" value="' . $linked_job['id'] . '" ' . $isChecked . '>';                  
             // Check if 'name' index is set
             if (isset($linked_job['name'])) {
                 echo " " . $print_relationship . $job_pointer  . ' - ' . $linked_job['name'];
@@ -49,22 +50,22 @@ if(count($active_user_jobs) > 0){?>
       <script>
         document.addEventListener('DOMContentLoaded', function() {
           removeStatus("Linked", "linked_tab");
-          document.getElementById("unlink-children-div").style.display='none';
         });
       </script>
-      <?php 
-    }
-    else{ ?>
-      <script>
-        document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById("linked_tab").click();
-        });
-      </script>
-
-      <?php 
-      if(!$job['parent_job_id'] && $job['parent_job_id'] != 0 && $job['is_parent']){?>
-        <script>document.getElementById("unlink-children-div").style.display='block'; </script>
+    <?php 
+      if(!$job['is_parent']){?>
+        
       <?php }
+
+    }
+    else{ 
+
+      if($job['is_parent']){?>
+        <script>document.addEventListener("DOMContentLoaded", function() {console.log("should show div");document.getElementById("unlink-children-div").style.display='block'; });</script>
+      <?php }
+      // else{
+        // <script>document.getElementById("unlink-children-div").style.display='none'; </script> -->
+      // }
 
     }?> 
   </div> <!--show "linked jobs" tab if there are linked jobs-->
@@ -72,7 +73,7 @@ if(count($active_user_jobs) > 0){?>
 
 
   <div id="NotPriced" class="tabcontent">
-    <h4>Not Priced</h4>
+    <!-- <h4>Not Priced</h4> -->
     <!-- <p>These are the user's jobs that have been submitted and not processed further.</p>  -->
     <?php $submitted = 0;?>
     <div class="user_jobs_container">
@@ -105,7 +106,7 @@ if(count($active_user_jobs) > 0){?>
 
 
   <div id="PendingPayment" class="tabcontent">
-    <h4>Pending Payment</h4>
+    <!-- <h4>Pending Payment</h4> -->
     <!-- <p>These are the user's jobs that have been priced and are awaiting payment by the customer.</p> -->
     <?php $priced = 0; ?>
     <div class="user_jobs_container">
@@ -138,7 +139,7 @@ if(count($active_user_jobs) > 0){?>
 
 
   <div id="Paid" class="tabcontent">
-    <h4>Paid</h4>
+    <!-- <h4>Paid</h4> -->
     <!-- <p>These are the user's jobs that have been priced and are awaiting payment by the customer.</p> -->
     <?php $paid = 0;?>
     <div class="user_jobs_container">
@@ -172,7 +173,7 @@ if(count($active_user_jobs) > 0){?>
 
 
   <div id="InProgress" class="tabcontent">
-    <h4>In Progress</h4>  
+    <!-- <h4>In Progress</h4>   -->
     <!-- <p>These are the user's jobs that have been priced and are awaiting payment by the customer.</p> -->
     <?php $ip = 0;?>
     <div class="user_jobs_container">
@@ -203,7 +204,7 @@ if(count($active_user_jobs) > 0){?>
   </div> <!--show in progress tab if there are jobs in progress-->
    
   <div id="Completed" class="tabcontent">
-    <h4>Completed</h4>
+    <!-- <h4>Completed</h4> -->
     <!-- <p>These are the user's jobs that have been been printed/cut but not delivered.</p> -->
     <?php $printed = 0;?>
     <div class="user_jobs_container">
@@ -234,7 +235,7 @@ if(count($active_user_jobs) > 0){?>
   </div> <!--show completed (not delivered) tab if there are completed/ not delivered jobs-->
   
   <div id="OnHold" class="tabcontent">
-    <h4>On Hold</h4>
+    <!-- <h4>On Hold</h4> -->
     <?php $hold = 0;?>
     <div class="user_jobs_container">
       <?php foreach ($active_user_jobs as $active_job) {
@@ -282,7 +283,7 @@ if(count($active_user_jobs) > 0){?>
     <?php } ?>
 
   <?php } ?>
-    <div class="col-md-4 mb-3" id= "unlink-children-div">
+    <div class="col-md-4 mb-3" id= "unlink-children-div" style="display:none;">
       <!--set to checkbox "Unlink selected as children"-->
       <input type="checkbox" id="unlink-children-checkbox" name="unlink-children-checkbox" value="unlink_children" style="margin-top:3px;">
       <label for="unlink-children-checkbox" style="margin-top:5px;">Abandon selected jobs as children</label> 
@@ -294,6 +295,18 @@ if(count($active_user_jobs) > 0){?>
 <?php if(count($active_user_jobs) > 0){?>
 <hr class="mb-6">
 <?php } ?>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    <?php foreach ($active_statuses as $index => $isActive): ?>
+        if (<?php echo $isActive ? 'true' : 'false'; ?>) {
+            document.getElementById('<?php echo $tabs[$index]; ?>').click();
+        }
+    <?php endforeach; ?>
+});
+</script>
+
 
 <!-- Contains the javascript to show/hide empty tabs -->
 <script type="text/javascript" src="js/linked_jobs_function.js"></script>
