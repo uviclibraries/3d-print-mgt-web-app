@@ -4,6 +4,7 @@
 
   <div class="row">
     <div class="col-md-3 mb-3">
+      <!--Label with error message if dimensions out of bounds-->
         <label for="length_input">Length<span class="error"></span></label>
         <div class="input-group">
           <div class="input-group mb-3">
