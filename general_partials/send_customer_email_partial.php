@@ -18,10 +18,10 @@ switch($jobType){
     break;
 }
 
-$job_href = $job_href.$job['id'];
+$job_href = $job_href.$curr_id;
 
 //email is being triggered by submission of new job
-if($status_email == "submitted"){
+if($statusEmail == "submitted"){
 
 	$job_name = $_POST["job_name"];
 	//Send customer submission email
