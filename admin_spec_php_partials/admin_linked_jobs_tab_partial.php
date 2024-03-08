@@ -50,6 +50,7 @@ if(count($active_user_jobs) > 0){?>
       <script>
         document.addEventListener('DOMContentLoaded', function() {
           removeStatus("Linked", "linked_tab");
+          document.getElementById('Linked').style.display='none';
         });
       </script>
     <?php 
@@ -58,10 +59,10 @@ if(count($active_user_jobs) > 0){?>
       <?php }
 
     }
-    else{ 
-
-      if($job['is_parent']){?>
-        <script>document.addEventListener("DOMContentLoaded", function() {console.log("should show div");document.getElementById("unlink-children-div").style.display='block'; });</script>
+    else{ ?>
+      <script>document.getElementById('Linked').style.display='block';</script>
+      <?php if($job['is_parent']){?>
+        <script>document.addEventListener("DOMContentLoaded", function() {document.getElementById("unlink-children-div").style.display='block'; });</script>
       <?php }
       // else{
         // <script>document.getElementById("unlink-children-div").style.display='none'; </script> -->
