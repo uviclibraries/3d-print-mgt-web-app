@@ -225,7 +225,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     //redirect to customer dashboard upon confirm cancel and update job status in db
     echo "<script>";
-    echo "window.location.replace('https://webapp.library.uvic.ca/3dprint/customer-dashboard.php');";
+    echo "window.location.replace('customer-dashboard.php');";
     echo "setTimeout(move, 3000);";
     echo "</script>";
    
