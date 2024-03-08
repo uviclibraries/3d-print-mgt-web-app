@@ -85,7 +85,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $n_delivered = $job['delivered_signer'];
   $n_archived=$job['archived_date'];
 
-
+  //Sets job status update date, and admin who updated the status, and sends any relevant emails via 'general_partials/send_customer_email_partial.php'
+  include('admin_spec_php_partials/admin_update_job_status_email_partial.php');
+  
   //Updates job id, price, staff notes, copies, updated model name, status, parentid, and if laser cut or 3d print, duration and material type. 
   include('sql_snippets/update_broad_specs_snippet.php');
 
@@ -93,8 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   include('sql_snippets/update_large_format_specs_snippet.php');
 
 
-  //Sets job status update date, and admin who updated the status, and sends any relevant emails via 'general_partials/send_customer_email_partial.php'
-  include('admin_spec_php_partials/admin_update_job_status_email_partial.php');
+
 
 
   $stmt->execute();
