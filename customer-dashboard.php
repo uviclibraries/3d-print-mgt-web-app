@@ -296,7 +296,7 @@ function generateTable($table_id, $rel_jobs, $job_ref, $status_date, $date_heade
   <p><a href="#large-format-print-jobs" >(Jump to Large Format Print jobs)</a></p>
   
     <button class="accordion active">Submitted</button>
-    <div class="panel" style="display:block;">
+    <div class="panel">
       <?php generateTable('d_not_priced',$d_not_priced, $d_href, 'submission_date', 'Submission Date'); ?>
     </div>
     
@@ -307,17 +307,17 @@ function generateTable($table_id, $rel_jobs, $job_ref, $status_date, $date_heade
   
   
   <button class="accordion">Pending Payment</button>
-    <div class="panel">
+    <div class="panel" style="display:block;">
       <?php generateTable('d_pending_payment',$d_pending_payment, $d_href, 'priced_date', 'Priced Date'); ?>
     </div>
   
   <button class="accordion active">Paid</button>
-    <div class="panel" style="display:block;">
+    <div class="panel">
       <?php generateTable('d_paid', $d_paid, $d_href, 'paid_date', 'Paid Date'); ?>
     </div>
   
   <button class="accordion active">In Progress</button>
-    <div class="panel" style="display:block;">
+    <div class="panel">
       <?php generateTable('d_inprogress_completed',$d_in_progress, $d_href, 'printing_date', 'Print Start Date'); 
       // generateRows($d_completed, $d_href, 'completed_date');
       // generateTableEnd();
@@ -325,7 +325,7 @@ function generateTable($table_id, $rel_jobs, $job_ref, $status_date, $date_heade
     </div>
   
   <button class="accordion">Ready for pickup</button>
-    <div class="panel">
+    <div class="panel" style="display:block;">
         <?php generateTable('d_delivered',$d_delivered, $d_href, 'delivered_date', 'Delivered Date'); ?>
     </div>
 
@@ -335,7 +335,7 @@ function generateTable($table_id, $rel_jobs, $job_ref, $status_date, $date_heade
   <p><a href="#3d-print-jobs" >(Jump to 3D Print jobs)</a></p>
   <p><a href="#large-format-print-jobs" >(Jump to Large Format Print jobs)</a></p>
   <button class="accordion active">Submitted</button>
-    <div class="panel" style="display:block;">
+    <div class="panel">
       <?php generateTable('l_not_priced', $l_not_priced, $l_href, 'submission_date', 'Submission Date'); ?>
     </div>
 
@@ -346,23 +346,23 @@ function generateTable($table_id, $rel_jobs, $job_ref, $status_date, $date_heade
   
 
   <button class="accordion">Pending Payment</button>
-    <div class="panel">
+    <div class="panel" style="display:block;">
       <?php generateTable('l_pending_payment',$l_pending_payment, $l_href, 'priced_date', 'Priced Date'); ?>
     </div>
 
   <button class="accordion active">Paid</button> 
-    <div class="panel" style="display:block;">
+    <div class="panel">
       <?php generateTable('l_paid', $l_paid, $l_href, 'paid_date', 'Paid Date'); ?>
     </div>
 
   <button class="accordion active">Cutting</button> 
-    <div class="panel" style="display:block;">
+    <div class="panel">
       <?php generateTable('l_in_progress',$l_in_progress, $l_href, 'printing_date', 'Cut Start Date'); ?>
     </div>
 
   
   <button class="accordion">Ready for pickup</button>
-    <div class="panel">
+    <div class="panel" style="display:block;">
       <?php generateTable('l_delivered',$l_delivered, $l_href, 'delivered_date', 'Delivered Date'); ?>
     </div>
 
@@ -371,7 +371,7 @@ function generateTable($table_id, $rel_jobs, $job_ref, $status_date, $date_heade
   <p><a href="#3d-print-jobs" >(Jump to 3D Print jobs)</a></p>
   <p><a href="#laser-cut-jobs" >(Jump to Laser Cut jobs)</a></p>
   <button class="accordion active">Submitted</button>
-    <div class="panel" style="display:block;">
+    <div class="panel">
       <?php generateTable('lf_not_priced',$lf_not_priced, $lf_href, 'submission_date', 'Submission Date'); ?>
     </div>
     
@@ -382,22 +382,22 @@ function generateTable($table_id, $rel_jobs, $job_ref, $status_date, $date_heade
   
   
   <button class="accordion">Pending Payment</button>
-    <div class="panel">
+    <div class="panel" style="display:block;">
       <?php generateTable('lf_pending_payment',$lf_pending_payment, $lf_href, 'priced_date', 'Priced Date'); ?>
     </div>
   
   <button class="accordion active">Paid</button>
-    <div class="panel" style="display:block;">
+    <div class="panel">
       <?php generateTable('lf_paid',$lf_paid, $lf_href, 'paid_date', 'Paid Date'); ?>
     </div>
   
   <button class="accordion active">Printing</button>
-    <div class="panel" style="display:block;">
+    <div class="panel">
       <?php generateTable('lf_in_progress',$lf_in_progress, $lf_href, 'printing_date', 'Print Start Date'); ?>
     </div>
   
   <button class="accordion">Ready for pickup</button>
-    <div class="panel">
+    <div class="panel" style="display:block;">
       <?php generateTable('lf_delivered', $lf_delivered, $lf_href, 'delivered_date', 'Delivered Date'); ?>
     </div>
 
