@@ -10,6 +10,13 @@ $stm->execute([$_GET["job_id"]]);
 $job=$stm->fetch();
 // print_r(array_keys($job));
 
+
+$jobType = "laser cut";
+$userView = "customer";
+$type_href= '<a href="';
+$type_href  = $type_href . 'customer-laser-job-information.php?job_id=';
+
+
 //Get users name & email
 $userSQL = $conn->prepare("SELECT * FROM users WHERE netlink_id = :netlink_id");
 $userSQL->bindParam(':netlink_id', $job['netlink_id']);
@@ -145,21 +152,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $job_owner = $userSQL->fetch();
 
   $jobName =$_POST["job_name"];
-  $direct_link = "https://onlineacademiccommunity.uvic.ca/dsc/how-to-laser-cut/";
-  $msg = "
-  <html>
-  <head>
-  <title>HTML email</title>
-  </head>
-  <body>
-  <p>Hello, ".$job_owner['name'].". This is an automated message from the DSC.</p>
-  <p>Thank you for submitting your laser cut request (".$jobName.") to the DSC at McPherson Library. We will evaluate the cost of the laser cut and you'll be notified by email when it is ready for payment. If you have any questions about the process or the status of your laser cut, please review our <a href=". $direct_link .">FAQ</a> or email us at DSCommons@uvic.ca.</p>
-  </body>
-  </html>";
-  $headers = "MIME-Version: 1.0" . "\r\n";
-  $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-  $headers .= "From: dscommons@uvic.ca" . "\r\n";
-  mail($job_owner['email'],"DSC - New laser cut Job",$msg,$headers);
+
+  include('general_partials/send_customer_email_partial.php');
 
 header("location: customer-dashboard.php");
 }
