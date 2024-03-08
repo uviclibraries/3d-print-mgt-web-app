@@ -31,7 +31,6 @@
     $stmt->bindParam(':duration', $duration , PDO::PARAM_INT);
   }
 
-  if($_POST['checked_jobs'] && count($_POST['checked_jobs'])>0){
   if(isset($_POST['checked_jobs']) && $_POST['checked_jobs'] && count($_POST['checked_jobs'])>0){
 
     //if job(s) was selected from within any <div class="user_jobs_container"> and 'set selected jobs as children' checkbox selected, change "is_parent" field val to true
@@ -76,5 +75,5 @@
   $stmt->bindParam(':cancelled_signer', $n_cancelled);
   $stmt->bindParam(':hold_signer', $n_hold);
   $stmt->bindParam(':archived_signer',$n_archived);
-
+  
 ?>
