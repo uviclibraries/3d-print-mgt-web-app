@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           throw new RuntimeException('Failed to move uploaded file.');
       }
 
-      echo 'File is uploaded successfully.';
+      // echo 'File is uploaded successfully.';
 
   } catch (RuntimeException $e) {
 
@@ -93,15 +93,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $current_date = date("Y-m-d");
   $good_statement = True;
   
-  //Inserts new job into web_job and and sets netlink id, job name, status=submitted, submission_date=todat, job purpose, and if for academic purpose, course code and due date.
-  
-  include('sql_snippets/insert_new_webjob_snippet.php');
   //binds user to job
   include('sql_snippets/bind_user_new_snippet.php');
 
+  
+  //Set job type string and link to FAQ page-->
+  $jobType = "";
+  $direct_link ="";
+  if (isset($_POST["job_type"])) {
+      switch ($_POST["job_type"]) {
+          case "laser_cut":
+              $jobType = "laser cut";
+              $direct_link ="https://onlineacademiccommunity.uvic.ca/dsc/how-to-laser-cut/";
+              break;
+          case "3d_print":
+              $jobType = "3d print";
+              $direct_link ="https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/";
+              break;
+          case "large_format_print":
+              $jobType = "large format print";
+              $direct_link = "https://onlineacademiccommunity.uvic.ca/dsc/tools-tech/large-format-printer-and-scanner/";
+              break;
+          default:
+              $jobType = "unknown";
+      }
+  }
+
+  include('general_partials/send_customer_email_partial.php');
+
+  //Inserts new job into web_job and and sets netlink id, job name, status=submitted, submission_date=todat, job purpose, and if for academic purpose, course code and due date.
+  include('sql_snippets/insert_new_webjob_snippet.php');
+  
 
   /*TODO also validate laser cutting variables*/
-
+  // echo($_POST["job_type"]);
 
   if($_POST["job_type"] == "3d_print"){
     //Inserts new job into 3d_print and and sets id, model (file) name, infill, scale, layer_height, supports, copies, user comments.
@@ -127,31 +152,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
 
-//Set job type string and link to FAQ page-->
-  $jobType = "";
-  $direct_link ="";
-  if (isset($_POST["job_type"])) {
-      switch ($_POST["job_type"]) {
-          case "laser_cut":
-              $jobType = "laser cut";
-              $direct_link ="https://onlineacademiccommunity.uvic.ca/dsc/how-to-laser-cut/";
-              break;
-          case "3d_print":
-              $jobType = "3d print";
-              $direct_link ="https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/";
-              break;
-          case "large_format_print":
-              $jobType = "large format print";
-              $direct_link = "https://onlineacademiccommunity.uvic.ca/dsc/tools-tech/large-format-printer-and-scanner/";
-              break;
-          default:
-              $jobType = "unknown";
-      }
-  }
-
-  include('general_partials/send_customer_email_partial.php');
-
-header("location: customer-dashboard.php");
+// header("location: customer-dashboard.php");
 }
 
 ?>
@@ -287,7 +288,7 @@ header("location: customer-dashboard.php");
           large_format_div.style.display = "none";
 
           allowedExtensions_3d_laser = ".stl, .svg, .obj, .pdf (Max 200M)";
-          allowedExtensions_large_format = ".stl, .svg, .pdf (Max 200M)";
+          allowedExtensions_large_format = ".svg, .pdf (Max 200M)";
 
           // Show the selected div
           switch(jobType) {
@@ -472,7 +473,7 @@ header("location: customer-dashboard.php");
       <script>
       document.getElementById('myFile').addEventListener('change', function() {
         var job_type = document.getElementById('large_format_print').checked ? "large_format" : "laser_3d" ;
-        var allowedExtensions = document.getElementById('large_format_print').checked ? ['stl', 'svg','pdf','STL', 'SVG', 'PDF'] : ['stl', 'svg', 'obj', 'pdf','STL', 'SVG', 'OBJ', 'PDF'];
+        var allowedExtensions = document.getElementById('large_format_print').checked ? ['svg','pdf', 'SVG', 'PDF'] : ['stl', 'svg', 'obj', 'pdf','STL', 'SVG', 'OBJ', 'PDF'];
         var fileName = this.value;
         var extension = fileName.split('.').pop().toLowerCase();
         var isValidFile = allowedExtensions.includes(extension);
