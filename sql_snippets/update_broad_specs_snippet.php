@@ -17,8 +17,9 @@
   $stmt->bindParam(':status', $new_status, PDO:: PARAM_STR);
   
 
-  $new_parent_id = $job['parent_job_id'];
-  if($_POST["status"] = "cancelled" && $job['parent_job_id']!=0){
+  $new_parent_id = $prev_parent_id;
+
+  if($_POST["status"] == "cancelled" && $job['parent_job_id']!=0){
     $new_parent_id = 0;
     include('remove_as_parent-snippet.php');
   }
@@ -50,7 +51,6 @@
       }
     }
   }
-
   $stmt->bindParam(':is_parent', $isParent, PDO:: PARAM_BOOL);
 
   /*
