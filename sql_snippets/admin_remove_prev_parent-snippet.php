@@ -5,22 +5,25 @@
 
 //still_parent is true if job had a parent previously and parent_job_id wasn't set to 0, false if wasn't previously
 $n_parent = false;
-$compare_linked = array_diff($linked_jobs, $checked_jobs);
+if(isset($_POST['checked_jobs']) && $_POST['checked_jobs'] && count($_POST['checked_jobs'])>0){
+    $checked_jobs = $_POST['checked_jobs'];
+    $compare_linked = array_diff($linked_jobs, $checked_jobs);
 
-forEach ($compare_linked as $linked) {
-    if($linked['parent_job_id']){
-        $n_parent = true;
-        break;
+    forEach ($compare_linked as $linked) {
+        if($linked['parent_job_id']){
+            $n_parent = true;
+            break;
+        }
+        else{$n_parent = false;}
     }
-    else{$n_parent = false;}
-}
 
-//check if unlink checkbox is visible and was checked
-if(!$n_parent){
+    //check if unlink checkbox is visible and was checked
+    if(!$n_parent){
+        $parent = $prev_parent_id;
+        $set_isParent = $conn->prepare("UPDATE web_job SET is_parent = FALSE WHERE id = {$parent}");
+        $set_isParent->execute();
 
-    $set_isParent = $conn->prepare("UPDATE web_job SET is_parent = FALSE WHERE id = :id");
-    $set_isParent->execute();
-
+    }
 }
 
 ?>
