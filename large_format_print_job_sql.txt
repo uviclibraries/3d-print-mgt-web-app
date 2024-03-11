@@ -1,9 +1,0 @@
-CREATE TABLE `large_format_print_job`(
-`large_format_print_id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
-`model_name` varchar(250) NOT NULL,
-`model_name_2` varchar(250) DEFAULT NULL,
-`copies` int(11) NOT NULL,
-`width_inches` float(7) NOT NULL,
-`length_inches` float(7) NOT NULL,
-`comments` text
-) DEFAULT CHARSET=utf8
