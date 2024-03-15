@@ -6,14 +6,12 @@ chdir("/usr/local/apache2/htdocs-webapp/3dprint/jobs_cron");
 
 require ('../db.php');
 
-// $jobTypes=['3d print', 'laser cut', 'large format print'];
-// $jobTypeTables=['3d_print_job', 'laser_cut_job', 'large_format_print_job'];
-// $jobTypeIDs=['3d_print_id', 'laser_cut_id', 'large_format_print_id'];
 
 //Can add job types to each array as new types are built in to webapp
-$jobTypes=['3d print', 'laser cut'];
-$jobTypeTables=['3d_print_job', 'laser_cut_job'];
-$jobTypeIDs=['3d_print_id', 'laser_cut_id'];
+$jobTypes=['3d print', 'laser cut', 'large format print'];
+$jobTypeTables=['3d_print_job', 'laser_cut_job', 'large_format_print_job'];
+$jobTypeIDs=['3d_print_id', 'laser_cut_id', 'large_format_print_id'];
+
 
 //One semester ago & one semester + 2 weeks ago.
 $today_120 = date('Ymd', strtotime("-120 days"));
