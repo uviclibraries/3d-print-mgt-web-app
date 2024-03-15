@@ -12,19 +12,17 @@
   $stmt->bindParam(':copies', $copies , PDO::PARAM_INT);
   
   $stmt->bindParam(':model_name_2', $modify_value);
+  
+  $new_parent_id = $prev_parent_id;
+  if($_POST["status"] == "cancelled" && $prev_parent_id!=0){
+    $new_parent_id = 0;
+  }
+
+  $stmt->bindParam(':parent_job_id', $new_parent_id, PDO:: PARAM_INT);
 
   $new_status = isset($_POST["status"]) ? $_POST["status"] : $job['status'];
   $stmt->bindParam(':status', $new_status, PDO:: PARAM_STR);
   
-
-  $new_parent_id = $prev_parent_id;
-
-  if($_POST["status"] == "cancelled" && $job['parent_job_id']!=0){
-    $new_parent_id = 0;
-    include('remove_as_parent-snippet.php');
-  }
-  $stmt->bindParam(':parent_job_id', $new_parent_id, PDO:: PARAM_INT);
-
 
   if($jobType == "laser cut" || $jobType == "3d print"){
     $stmt->bindParam(':material_type', $_POST["material_type"]);
@@ -32,11 +30,10 @@
     $stmt->bindParam(':duration', $duration , PDO::PARAM_INT);
   }
 
-  if(isset($_POST['checked_jobs']) && $_POST['checked_jobs'] && count($_POST['checked_jobs'])>0){
-
+  if(isset($_POST['checked_jobs']) && isset($_POST['checked_jobs']) && $_POST['checked_jobs'] && count($_POST['checked_jobs'])>0){
     //if job(s) was selected from within any <div class="user_jobs_container"> and 'set selected jobs as children' checkbox selected, change "is_parent" field val to true
-    if(isset($_POST['set-children-checkbox']) && $_POST['set-children-checkbox'] == 'set_children'){
-      $isParent = true;
+    if(isset($_POST['set-children-checkbox']) && $_POST['set-children-checkbox'] == 'set_children' && isset($_POST['checked_jobs']) && count($_POST['checked_jobs'])>0){
+      $isParent = 1;
     }
 
     //if job(s) was selected from within any <div class="user_jobs_container"> and 'unlink selected jobs as children' checkbox selected, loop through linked jobs and compare against checked jobs. if any remain whose parent id is the current job's id, change "is_parent" field val to true
