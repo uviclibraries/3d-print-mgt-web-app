@@ -97,6 +97,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   //Snippet checks if any related active user jobs have been selected, and updates those jobs' status to match the jobs status after save.
   include('sql_snippets/admin_update_multiple_status_snippet.php');
 
+  //Snippet to check if any remaining parents, resets parent to not parent if true
+  include('sql_snippets/admin_remove_prev_parent-snippet.php');
 
   //exit to dashboard after saving
   header("location: admin-dashboard.php");

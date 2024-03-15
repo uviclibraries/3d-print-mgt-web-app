@@ -95,19 +95,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   $stmt->execute();
 
-  //checks if the job was previously assigned a parent. If true, and if parent changed, loops through user_active_jobs to check if previous parent is still a parent of other jobs. If false, changes prev parent to is_parent=false.
-  include('sql_snippets/admin_remove_prev_parent-snippet.php');
-
   //Snippet checks if any related active user jobs have been selected, and updates those jobs' status to match the jobs status after save.
   include('sql_snippets/admin_update_multiple_status_snippet.php');
 
+  //Snippet to check if any remaining parents, resets parent to not parent if true
+  include('sql_snippets/admin_remove_prev_parent-snippet.php');
+
   //exit to dashboard after saving
-  header("location: admin-dashboard.php");
+  // header("location: admin-dashboard.php");
   }
 
   //sets status date and signer variables based on $job['status'] and $job_owner['name'] at time of page load.
   include('general_partials/declare_status_date.php');
-
 ?>
 
 <!doctype html>
