@@ -26,7 +26,7 @@
         </div>
       </div><!--Status-->
 
-<script>
+<!-- <script>
 window.addEventListener('load', function() {
     var statusSelect = document.getElementById('status-select');
     var lockedStatuses = ['cancelled', 'archived'];
@@ -34,4 +34,4 @@ window.addEventListener('load', function() {
         statusSelect.disabled = true; // Disable select if it has a "locked" status
     }
 });
-</script>
+</script> -->
