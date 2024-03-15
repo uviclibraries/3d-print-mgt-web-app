@@ -2,7 +2,9 @@
 //job hrefs in admin..-specification.php files
 
 // echo "linked jobs: ". count($linked_jobs) . " ; active user jobs: " . count($active_user_jobs);
-if(count($active_user_jobs) > 0){?>
+if(count($active_user_jobs) > 0){
+    $permit_link_statuses = array('submitted', 'pending payment', 'paid', 'on hold');
+?>
   <div class="col-md-12 order-md-1">
   
     <!-- <h4>Active Customer Jobs</h4> -->
@@ -27,13 +29,15 @@ if(count($active_user_jobs) > 0){?>
     <!-- <h4>Linked</h4> -->
     <p>These are the user's jobs that are financially linked to the job in this page. </p> 
     <div class="user_jobs_container">
-      <?php foreach ($linked_jobs as $linked_job) {
+      <?php 
+        foreach ($linked_jobs as $linked_job) {
         if($linked_job != $job) {
           $isChecked = $linked_job['status'] == 'submitted' || $linked_job['status'] == 'pending payment' ?'checked':'';
             $print_relationship = $linked_job['id'] == $job['parent_job_id'] ? 'PARENT: ' : ($linked_job['parent_job_id'] == $job['id']? 'CHILD: ':'');
             $job_pointer = $type_href . $linked_job["id"] . '">' . $linked_job["id"] . '</a>';
+            $unlinking_listener = in_array($linked_job['status'], $permit_link_statuses) && !$linked_job['is_parent'] && $print_relationship == 'CHILD: ' ? 'allow-unlinking' : 'prohibit-unlinking';
             echo '<div class="job-item">';
-            echo '<input type="checkbox" class ="job-checkbox" id="'. $linked_job['id'] . '" name="checked_jobs[]" value="' . $linked_job['id'] . '" ' . $isChecked . '>';                  
+            echo '<input type="checkbox" class ="job-checkbox prohibit-linking '. $unlinking_listener . '" id="'. $linked_job['id'] . '" name="checked_jobs[]" value="' . $linked_job['id'] . '" ' . $isChecked . '>';                  
             // Check if 'name' index is set
             if (isset($linked_job['name'])) {
                 echo " " . $print_relationship . $job_pointer  . ' - ' . $linked_job['name'];
@@ -57,18 +61,12 @@ if(count($active_user_jobs) > 0){?>
       if(!$job['is_parent']){?>
         
       <?php }
-
+      
     }
     else{ ?>
       <script>document.getElementById('Linked').style.display='block';</script>
-      <?php if($job['is_parent']){?>
-        <script>document.addEventListener("DOMContentLoaded", function() {document.getElementById("unlink-children-div").style.display='block'; });</script>
-      <?php }
-      // else{
-        // <script>document.getElementById("unlink-children-div").style.display='none'; </script> -->
-      // }
 
-    }?> 
+      <?php }?> 
   </div> <!--show "linked jobs" tab if there are linked jobs-->
 
 
@@ -82,8 +80,9 @@ if(count($active_user_jobs) > 0){?>
         if($active_job != $job && $active_job['status'] == 'submitted') {
           $submitted++;
             $job_pointer = $type_href . $active_job["id"] . '">' . $active_job["id"] . '</a>';
+            $linking_listener = !$active_job['is_parent'] ? 'allow-linking' : 'prohibit-linking';
             echo '<div class="job-item">';
-            echo '<input type="checkbox" class ="job-checkbox" id="'. $active_job['id'] . '" name="checked_jobs[]" value="' . $active_job['id'] . '">';                  
+            echo '<input type="checkbox" class ="job-checkbox ' . $linking_listener . ' prohibit-unlinking" id="'. $active_job['id'] . '" name="checked_jobs[]" value="' . $active_job['id'] . '">';                  
             // Check if 'name' index is set
             if (isset($active_job['name'])) {
                 echo " " . $job_pointer  . ' - ' . $active_job['name'];
@@ -115,8 +114,9 @@ if(count($active_user_jobs) > 0){?>
         if($active_job != $job && $active_job['status'] == 'pending payment') {
           $priced++;
             $job_pointer = $type_href . $active_job["id"] . '">' . $active_job["id"] . '</a>';
+            $linking_listener = !$active_job['is_parent'] && $active_job['parent_job_id'] == 0 && in_array($active_job['status'], $permit_link_statuses) ? 'allow-linking' : 'prohibit-linking';
             echo '<div class="job-item">';
-            echo '<input type="checkbox" class ="job-checkbox" id="'. $active_job['id'] . '" name="checked_jobs[]" value="' . $active_job['id'] . '">';                  
+            echo '<input type="checkbox" class ="job-checkbox ' . $linking_listener . ' prohibit-unlinking" id="'. $active_job['id'] . '" name="checked_jobs[]" value="' . $active_job['id'] . '">';                  
             // Check if 'name' index is set
             if (isset($active_job['name'])) {
                 echo " " . $job_pointer  . ' - ' . $active_job['name'];
@@ -148,8 +148,9 @@ if(count($active_user_jobs) > 0){?>
         if($active_job != $job && $active_job['status'] == 'paid') {
           $paid++;
             $job_pointer = $type_href . $active_job["id"] . '">' . $active_job["id"] . '</a>';
+            $linking_listener = !$active_job['is_parent'] ? 'allow-linking' : 'prohibit-linking';
             echo '<div class="job-item">';
-            echo '<input type="checkbox" class ="job-checkbox" id="'. $active_job['id'] . '" name="checked_jobs[]" value="' . $active_job['id'] . '">';                  
+            echo '<input type="checkbox" class ="job-checkbox ' . $linking_listener . ' prohibit-unlinking" id="'. $active_job['id'] . '" name="checked_jobs[]" value="' . $active_job['id'] . '">';                  
             // Check if 'name' index is set
             if (isset($active_job['name'])) {
                 echo " " . $job_pointer  . ' - ' . $active_job['name'];
@@ -182,8 +183,9 @@ if(count($active_user_jobs) > 0){?>
         if($active_job != $job && $active_job['status'] == 'printing') {
           $ip++;
             $job_pointer = $type_href . $active_job["id"] . '">' . $active_job["id"] . '</a>';
+
             echo '<div class="job-item">';
-            echo '<input type="checkbox" class ="job-checkbox" id="'. $active_job['id'] . '" name="checked_jobs[]" value="' . $active_job['id'] . '">';                  
+            echo '<input type="checkbox" class ="job-checkbox prohibit-linking prohibit-unlinking" id="'. $active_job['id'] . '" name="checked_jobs[]" value="' . $active_job['id'] . '">';                  
             // Check if 'name' index is set
             if (isset($active_job['name'])) {
                 echo " " . $job_pointer  . ' - ' . $active_job['name'];
@@ -214,7 +216,7 @@ if(count($active_user_jobs) > 0){?>
           $printed++;
             $job_pointer = $type_href . $active_job["id"] . '">' . $active_job["id"] . '</a>';
             echo '<div class="job-item">';
-            echo '<input type="checkbox" class ="job-checkbox" id="'. $active_job['id'] . '" name="checked_jobs[]" value="' . $active_job['id'] . '">';                  
+            echo '<input type="checkbox" class ="job-checkbox prohibit-linking prohibit-unlinking" id="'. $active_job['id'] . '" name="checked_jobs[]" value="' . $active_job['id'] . '">';                  
             // Check if 'name' index is set
             if (isset($active_job['name'])) {
                 echo " " . $job_pointer  . ' - ' . $active_job['name'];
@@ -243,8 +245,9 @@ if(count($active_user_jobs) > 0){?>
         if($active_job != $job && $active_job['status'] == 'on hold') {
           $hold++;
             $job_pointer = $type_href . $active_job["id"] . '">' . $active_job["id"] . '</a>';
+            $linking_listener = !$active_job['is_parent'] ? 'allow-linking' : 'prohibit-linking';
             echo '<div class="job-item">';
-            echo '<input type="checkbox" class ="job-checkbox" id="'. $active_job['id'] . '" name="checked_jobs[]" value="' . $active_job['id'] . '">';                  
+            echo '<input type="checkbox" class ="job-checkbox ' . $linking_listener . ' prohibit-unlinking" id="'. $active_job['id'] . '" name="checked_jobs[]" value="' . $active_job['id'] . '">';                  
             // Check if 'name' index is set
             if (isset($active_job['name'])) {
                 echo " " . $job_pointer  . ' - ' . $active_job['name'];
@@ -274,21 +277,25 @@ if(count($active_user_jobs) > 0){?>
       <label for="set-statuses-checkbox" style="margin-top:5px;margin-left: 10px;">Update statuses to match</label> 
     </div>
 
-    <?php $accepted_linking_statuses = array("submitted", "pending payment", "paid", "on hold");
-      if(($job['is_parent'] || ($job['parent_job_id'] == 0)) && in_array($job['status'], $accepted_linking_statuses)) {?>
-      <div class="col-md-4 mb-3">
+    <?php 
+      if(($job['is_parent'] || ($job['parent_job_id'] == 0)) && in_array($job['status'], $permit_link_statuses)) {?>
+      <div class="col-md-4 mb-3" id="link-children-div">
         <!--set to checkbox "Set selected as children"-->
         <input type="checkbox" id="set-children-checkbox" name="set-children-checkbox" value="set_children" style="margin-top:3px;">
         <label for="set-children-checkbox"style="margin-top:5px;">Set selected jobs as children</label> 
       </div>
-    <?php } ?>
+    <?php 
+    } ?>
 
   <?php } ?>
-    <div class="col-md-4 mb-3" id= "unlink-children-div" style="display:none;">
+  <?php 
+  if($linked_jobs && ($job['is_parent'] || ($job['parent_job_id'] == 0)) && in_array($job['status'], $permit_link_statuses)) {?>
+    <div class="col-md-4 mb-3" id="unlink-children-div">
       <!--set to checkbox "Unlink selected as children"-->
       <input type="checkbox" id="unlink-children-checkbox" name="unlink-children-checkbox" value="unlink_children" style="margin-top:3px;">
       <label for="unlink-children-checkbox" style="margin-top:5px;">Abandon selected jobs as children</label> 
     </div>
+  <?php } ?>
   </div> 
 </div>
 <?php } ?>
