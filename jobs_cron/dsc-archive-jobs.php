@@ -15,7 +15,7 @@ require ('../db.php');
 //set all of their `archived_date` values to date cron_job ran
 //set all of their `archived_signer` values to 'cron_job' to indicate it was automatically archived
 
-$stm1 = $conn->query("UPDATE web_job SET status = 'archived', archived_date = CURRENT_DATE, archived_signer = 'cron_job' WHERE netlink_id = 'chloefarr' AND status IN ('delivered','cancelled') AND (cancelled_date IS NOT NULL OR delivered_date IS NOT NULL) AND (cancelled_date < DATE_ADD(NOW(), INTERVAL -14 DAY) OR delivered_date < DATE_ADD(NOW(), INTERVAL -14 DAY) )");
+$stm1 = $conn->query("UPDATE web_job SET status = 'archived', archived_date = CURRENT_DATE, archived_signer = 'cron_job' WHERE status IN ('delivered','cancelled') AND (cancelled_date IS NOT NULL OR delivered_date IS NOT NULL) AND (cancelled_date < DATE_ADD(NOW(), INTERVAL -14 DAY) OR delivered_date < DATE_ADD(NOW(), INTERVAL -14 DAY) )");
 
 $stm1->execute();
 
