@@ -3,21 +3,23 @@
 $faq_href ="";
 $job_href ="";
 $library_href= "https://www.uvic.ca/library/";
+$test_domain = "https://devwebapp.library.uvic.ca/demo/3dwebapp/";
+$production_domain = "https://webapp.library.uvic.ca/3dprint/";
 switch($jobType){
   case ("3d print"):
     $faq_href = 'https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/';
-    $job_href = 'customer-3d-job-information?job_id=';
+    $job_href = 'customer-3d-job-information.php?job_id=';
     break;
   case("laser cut"):
     $faq_href = 'https://onlineacademiccommunity.uvic.ca/dsc/how-to-laser-cut/';
-    $job_href = 'customer-laser-job-information.php?job_id=';
+    $job_href = 'customer-laser-job-information.php.php?job_id=';
     break;
   case("large format print"):
     $faq_href = 'https://onlineacademiccommunity.uvic.ca/dsc/tools-tech/large-format-printer-and-scanner/';
-    $job_href = 'customer-large-format-print-job-information?job_id=';
+    $job_href = 'customer-large-format-print-job-information.php?job_id=';
     break;
 }
-$job_href = $job_href.$job['id'];
+$job_href = $production_domain.$job_href.$job['id'];
 
 $current_date = date("Y-m-d");
 $empty_date = '0000-00-00';
@@ -28,7 +30,7 @@ $userSQL->execute();
 $job_owner = $userSQL->fetch();
 
       
-  if ($_POST['status'] == "pending payment") {
+  if ($_POST['status'] == "pending payment" && $_POST["price"] > 0) {
     $d_priced = $current_date;
     $n_priced = $user;
     // $status_email = "pending payment";
