@@ -10,7 +10,8 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] != true) {
 	phpCAS::setDebug();
 	phpCAS::setVerbose(true);
 
-	phpCAS::client(CAS_VERSION_2_0, 'www.uvic.ca', 443, '/cas');
+	// phpCAS::client(CAS_VERSION_2_0, 'www.uvic.ca', 443, '/cas');
+	phpCAS::client(CAS_VERSION_2_0, 'www.uvic.ca', 443, '/cas', 'https://webapp2.library.uvic.ca');
 	phpCAS::setNoCasServerValidation();
 	phpCAS::forceAuthentication();
 

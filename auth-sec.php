@@ -20,7 +20,8 @@ if (isset($_REQUEST['logout'])) {
 	$_SESSION['loggedin'] = false;
 	session_unset();
 	session_destroy();
-	phpCAS::client(CAS_VERSION_2_0, 'www.uvic.ca', 443, '/cas');
+	// phpCAS::client(CAS_VERSION_2_0, 'www.uvic.ca', 443, '/cas');
+	phpCAS::client(CAS_VERSION_2_0, 'www.uvic.ca', 443, '/cas', 'https://webapp2.library.uvic.ca');
 	phpCAS::logout();
 }
 
