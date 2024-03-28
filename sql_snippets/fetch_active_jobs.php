@@ -45,7 +45,7 @@ $stm = $conn->prepare("SELECT web_job.id AS id, web_job.job_name AS name, web_jo
   }
 
 
-$stm = $conn->prepare("SELECT web_job.id AS id, web_job.job_name AS name, web_job.status AS status, web_job.parent_job_id AS parent_job_id , web_job.is_parent AS is_parent FROM web_job INNER JOIN $typeTableName ON id = $typeID WHERE 
+$stm = $conn->prepare("SELECT web_job.id AS id, web_job.job_name AS name, web_job.status AS status, web_job.parent_job_id AS parent_job_id , web_job.is_parent AS is_parent, netlink_id AS :netlink_id FROM web_job INNER JOIN $typeTableName ON id = $typeID WHERE 
   status NOT IN ('delivered', 'archived', 'cancelled') 
   AND id != {$job['id']}
   AND (
