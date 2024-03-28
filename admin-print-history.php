@@ -315,7 +315,7 @@ if (isset($_POST["getLargeFormatCSV"])) {
     <div class="row">
       <div class="container">
         <div class="py-5 px-5 text-left">
-          <h3 id="topOfPage">Archived &amp; Cancelled Jobs</h3>
+          <h3 id="topOfPage">Delivered, Archived &amp; Cancelled Jobs</h3>
            <br>
           <!--Search bar-->
           <div class="row">

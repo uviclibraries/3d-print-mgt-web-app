@@ -1,9 +1,8 @@
 3D Print Job Management Web Application
 
-This is a web appliction to manage the submission of 3D print job requests, 
-3D print job settings, online payment through a 3rd party credit card
-payment processor, and management of the administrative work flow from
+This is a web application to manage the submission of 3D print, laser cut, and large format print job requests, 
+3D print, laser cut, and large format print job settings, online payment through a 3rd party credit card payment processor, and management of the administrative work flow from
 start to finish.
 
-This project was sponsered by the Univrerstiy of Victoria Libraries
+This project was sponsored by the Univrersity of Victoria Libraries
 Digital Scholarship Commons https://uvic.ca/library/dsc

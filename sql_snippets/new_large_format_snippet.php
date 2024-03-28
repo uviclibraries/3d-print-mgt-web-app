@@ -6,7 +6,7 @@
     }
 
     $lengthInches =$_POST["length_input"];
-    $widthInches =$_POST["width_input"];
+    $widthInches = $_POST["width_input"];
     
 
     if($_POST["unit_measurement"] == 'cm'){
