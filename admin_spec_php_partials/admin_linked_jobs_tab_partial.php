@@ -305,15 +305,7 @@ if(count($active_user_jobs) > 0){
 <?php } ?>
 
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    <?php foreach ($active_statuses as $index => $isActive): ?>
-        if (<?php echo $isActive ? 'true' : 'false'; ?>) {
-            document.getElementById('<?php echo $tabs[$index]; ?>').click();
-        }
-    <?php endforeach; ?>
-});
-</script>
+
 
 
 <!-- Contains the javascript to show/hide empty tabs -->
