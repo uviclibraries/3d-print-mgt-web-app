@@ -8,7 +8,7 @@
         <label for="length_input">Length<span class="error"></span></label>
         <div class="input-group">
           <div class="input-group mb-3">
-            <input type="number" step="0.01" name="length_inches" class="form-control" value="<?php echo $job["length_inches"]; ?>" placeholder="100" aria-label="100" aria-describedby="basic-addon2" oninput="validateDimensions()" style="width: 200px;">
+            <input type="number" step="0.01" name="length_inches" class="form-control" value="<?php echo $job["length_inches"]; ?>" placeholder="Length" aria-label="100" aria-describedby="basic-addon2" oninput="validateDimensions()" style="width: 200px;">
         </div>
         <div class="invalid-feedback" style="width: 100%;">
         Please enter the desired length.

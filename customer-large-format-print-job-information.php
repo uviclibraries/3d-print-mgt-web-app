@@ -152,7 +152,7 @@ $type_href  = $type_href . 'customer-large-format-print-job-information.php?job_
             <label for="length">Length</label>
             <div class="input-group">
               <div class="input-group mb-3">
-                <input type="number" step="0.01" class="form-control" placeholder="100" value="<?php echo $job["height_inches"]; ?>" aria-label="100" aria-describedby="basic-addon2" readonly>
+                <input type="number" step="0.01" class="form-control" placeholder="Length" value="<?php echo $job["length_inches"]; ?>" aria-label="100" aria-describedby="basic-addon2" readonly>
                 <div class="input-group-append">
                 <span class="input-group-text" id="basic-addon2">in</span>
                 </div>
