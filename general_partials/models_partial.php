@@ -1,9 +1,9 @@
 <hr class="mb-6">
 <div class="col-md-12 order-md-1">
-  <h4 class="mb-3">Model Files</h4>
+  <h4 class="mb-3">Job Files</h4>
   <div class="row">
     <div class="col-md-4 mb-3">
-      <h5 class="mb-3">Original Model</h5>
+      <h5 class="mb-3">Original File</h5>
         <?php
         if (is_file(("uploads/" . $job['model_name']))) {
             ?>
@@ -11,7 +11,7 @@
             <a href="<?php echo "uploads/" . $job['model_name']; ?>" download="<?php
                 $filetype = explode(".", $job['model_name']);
                 echo $job['job_name'] . "." . $filetype[1]; ?>">
-                Download 3D file
+                Download File
             </a>
         <?php
         }
@@ -28,7 +28,7 @@
 
     <?php //checks if there is a modify file
     if ($job['model_name_2'] != NULL && is_file(("uploads/" . $job['model_name_2']))) { ?>
-      <a href="<?php echo "uploads/" . $job['model_name_2']; ?>" download>Download Modified 3D file</a>
+      <a href="<?php echo "uploads/" . $job['model_name_2']; ?>" download>Download Modified File</a>
     <?php } else { echo 'No modified file has been saved';}?>
     <br/>
       <small class="text-muted">(Upload new modified file - max 200MB)</small>

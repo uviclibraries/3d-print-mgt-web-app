@@ -215,7 +215,7 @@ header("location: customer-dashboard.php");
       </div>
       <hr class="mb-6">
 
-      <h3 class="mb-3">Upload Model or Graphic</h3>
+      <h3 class="mb-3">Upload File</h3>
       <small class="text-muted">Accepted file types: .stl, .svg, .obj, .pdf (Max 200M)</small>
       <br>    
 
