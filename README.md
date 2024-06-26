@@ -1,4 +1,4 @@
-# 3D Print Management Web App Project
+# 3D Print Management Web App Project 
 
 index.php
 Redirect to UVic Login page. Checks to see if user exists in current database else conducts LDAP lookup
