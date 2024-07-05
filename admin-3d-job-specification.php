@@ -34,7 +34,7 @@ $parent_href = $type_href.$job['parent_job_id'] . '"">' . $prev_parent_id . '</a
 
 //Displays a warning if the user has had 3d jobs done in the current semester totalling over 30 hours
 include('sql_snippets/3d_customer_duration_warning_snippet.php');
-$max_minutes = 140*60; //current max hours in a term (1/3 of the year) is 30 hours, or 30*60 minutes
+$max_minutes = 30*60; //current max hours in a term (1/3 of the year) is 30 hours, or 30*60 minutes
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   //used if modify is not updated.
@@ -86,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $n_delivered = $job['delivered_signer'];
   $n_cancelled = $job['cancelled_signer'];
   $n_hold = $job['hold_signer'];
-  $n_archived=$job['archived_signer'];
+  $n_archived=$job['archived_date'];
 
  //Sets job status update date, and admin who updated the status, and sends any relevant emails via '../general_partials/send_customer_email_partial.php'
   include('admin_spec_php_partials/admin_update_job_status_email_partial.php');

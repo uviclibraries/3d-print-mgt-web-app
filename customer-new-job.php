@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $current_date = date("Y-m-d");
   $good_statement = True;
   
-  //Inserts new job into web_job and and sets netlink id, job name, status=submitted, submission_date=today, job purpose, and if for academic purpose, course code and due date.
+  //Inserts new job into web_job and and sets netlink id, job name, status=submitted, submission_date=todat, job purpose, and if for academic purpose, course code and due date.
   include('sql_snippets/insert_new_webjob_snippet.php');
   
   //binds user to job

@@ -7,11 +7,10 @@ session_start();
 require_once 'CAS.php'; //required for uvic CASphp
 require ('db.php');			//required to access db
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] != true) {
-	phpCAS::setDebug();
+	//phpCAS::setDebug();
 	phpCAS::setVerbose(true);
 
-	// phpCAS::client(CAS_VERSION_2_0, 'www.uvic.ca', 443, '/cas');
-	phpCAS::client(CAS_VERSION_2_0, 'www.uvic.ca', 443, '/cas', 'https://webapp2.library.uvic.ca');
+	phpCAS::client(CAS_VERSION_2_0, 'www.uvic.ca', 443, '/cas', 'https://webapp.library.uvic.ca');
 	phpCAS::setNoCasServerValidation();
 	phpCAS::forceAuthentication();
 
