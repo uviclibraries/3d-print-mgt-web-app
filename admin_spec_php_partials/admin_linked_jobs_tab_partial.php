@@ -28,6 +28,25 @@ if(count($active_user_jobs) > 0){
   <div id="Linked" class="tabcontent">
     <!-- <h4>Linked</h4> -->
     <p>These are the user's jobs that are financially linked to the job in this page. </p> 
+    <button id="selectChildrenButton" onclick="selectChildren()" type="button">Select All Children</button>
+    <script>
+      function selectChildren() {
+        var checkboxes = document.querySelectorAll('#Linked .user_jobs_container .job-checkbox');
+        checkboxes.forEach(function(checkbox) {
+          checkbox.checked = true;
+        });
+      }
+
+      document.addEventListener('DOMContentLoaded', function() {
+        var jobItems = document.querySelectorAll('#Linked .user_jobs_container .job-item');
+        var shouldHideButton = Array.from(jobItems).some(function(item) {
+          return item.textContent.trim().startsWith('PARENT: ');
+        });
+        if (shouldHideButton) {
+          document.getElementById('selectChildrenButton').style.display = 'none';
+        }
+      });
+    </script>
     <div class="user_jobs_container">
       <?php 
         foreach ($linked_jobs as $linked_job) {

@@ -12,7 +12,7 @@ switch($jobType){
     break;
   case("laser cut"):
     $faq_href = 'https://onlineacademiccommunity.uvic.ca/dsc/how-to-laser-cut/';
-    $job_href = 'customer-laser-job-information.php?job_id=';
+    $job_href = 'customer-laser-job-information.php.php?job_id=';
     break;
   case("large format print"):
     $faq_href = 'https://onlineacademiccommunity.uvic.ca/dsc/tools-tech/large-format-printer-and-scanner/';
@@ -47,7 +47,7 @@ $job_owner = $userSQL->fetch();
         <p> Hello, ". $job_owner['name'] .". This is an automated email from the DSC. </p>
         <p> Your ".$jobType." job (".$job['job_name']. ") has been evaluated at a cost of $" . (number_format((float)$_POST["price"], 2, '.','')) . " </p>
         <p> Please make your payment <a href=". $job_href .">here</a> for it to be placed in our printing queue.</p>
-        <p>If you have any questions please review our <a href=". $faq_href .">FAQ</a> or email us at ".$dsc_email. ".</p>
+        <p>If you have any questions please review our <a href=". $faq_href .">FAQ</a> or email us at <a href='mailto:dscommons@uvic.ca'>dscommons@uvic.ca</a>.</p>
         </body>
         </html>";
         $headers = "MIME-Version: 1.0" . "\r\n";

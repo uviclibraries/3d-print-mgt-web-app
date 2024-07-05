@@ -24,9 +24,4 @@
       <!-- <small class="text-muted"> - Elaborate in Additional Comments section</small> -->
     </div>
   </div>
-    <!-- <div class="col-md-3 mb-3"> -->
-  <label for="drawing-description">Drawing Description</label>
-  <div class="input-group">
-    <textarea rows="5" cols="50" class="form-control" aria-label="drawing-description" readonly><?php echo $job["specifications"]; ?></textarea>
-  </div>
 </div>
