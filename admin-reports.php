@@ -200,6 +200,12 @@ if (isset($_POST["getCSV"])) {
 
   <br>
   <h3>Moneris Report: <?php echo date("Y/m/d-h:ia"); ?></h3>
+
+  <?php foreach ($all_users as $row) { // To get the total dollar amount for the resport
+    $sum += $row["charge_total"];
+    }
+  ?>
+
   <div class="row">
     <div class="col align-self-start">
     <p><?php echo $dateline . " Sum: "?><b><?php echo "$" . number_format((float)$sum, 2, '.',''); ?></b></p>
@@ -275,7 +281,6 @@ if (isset($_POST["getCSV"])) {
       </tbody>
     </table>
   </div>
-
 <hr class="mb-12">
 
 </div>
