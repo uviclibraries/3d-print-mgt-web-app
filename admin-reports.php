@@ -226,24 +226,13 @@ if (isset($_POST["getCSV"])) {
             <th>Full Name</th>
             <th>Date</th>
             <th>Time</th>
-            <th>Duration</th>
             <th>Message</th>
-            <th>TRXN Num</th>
             <th>Cardholder</th>
             <th>Charge</th>
             <th>Card</th>
-            <th>Bank Approval Code</th>
             <th>Bank Transaction ID</th>
-            <th>INVOICE</th>
-            <th>ISSCONF</th>
-            <th>ISSNAME</th>
-            <th>ISO Code</th>
-            <th>AVS Response Code</th>
-            <th>CAVV Result Code</th>
             <th>Response Code</th>
-            <th>Result</th>
-            <th>Trans Name</th>
-            <th>f4l4</th>
+            <th>ISO Code</th>
           </thread>
         </tr>
         <!------------------------------------------->
@@ -255,24 +244,13 @@ if (isset($_POST["getCSV"])) {
           <td><?php echo $row["full_name"]; ?></td>
           <td><?php echo $row["date_stamp"]; ?></td>
           <td><?php echo $row["time_stamp"]; ?></td>
-          <td><?php echo "0"; ?></td>
           <td><?php echo $row["message"]; ?></td>
-          <td><?php echo $row["txn_num"]; ?></td>
           <td><?php echo $row["cardholder"]; ?></td>
           <td><?php echo $row["charge_total"]; ?></td>
           <td><?php echo $row["card"]; ?></td>
-          <td><?php echo $row["bank_approval_code"]; ?></td>
           <td><?php echo $row["bank_transaction_id"]; ?></td>
-          <td><?php echo $row["INVOICE"]; ?></td>
-          <td><?php echo $row["ISSCONF"]; ?></td>
-          <td><?php echo $row["ISSNAME"]; ?></td>
-          <td><?php echo $row["iso_code"]; ?></td>
-          <td><?php echo $row["avs_response_code"]; ?></td>
-          <td><?php echo $row["cavv_result_code"]; ?></td>
           <td><?php echo $row["response_code"]; ?></td>
-          <td><?php echo $row["result"]; ?></td>
-          <td><?php echo $row["trans_name"]; ?></td>
-          <td><?php echo $row["f4l4"]; ?></td>
+          <td><?php echo $row["iso_code"]; ?></td>
         </tr>
         <?php
         }
