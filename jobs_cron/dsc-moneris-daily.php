@@ -11,10 +11,15 @@ $yesterday = date("Y-m-d", strtotime("-1 days"));
 $stm->bindParam(':yesterday_date', $yesterday, PDO::PARAM_STR);
 $stm->execute();
 $daily_results = $stm->fetchAll();
-// print("num transactions: ". count($daily_results).'<br>');
-$header = array("Order ID", "Netlink ID", "Full Name", "Date", "Time", "Message", "Transaction Num", "Cardholder", "Charge", "Card", "Bank Approval Code", "Bank Transaction ID", "INVOICE", "ISSCONF", "ISSNAME", "ISO Code", "AVS Response Code", "CAVV Result Code", "Response Code");
-$fix = array("Result", "Trans Name", "f4l4");
-$header = array_merge($header, $fix);
+
+// Debugging Code *************
+#print("num transactions: ". count($daily_results).'<br>');
+#exit;
+// **************
+
+$header = array("Order ID", "Netlink ID", "Full Name", "Date", "Time", "Message", "Cardholder", "Charge", "Card", "Bank Transaction ID", "ISO Code", "Response Code");
+//$fix = array("Result", "Trans Name", "f4l4");
+//$header = array_merge($header, $fix);
 
 $sum = 0;
 $direct_link = "https://webapp.library.uvic.ca/3dprint/admin-reports.php?approved=on&searchdate_start=". $yesterday ."&searchdate_end=". $yesterday;
@@ -49,22 +54,12 @@ foreach ($daily_results as $row) {
   <td>" . $row["date_stamp"] . "</td>
   <td>" . $row["time_stamp"] . "</td>
   <td>" . $row["message"] . "</td>
-  <td>" . $row["txn_num"] . "</td>
   <td>" . $row["cardholder"] . "</td>
   <td>" . $row["charge_total"] . "</td>
   <td>" . $row["card"] . "</td>
-  <td>" . $row["bank_approval_code"] . "</td>
   <td>" . $row["bank_transaction_id"] . "</td>
-  <td>" . $row["INVOICE"] . "</td>
-  <td>" . $row["ISSCONF"] . "</td>
-  <td>" . $row["ISSNAME"] . "</td>
   <td>" . $row["iso_code"] . "</td>
-  <td>" . $row["avs_response_code"] . "</td>
-  <td>" . $row["cavv_result_code"] . "</td>
   <td>" . $row["response_code"] . "</td>
-  <td>" . $row["result"] . "</td>
-  <td>" . $row["trans_name"] . "</td>
-  <td>" . $row["f4l4"] . "</td>
   </tr>";
   $sum += $row["charge_total"];
 }
@@ -79,6 +74,11 @@ $msg .= "
 </body>
 </html>";
 
+// Debugging code *************
+#print ($msg.'<br>');
+#exit;
+// ***************s
+
 $headers = "MIME-Version: 1.0" . "\r\n";
 $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
 $headers .= "From: dscommons@uvic.ca" . "\r\n";
@@ -88,9 +88,9 @@ $subject = $yesterday . " 3D print Moneris Report";
 $stm = $conn->query("SELECT email FROM users WHERE cron_report = 1 && user_type = 0");
 $cron_report_email = $stm->fetchAll();
 
-mail('chloefarr@uvic.ca',$subject,$msg,$headers);
+#mail('rmccue@uvic.ca',$subject,$msg,$headers);
 foreach ($cron_report_email as $admin) {
-  // print($admin['email'].'<br>');
+  #print($admin['email'].'<br>');
   mail($admin['email'],$subject,$msg,$headers);
 }
 

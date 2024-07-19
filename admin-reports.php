@@ -87,9 +87,9 @@ if (isset($_POST["getCSV"])) {
   header("Content-Disposition: attachment; filename=".$filename);
 
   $fp = fopen("php://output", "w");
-  $column = array("Order ID", "Netlink ID", "Full Name", "Date", "Duration", "Time", "Message", "Transaction Num", "Cardholder", "Charge", "Card", "Bank Approval Code", "Bank Transaction ID", "INVOICE", "ISSCONF", "ISSNAME", "ISO Code", "AVS Response Code", "CAVV Result Code",);
-  $fix = array("Response Code", "Result", "Trans Name", "f4l4");
-  $column = array_merge($column, $fix);
+  $column = array("Order ID", "Netlink ID", "Full Name", "Date", "Time", "Message", "Cardholder", "Charge", "Card", "Bank Transaction ID", "ISO Code", "Response Code");
+  #$fix = array("Response Code", "Result", "Trans Name", "f4l4");
+  #$column = array_merge($column, $fix);
   fputcsv($fp, $column);
   foreach ($all_users as $row) {
     fputcsv($fp, $row);

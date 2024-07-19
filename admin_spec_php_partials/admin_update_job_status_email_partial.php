@@ -12,7 +12,7 @@ switch($jobType){
     break;
   case("laser cut"):
     $faq_href = 'https://onlineacademiccommunity.uvic.ca/dsc/how-to-laser-cut/';
-    $job_href = 'customer-laser-job-information.php.php?job_id=';
+    $job_href = 'customer-laser-job-information.php?job_id=';
     break;
   case("large format print"):
     $faq_href = 'https://onlineacademiccommunity.uvic.ca/dsc/tools-tech/large-format-printer-and-scanner/';

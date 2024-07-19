@@ -20,7 +20,7 @@ $jobTypeIDs=['3d_print_id', 'laser_cut_id', 'large_format_print_id'];
 
 
 $faq_hrefs=['https://onlineacademiccommunity.uvic.ca/dsc/how-to-3d-print/', 'https://onlineacademiccommunity.uvic.ca/dsc/how-to-laser-cut/', 'https://onlineacademiccommunity.uvic.ca/dsc/tools-tech/large-format-printer-and-scanner/'];
-$job_hrefs=['../customer-3d-job-information?job_id=', '../customer-laser-job-information.php?job_id=', '../customer-large-format-print-job-information?job_id='];
+$job_hrefs=['../customer-3d-job-information.php?job_id=', '../customer-laser-job-information.php?job_id=', '../customer-large-format-print-job-information.php?job_id='];
 
 
 //FOR JOBS THAT HAVE BEEN LEFT UNPAID FOR 21+ DAYS    
