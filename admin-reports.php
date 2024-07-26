@@ -201,7 +201,7 @@ if (isset($_POST["getCSV"])) {
   <br>
   <h3>Moneris Report: <?php echo date("Y/m/d-h:ia"); ?></h3>
 
-  <?php foreach ($all_users as $row) { // To get the total dollar amount for the resport
+  <?php $sum = 0; foreach ($all_users as $row) { // To get the total dollar amount for the resport
     $sum += $row["charge_total"];
     }
   ?>
