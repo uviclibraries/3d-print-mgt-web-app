@@ -12,7 +12,7 @@ switch($jobType){
     break;
   case("laser cut"):
     $faq_href = 'https://onlineacademiccommunity.uvic.ca/dsc/how-to-laser-cut/';
-    $job_href = 'customer-laser-job-information.php?job_id=';
+    $job_href = 'customer-laser-job-information.php.php?job_id=';
     break;
   case("large format print"):
     $faq_href = 'https://onlineacademiccommunity.uvic.ca/dsc/tools-tech/large-format-printer-and-scanner/';
@@ -47,7 +47,7 @@ $job_owner = $userSQL->fetch();
         <p> Hello, ". $job_owner['name'] .". This is an automated email from the DSC. </p>
         <p> Your ".$jobType." job (".$job['job_name']. ") has been evaluated at a cost of $" . (number_format((float)$_POST["price"], 2, '.','')) . " </p>
         <p> Please make your payment <a href=". $job_href .">here</a> for it to be placed in our printing queue.</p>
-        <p>If you have any questions please review our <a href=". $faq_href .">FAQ</a> or email us at <a href='mailto:dscommons@uvic.ca'>dscommons@uvic.ca</a>.</p>
+        <p>If you have any questions please review our <a href=". $faq_href .">FAQ</a> or email us at ".$dsc_email. ".</p>
         </body>
         </html>";
         $headers = "MIME-Version: 1.0" . "\r\n";
@@ -86,23 +86,40 @@ $job_owner = $userSQL->fetch();
       // $status_email = "delivered";
       //email user
       if (isset($_POST['email_enabaled']) && $_POST['email_enabaled'] == "enabled") {
-        // include('../general_partials/send_customer_email_partial');
-        $msg = "
-        <html>
-        <head>
-        <title>HTML email</title>
-        </head>
-        <body>
-        <p>Hello, ". $job_owner['name'] .". This is an automated email from the DSC. </p>
-        <p> Your ".$jobType." job (".$job['job_name']. ") has been completed. You can pick it up from the front desk at the McPherson Library.</p>
-        <p>Please check up to date library hours by checking the library website <a href=". $library_href .">here</a></p>
-        </body>
-        </html>";
-        $headers = "MIME-Version: 1.0" . "\r\n";
-        $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-        $headers .= "From: dscommons@uvic.ca" .  "\r\n";
-        mail($job_owner['email'], "Your ".$jobType." is ready for collection",$msg,$headers);
-      }
+          if($jobType === "large format print"){// include('../general_partials/send_customer_email_partial');
+            $msg = "
+            <html>
+            <head>
+            <title>HTML email</title>
+            </head>
+            <body>
+            <p>Hello, ". $job_owner['name'] .". This is an automated email from the DSC. </p>
+            <p> Your ".$jobType." job (".$job['job_name']. ") has been completed. You can pick it up from the Digital Scholarship Commons between 9am-5pm, Monday - Friday.</p>
+            </body>
+            </html>";
+            $headers = "MIME-Version: 1.0" . "\r\n";
+            $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+            $headers .= "From: dscommons@uvic.ca" .  "\r\n";
+            mail($job_owner['email'], "Your ".$jobType." is ready for collection",$msg,$headers);
+          }
+          else{
+            $msg = "
+              <html>
+              <head>
+              <title>HTML email</title>
+              </head>
+              <body>
+              <p>Hello, ". $job_owner['name'] .". This is an automated email from the DSC. </p>
+              <p> Your ".$jobType." job (".$job['job_name']. ") has been completed. You can pick it up from the front desk at the McPherson Library.</p>
+              <p>Please check up to date library hours by checking the library website <a href=". $library_href .">here</a></p>
+              </body>
+              </html>";
+              $headers = "MIME-Version: 1.0" . "\r\n";
+              $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+              $headers .= "From: dscommons@uvic.ca" .  "\r\n";
+              mail($job_owner['email'], "Your ".$jobType." is ready for collection",$msg,$headers);
+          }
+        }
 
   } elseif($_POST['status'] == "on hold"){
     $d_hold = $current_date;
