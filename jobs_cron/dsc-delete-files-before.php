@@ -31,7 +31,7 @@ for ($type = 0; $type < count($jobTypes); $type++){
     {$table} 
   ON web_job.id = {$id_on_table} 
   WHERE web_job.status = 'archived' 
-  AND web_job.delivered_date < '$today_134' AND '$today_120'");
+  AND web_job.delivered_date < '$today_120'");
   $job_arh = $stm->fetchAll();
 
   // print(count($job_arh)."<br>");

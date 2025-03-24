@@ -32,7 +32,9 @@ if($statusEmail == "submitted"){
 	</head>
 	<body>
 	<p>Hello, ".$user_name.". This is an automated message from the DSC.</p>
-	<p>Thank you for submitting your ".$jobType." (".$job_name.") request to the DSC at McPherson Library. We will evaluate the cost of the ".$jobType." and you'll be notified by email when it is ready for payment. If you have any questions about the process or the status of your ".$jobType.", please review our <a href=". $faq_href .">FAQ</a> or email us at DSCommons@uvic.ca.</p>
+	<p>Thank you for submitting your ".$jobType." (".$job_name.") request to the DSC at the Mearns Centre - McPherson Library.</p>
+	<p>We will evaluate the cost of the ".$jobType." and you'll be notified by email when it is ready for payment.</p>
+	<p>If you have any questions about the process or the status of your ".$jobType.", please review our <a href=". $faq_href .">FAQ</a> or email us at <a href='mailto:dscommons@uvic.ca'>dscommons@uvic.ca</a>.</p>
 	</body>
 	</html>";
 	$headers = "MIME-Version: 1.0" . "\r\n";
